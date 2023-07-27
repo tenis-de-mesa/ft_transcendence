@@ -1,6 +1,6 @@
 all: up
 
-up:
+up: format
 	docker compose up --build
 
 down:
