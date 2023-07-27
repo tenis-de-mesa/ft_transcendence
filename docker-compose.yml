@@ -1,5 +1,5 @@
 services:
-  postgres:
+  db:
     image: "postgres:alpine"
     restart: "always"
     ports:
@@ -8,3 +8,10 @@ services:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+  backend:
+    build: ./backend
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
