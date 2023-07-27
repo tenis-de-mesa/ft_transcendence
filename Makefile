@@ -1,2 +1,7 @@
-all:
-	docker compose up
+all: up
+
+up:
+	docker compose up --build
+
+down:
+	docker compose down
