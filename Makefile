@@ -1,11 +1,11 @@
 all: up
 
-up: format
+up:
 	docker compose up --build
 
 down:
 	docker compose down
 
 format:
-	cd backend && pnpm format
-	cd frontend && pnpm format
+	docker compose run frontend pnpm format
+	docker compose run backend pnpm format
