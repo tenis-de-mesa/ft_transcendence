@@ -8,4 +8,4 @@ COPY . .
 
 RUN pnpm i
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "start:dev"]
