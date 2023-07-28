@@ -1,3 +1,5 @@
+include .env
+
 all: up 
 
 up: .env backend/node_modules frontend/node_modules
@@ -22,3 +24,10 @@ format:
 test:
 	docker compose run frontend pnpm test
 	docker compose run backend pnpm test
+
+backend-sh:
+	docker compose run backend sh
+
+db-console:
+	docker compose run db \
+		psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB}
