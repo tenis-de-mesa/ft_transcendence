@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: "postgres:alpine"
@@ -8,6 +10,8 @@ services:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    networks:
+      - internal
 
   backend:
     build: ./backend
@@ -17,6 +21,8 @@ services:
       - ./backend:/backend
     depends_on:
       - db
+    networks:
+      - internal
 
   frontend:
     build: ./frontend
@@ -26,3 +32,9 @@ services:
       - ./frontend:/frontend
     depends_on:
       - backend
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
