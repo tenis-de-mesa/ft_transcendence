@@ -18,3 +18,7 @@ down:
 format:
 	docker compose run frontend pnpm format
 	docker compose run backend pnpm format
+
+test:
+	docker compose run frontend pnpm test
+	docker compose run backend pnpm test
