@@ -4,11 +4,11 @@
 import { IsString, IsInt } from 'class-validator';
 
 export class CreateCatDto {
-    @IsString()
-    name: string;
+  @IsString()
+  name: string;
 
-    @IsInt()
-    age: number;
+  @IsInt()
+  age: number;
 
-    breed: string;
+  breed: string;
 }

@@ -28,5 +28,4 @@ export class CatsService {
   async delete(id: number): Promise<void> {
     await this.catsRepository.delete({ id });
   }
-
 }

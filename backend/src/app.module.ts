@@ -22,7 +22,7 @@ import { CatsModule } from './cats/cats.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    CatsModule
+    CatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -27,5 +27,5 @@ export class CatsController {
   @Delete(':id')
   async destroy(@Param('id') id: number): Promise<void> {
     this.catsService.delete(id);
-  }  
+  }
 }
