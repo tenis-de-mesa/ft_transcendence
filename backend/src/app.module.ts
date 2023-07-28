@@ -1,11 +1,13 @@
+// https://docs.nestjs.com/modules
+// https://docs.nestjs.com/techniques/database
+// https://typeorm.io/#quick-start
+
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-
-// https://docs.nestjs.com/techniques/database
-// https://typeorm.io/#quick-start
+import { CatsModule } from './cats/cats.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    CatsModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,3 +1,5 @@
+// https://docs.nestjs.com/techniques/database#repository-pattern
+
 import {
   Entity,
   Column,
