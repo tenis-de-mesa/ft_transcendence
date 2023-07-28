@@ -2,17 +2,21 @@ include .env
 
 all: up 
 
-up: .env backend/node_modules frontend/node_modules
+up: .env backend frontend
 	docker compose up
-
-backend/node_modules:
-	docker compose run backend pnpm install
-
-frontend/node_modules:
-	docker compose run frontend pnpm install
 
 down:
 	docker compose down
+
+build:
+	docker compose build
+
+backend:
+	cp .env backend/
+	docker compose run backend pnpm install
+
+frontend:
+	docker compose run frontend pnpm install
 
 .env:
 	cp .env.sample .env
