@@ -10,10 +10,10 @@ down:
 
 backend/node_modules:
 	cp .env backend/
-	docker compose run backend pnpm install
+	docker compose run backend pnpm install --frozen-lockfile
 
 frontend/node_modules:
-	docker compose run frontend pnpm install
+	docker compose run frontend pnpm install --frozen-lockfile
 
 .env:
 	cp .env.sample .env
