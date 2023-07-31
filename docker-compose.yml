@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: "postgres:alpine"
+    restart: "always"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    networks:
+      - internal
+
+  backend:
+    build: ./backend
+    ports:
+      - 3001:3001
+    volumes:
+      - ./backend:/backend
+    depends_on:
+      - db
+    networks:
+      - internal
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/frontend
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
