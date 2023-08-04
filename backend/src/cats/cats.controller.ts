@@ -1,6 +1,6 @@
 // https://docs.nestjs.com/controllers
 
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './cats.dto';
 import { Cat } from './cat.entity';
@@ -20,12 +20,19 @@ export class CatsController {
   }
 
   @Post()
-  async create(@Body() cat: CreateCatDto) {
-    this.catsService.save(cat);
+  async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
+    const createdCat = await this.catsService.save(createCatDto);
+    return createdCat;
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: number, @Body() updateCatDto: CreateCatDto): Promise<Cat> {
+    const updatedCat = await this.catsService.update(id, updateCatDto);
+    return updatedCat;
   }
 
   @Delete(':id')
-  async destroy(@Param('id') id: number): Promise<void> {
+  async destroy(@Param('id', ParseIntPipe) id: number): Promise<void> {
     this.catsService.delete(id);
   }
 }

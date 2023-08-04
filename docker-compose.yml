@@ -25,7 +25,6 @@ services:
       - internal
 
   frontend:
-    profiles: ["frontend"] # https://docs.docker.com/compose/profiles/
     build: ./frontend
     ports:
       - 3000:3000

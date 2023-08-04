@@ -2,8 +2,8 @@ include .env
 
 all: up 
 
-up: .env backend/node_modules
-	docker compose up --build
+up: .env backend/node_modules frontend/node_modules
+	docker compose up
 
 down:
 	docker compose down

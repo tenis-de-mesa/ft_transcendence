@@ -21,11 +21,21 @@ export class CatsService {
     return this.catsRepository.findOneBy({ id });
   }
 
-  async save(cat: CreateCatDto) {
-    this.catsRepository.save(cat);
+  async save(cat: CreateCatDto): Promise<Cat> {
+    const createdCat = await this.catsRepository.save(cat);
+    return createdCat;
+  }
+
+  async update(id: number, cat: CreateCatDto): Promise<Cat> {
+    await this.catsRepository.update({ id }, cat);
+    return this.find(id);
   }
 
   async delete(id: number): Promise<void> {
-    await this.catsRepository.delete({ id });
+    try {
+      await this.catsRepository.delete({ id });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
