@@ -1,6 +1,7 @@
-FROM node:lts-alpine
+FROM node:18-alpine
 
-RUN npm i -g pnpm
+# https://pnpm.io/installation#using-corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /backend
 

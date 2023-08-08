@@ -2,7 +2,7 @@ include .env
 
 all: up
 
-up: backend/.env backend/node_modules frontend/node_modules
+up: .env backend/.env backend/node_modules frontend/node_modules
 	docker compose up
 
 down:
