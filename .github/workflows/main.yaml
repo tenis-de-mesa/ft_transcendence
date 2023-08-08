@@ -49,6 +49,10 @@ jobs:
         working-directory: ./backend
         run: pnpm test
 
+      - name: test e2e
+        working-directory: ./backend
+        run: pnpm test:e2e
+
   frontend:
     needs: ["backend"]
     timeout-minutes: 5
