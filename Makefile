@@ -27,6 +27,7 @@ format:
 test:
 	docker compose run frontend pnpm test
 	docker compose run backend pnpm test
+	docker compose run backend pnpm test:e2e
 
 backend-sh:
 	docker compose run backend sh
