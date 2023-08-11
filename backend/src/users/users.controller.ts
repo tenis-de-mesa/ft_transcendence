@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthenticatedGuard } from '../auth/guards';
 
 @Controller('users')
@@ -7,8 +7,8 @@ export class UsersController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('me')
-  async getMe() {
+  async getMe(@Request() req: any) {
     console.log('UsersController::getMe()'); // TODO: Remove log line
-    return 'getMe()';
+    return req.user;
   }
 }
