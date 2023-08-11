@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
-import { User } from '../entities/user.entity';
+import { User } from '../core/entities/user.entity';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
