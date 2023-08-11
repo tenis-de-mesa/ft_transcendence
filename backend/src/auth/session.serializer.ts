@@ -20,7 +20,11 @@ export class SessionSerializer extends PassportSerializer {
     await this.usersService
       .getUserById(id)
       .then((user) => {
-        done(null, user);
+        if (!user) {
+          done(new NotFoundException(`User with ID '${id}' not found`), null);
+        } else {
+          done(null, user);
+        }
       })
       .catch((error) => {
         done(error, null);
