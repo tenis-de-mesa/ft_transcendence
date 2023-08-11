@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: 'secret', // TODO: Use environment variable
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     }),
