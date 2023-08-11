@@ -1,19 +1,21 @@
 include .env
 
-all: up 
+all: up
 
-up: .env backend/node_modules frontend/node_modules
+up: backend/.env backend/node_modules frontend/node_modules
 	docker compose up
 
 down:
 	docker compose down
 
 backend/node_modules:
-	cp .env backend/
 	docker compose run backend pnpm install --frozen-lockfile
 
 frontend/node_modules:
 	docker compose run frontend pnpm install --frozen-lockfile
+
+backend/.env: .env
+	cp .env backend/.env
 
 .env:
 	cp .env.sample .env
