@@ -9,8 +9,8 @@ import { IntraDto } from '../dto';
 export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   constructor(private readonly authService: AuthService) {
     super({
-      authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
-      tokenURL: 'https://api.intra.42.fr/oauth/token',
+      authorizationURL: process.env.INTRA_AUTH_URL,
+      tokenURL: process.env.INTRA_TOKEN_URL,
       clientID: process.env.INTRA_CLIENT_ID,
       clientSecret: process.env.INTRA_CLIENT_SECRET,
       callbackURL: process.env.BACKEND_HOSTNAME + '/auth/login',
