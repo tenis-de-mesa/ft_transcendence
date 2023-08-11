@@ -8,13 +8,11 @@ export class AuthController {
   @Get('login')
   @UseGuards(IntraAuthGuard)
   login(@Response() res: any): void {
-    console.log('AuthController::login()'); // TODO: Remove log line
     res.redirect('http://localhost:3001');
   }
 
   @Get('logout')
   logout(@Request() req: any) {
-    console.log('AuthController::logout()'); // TODO: Remove log line
     req.session.destroy(null);
     return { msg: 'The user session has ended' };
   }

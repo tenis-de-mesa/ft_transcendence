@@ -8,7 +8,6 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   @Get('me')
   async getMe(@Request() req: any) {
-    console.log('UsersController::getMe()'); // TODO: Remove log line
     return req.user;
   }
 }

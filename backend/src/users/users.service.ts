@@ -11,7 +11,6 @@ export class UsersService {
   ) {}
 
   async createUser(dto: IntraDto): Promise<User> {
-    console.log('UsersService::createUser()'); // TODO: Remove log line
     return await this.userRepository.save({
       id: dto.id,
       login: dto.login,
@@ -19,8 +18,6 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<User> {
-    console.log('UsersService::getUserById()'); // TODO: Remove log line
-
     return await this.userRepository.findOneBy({ id }).then((user) => {
       if (!user) throw new NotFoundException(`User with ID '${id}' not found`);
       return user;

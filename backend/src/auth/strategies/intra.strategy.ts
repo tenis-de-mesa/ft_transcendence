@@ -8,7 +8,6 @@ import { IntraDto } from '../dto';
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
   constructor(private readonly authService: AuthService) {
-    console.log('IntraStrategy::constructor()'); // TODO: Remove log line
     super({
       authorizationURL: 'https://api.intra.42.fr/oauth/authorize',
       tokenURL: 'https://api.intra.42.fr/oauth/token',
@@ -32,7 +31,6 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       login: response.data.login,
     };
 
-    console.log('IntraStrategy::validate()'); // TODO: Remove log line
     return this.authService.validateIntraUser(dto);
   }
 }
