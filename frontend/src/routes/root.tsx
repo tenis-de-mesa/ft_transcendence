@@ -1,19 +1,14 @@
 import { Link, useLoaderData, useOutlet } from "react-router-dom";
 
 export async function loader() {
-  const bearer = document.cookie.replace(
-    /(?:(?:^|.*;\s*)Bearer\s*\=\s*([^;]*).*$)|^.*$/,
-    "$1",
-  );
-  if (!bearer) return ({user: null});
   const response = await fetch(`${process.env.BACKEND_HOSTNAME}/users/me`, {
     method: "GET",
+    credentials: 'include',
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${bearer}`,
+        'Content-Type': 'application/json'
     },
   }).then((res) => res.json());
-  return ({user: response.intra_login});
+  return ({ user: response.login });
 }
 
 export default function Root() {
@@ -33,30 +28,29 @@ export default function Root() {
     <>
       <header style={headerStyle}>
         <Link to={"/"}>🐱 🐱 🐱</Link>
+        {user &&<span>{user}</span>}
         {user && <Link to={"logout"} role="button">Sair</Link>}
         {!user && <Link to={"login"} role="button">Login</Link>}
       </header>
       <div className="container">
-        {outlet || <Welcome name={user} />}
+        {outlet || <Home name={user} />}
       </div>
     </>
   );
 }
 
-function Welcome({ name }: { name?: string }) {
+function Home({ name }: { name?: string }) {
   const containerStyle: React.CSSProperties = {
     display: "inline-flex",
     justifyContent: "center",
     alignItems: "center",
     height: "100vh",
+    width: "100%",
   };
 
   return (
     <div style={containerStyle}>
-      <div>
-      <h1>ft_transcendence!</h1>
-      {name && <p>Welcome, {name}</p>}
-      </div>
+        <h1>ft_transcendence {name ? "🔓" : "🔐"}</h1>
     </div>
   );
 }

@@ -16,10 +16,6 @@ const router = createBrowserRouter([
         loader: loginLoader,
       },
       {
-        path: "login/callback",
-        loader: loginLoader,
-      },
-      {
         path: "logout",
         loader: logoutLoader,
       },

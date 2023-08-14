@@ -7,13 +7,14 @@ export class AuthController {
 
   @Get('login')
   @UseGuards(IntraAuthGuard)
-  login(@Response() res: any): void {
-    res.redirect('http://localhost:3001');
+  login(@Request() req: any, @Response() res: any): void {
+    res.redirect('back');
   }
 
   @Get('logout')
-  logout(@Request() req: any) {
-    req.session.destroy(null);
-    return { msg: 'The user session has ended' };
+  logout(@Request() req: any, @Response() res: any) {
+    req.session.destroy(function () {
+      res.clearCookie('connect.sid', {path: '/'}).redirect('back');
+    }); 
   }
 }
