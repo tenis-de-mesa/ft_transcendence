@@ -1,14 +1,19 @@
 import { Link, useLoaderData, useOutlet } from "react-router-dom";
 
 export async function loader() {
-  const response = await fetch(`${process.env.BACKEND_HOSTNAME}/users/me`, {
+  const response: Response = await fetch(`${process.env.BACKEND_HOSTNAME}/users/me`, {
     method: "GET",
-    credentials: 'include',
+    credentials: "include",
     headers: {
-        'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
-  return ({ user: response.login });
+  });
+  if (response.ok) {
+    const data = await response.json();
+    return { user: data.login };
+  } else {
+    return { user: null };
+  }
 }
 
 export default function Root() {
@@ -28,7 +33,7 @@ export default function Root() {
     <>
       <header style={headerStyle}>
         <Link to={"/"}>🐱 🐱 🐱</Link>
-        {user &&<span>{user}</span>}
+        {user && <span>{user}</span>}
         {user && <Link to={"logout"} role="button">Sair</Link>}
         {!user && <Link to={"login"} role="button">Login</Link>}
       </header>
@@ -50,7 +55,7 @@ function Home({ name }: { name?: string }) {
 
   return (
     <div style={containerStyle}>
-        <h1>ft_transcendence {name ? "🔓" : "🔐"}</h1>
+      <h1>ft_transcendence {name ? "🔓" : "🔐"}</h1>
     </div>
   );
 }

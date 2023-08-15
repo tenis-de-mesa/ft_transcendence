@@ -3,11 +3,9 @@ import { IntraAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {
-  // constructor(private readonly authService: AuthService) {}
-
   @Get('login')
   @UseGuards(IntraAuthGuard)
-  login(@Request() req: any, @Response() res: any): void {
+  login(@Response() res: any): void {
     res.redirect('back');
   }
 
