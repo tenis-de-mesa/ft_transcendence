@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class IntraDto {
-    @IsNotEmpty()
-    @IsNumber()
-    id: number;
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
 
-    @IsNotEmpty()
-    @IsString()
-    login: string;
+  @IsNotEmpty()
+  @IsString()
+  login: string;
 }

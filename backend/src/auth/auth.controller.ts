@@ -12,7 +12,7 @@ export class AuthController {
   @Get('logout')
   logout(@Request() req: any, @Response() res: any) {
     req.session.destroy(function () {
-      res.clearCookie('connect.sid', {path: '/'}).redirect('back');
-    }); 
+      res.clearCookie('connect.sid', { path: '/' }).redirect('back');
+    });
   }
 }

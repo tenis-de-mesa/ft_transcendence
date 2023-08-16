@@ -1,11 +1,11 @@
 // https://docs.nestjs.com/techniques/validation#auto-validation
 
-import * as session from "express-session";
-import * as passport from "passport";
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
-import { AppModule } from "./app.module";
-import { AxiosExceptionFilter } from "./filters/axios-exception-filter";
+import * as session from 'express-session';
+import * as passport from 'passport';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+import { AxiosExceptionFilter } from './filters/axios-exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
