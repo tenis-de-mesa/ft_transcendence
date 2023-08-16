@@ -1,10 +1,10 @@
 import { Link, useLoaderData, useOutlet } from "react-router-dom";
 import Home from "./home";
+import { NavLink } from "react-router-dom";
 
 export default function Root() {
   const outlet = useOutlet();
   const user = useLoaderData() as { id: number; login: string };
-
   const headerStyle: React.CSSProperties = {
     backgroundColor: "#a161d1",
     color: "white",
@@ -12,23 +12,17 @@ export default function Root() {
     textAlign: "center",
     display: "flex",
     justifyContent: "space-between",
-    fontSize: "2em",
+    fontSize: "1.5em",
   };
   return (
     <>
       <header style={headerStyle}>
-        <Link to={"/"}>🐱 🐱 🐱</Link>
+        <Link to={"/"} style={{ textDecoration: "none" }}>
+          🐱 🐱 🐱
+        </Link>
         {user && <span>{user.login}</span>}
-        {user && (
-          <Link to={"logout"} role="button">
-            Sair
-          </Link>
-        )}
-        {!user && (
-          <Link to={"login"} role="button">
-            Login
-          </Link>
-        )}
+        {user && <NavLink to={"logout"}>Sair</NavLink>}
+        {!user && <NavLink to={"login"}>Entrar</NavLink>}
       </header>
       <div className="container">{outlet || <Home user={user} />}</div>
     </>
