@@ -1,27 +1,9 @@
 import { Link, useLoaderData, useOutlet } from "react-router-dom";
-
-export async function loader() {
-  const response: Response = await fetch(
-    `${process.env.BACKEND_HOSTNAME}/users/me`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  if (response.ok) {
-    const data = await response.json();
-    return { user: data.login };
-  } else {
-    return { user: null };
-  }
-}
+import Home from "./home";
 
 export default function Root() {
   const outlet = useOutlet();
-  const { user } = useLoaderData() as { user: string };
+  const user = useLoaderData() as { id: number; login: string };
 
   const headerStyle: React.CSSProperties = {
     backgroundColor: "#a161d1",
@@ -36,7 +18,7 @@ export default function Root() {
     <>
       <header style={headerStyle}>
         <Link to={"/"}>🐱 🐱 🐱</Link>
-        {user && <span>{user}</span>}
+        {user && <span>{user.login}</span>}
         {user && (
           <Link to={"logout"} role="button">
             Sair
@@ -48,23 +30,7 @@ export default function Root() {
           </Link>
         )}
       </header>
-      <div className="container">{outlet || <Home name={user} />}</div>
+      <div className="container">{outlet || <Home user={user} />}</div>
     </>
-  );
-}
-
-function Home({ name }: { name?: string }) {
-  const containerStyle: React.CSSProperties = {
-    display: "inline-flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    width: "100%",
-  };
-
-  return (
-    <div style={containerStyle}>
-      <h1>ft_transcendence {name ? "🔓" : "🔐"}</h1>
-    </div>
   );
 }

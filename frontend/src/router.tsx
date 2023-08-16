@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import Root, { loader as RootLoader } from "./routes/root.tsx";
+import Root from "./routes/root.tsx";
+import rootLoader from "./routes/rootLoader.tsx";
 import { loader as loginLoader } from "./routes/login.tsx";
 import { loader as logoutLoader } from "./routes/logout.tsx";
 
@@ -9,7 +10,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    loader: RootLoader,
+    loader: rootLoader,
     children: [
       {
         path: "login",
