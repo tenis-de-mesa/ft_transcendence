@@ -16,7 +16,8 @@ Back-end
 Front-end
 
 - `React`: Most popular JS component library
-- `NextJS`: Oficial React suggestion, most popular framework
+- `ReactRouter`: Simple Router for React
+- `Vite`: Suggestion from the official website of React (bundler without framework)
 
 Database
 
