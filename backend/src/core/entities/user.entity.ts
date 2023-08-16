@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToMany, JoinTable } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
@@ -7,4 +7,16 @@ export class User {
 
   @Column()
   login: string;
+
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: "friends", // table name for the junction table of this relation
+    joinColumn: {
+      name: "user_id",
+    },
+    inverseJoinColumn: {
+      name: "friend_id",
+    },
+  })
+  friends: User[];
 }
