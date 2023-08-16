@@ -3,9 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthModule } from '../src/auth/auth.module';
 import * as request from 'supertest';
 import { UsersModule } from '../src/users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../src/core/entities/user.entity';
 import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
+import MockTypeOrmModule from './mocktypeorm.module';
 
 describe('OAuth in Intranet', () => {
   const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
@@ -20,18 +19,7 @@ describe('OAuth in Intranet', () => {
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        AuthModule,
-        UsersModule,
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [User],
-          dropSchema: true,
-          synchronize: true,
-          logging: false,
-        }),
-      ],
+      imports: [AuthModule, UsersModule, MockTypeOrmModule],
     })
       .overrideGuard(AuthenticatedGuard)
       .useValue(mock_Guard)
