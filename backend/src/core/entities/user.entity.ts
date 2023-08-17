@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import { FriendRequest } from 'src/friend_request/entities/friend_request.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -19,4 +20,10 @@ export class User {
     },
   })
   friends: User[];
+
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
+  friend_requests_received: FriendRequest[];
+
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
+  friend_requests_sent: FriendRequest[];
 }
