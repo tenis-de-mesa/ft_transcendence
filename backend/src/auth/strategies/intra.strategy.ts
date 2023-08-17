@@ -4,21 +4,25 @@ import { Injectable } from '@nestjs/common';
 import { Strategy } from 'passport-oauth2';
 import { AuthService } from '../auth.service';
 import { IntraDto } from '../dto';
+import { EnvironmentConfigService } from '../../config/env.service';
 
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: EnvironmentConfigService,
+  ) {
     super({
-      authorizationURL: process.env.INTRA_AUTH_URL,
-      tokenURL: process.env.INTRA_TOKEN_URL,
-      clientID: process.env.INTRA_CLIENT_ID,
-      clientSecret: process.env.INTRA_CLIENT_SECRET,
-      callbackURL: process.env.BACKEND_HOSTNAME + '/auth/login',
+      authorizationURL: config.getAuthURL(),
+      tokenURL: config.getTokenURL(),
+      clientID: config.getClientID(),
+      clientSecret: config.getClientSecret(),
+      callbackURL: config.getBackendHostname() + '/auth/login',
     });
   }
 
   async validate(token: string): Promise<any> {
-    const endpoint = process.env.INTRA_FETCH_URL;
+    const endpoint = this.config.getFetchURL();
 
     const response = await axios.get(endpoint, {
       headers: {
