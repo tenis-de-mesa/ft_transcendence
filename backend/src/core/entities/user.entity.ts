@@ -5,6 +5,12 @@ export class User {
   @PrimaryColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   login: string;
+
+  @Column({ default: false })
+  tfaEnabled: boolean;
+
+  @Column({ nullable: true })
+  tfaSecret: string;
 }
