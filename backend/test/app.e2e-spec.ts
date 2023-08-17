@@ -1,19 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { CanActivate, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import MockTypeOrmModule from './mocktypeorm.module';
+import { AppModule } from '../src/app.module';
+import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
 
 describe('AppController (e2e)', () => {
+  const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
+
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env = {
+      NODE_ENV: 'test',
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideModule(TypeOrmModule)
-      .useModule(MockTypeOrmModule)
+
+      .overrideGuard(AuthenticatedGuard)
+      .useValue(mock_Guard)
+      .overrideGuard(IntraAuthGuard)
+      .useValue(mock_Guard)
       .compile();
 
     app = moduleFixture.createNestApplication();
