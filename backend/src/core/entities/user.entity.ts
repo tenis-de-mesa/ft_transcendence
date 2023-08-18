@@ -18,7 +18,7 @@ export class User {
 
   @ManyToMany(() => User)
   @JoinTable({
-    name: 'friends', // table name for the junction table of this relation
+    name: 'friends',
     joinColumn: {
       name: 'user_id',
     },
