@@ -18,7 +18,10 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<User> {
-    return await this.userRepository.findOneBy({ id });
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: { friends: true },
+    });
   }
 
   // getallusers
