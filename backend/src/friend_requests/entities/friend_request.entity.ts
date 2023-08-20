@@ -6,11 +6,11 @@ export class FriendRequest {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => User, (user) => user.friend_requests_received)
+  @ManyToOne(() => User, (user) => user.friend_requests_received)
   @JoinColumn({ name: 'receiver_id' })
   receiver: User;
 
-  @ManyToOne((type) => User, (user) => user.friend_requests_sent)
+  @ManyToOne(() => User, (user) => user.friend_requests_sent)
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 }

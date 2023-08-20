@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from './entities/friend_request.entity';
-import { DeleteResult, Repository, Transaction } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { User } from 'src/core/entities/user.entity';
 
 // https://www.typescriptlang.org/docs/handbook/2/classes.html
