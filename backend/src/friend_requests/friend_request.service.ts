@@ -2,11 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from '../core/entities/friend_request.entity';
 import { DeleteResult, Repository } from 'typeorm';
-import { User } from 'src/core/entities/user.entity';
-
-// https://www.typescriptlang.org/docs/handbook/2/classes.html
-// https://docs.nestjs.com/providers#services
-// https://docs.nestjs.com/techniques/database
+import { User } from '../core/entities/user.entity'
 
 @Injectable()
 export class FriendRequestService {
