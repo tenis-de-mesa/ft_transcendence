@@ -6,7 +6,7 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
-import { FriendRequest } from 'src/friend_requests/entities/friend_request.entity';
+import { FriendRequest } from './friend_request.entity'
 
 @Entity({ name: 'users' })
 export class User {
