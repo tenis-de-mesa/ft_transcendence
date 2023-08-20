@@ -4,7 +4,7 @@ import { AuthModule } from '../src/auth/auth.module';
 import * as request from 'supertest';
 import { UsersModule } from '../src/users/users.module';
 import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
-import MockTypeOrmModule from './mocktypeorm.module';
+import { TypeOrmConfigModule } from '../src/config/typeorm-config.module';
 
 describe('OAuth in Intranet', () => {
   const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
@@ -13,13 +13,11 @@ describe('OAuth in Intranet', () => {
 
   beforeAll(async () => {
     process.env = {
-      INTRA_AUTH_URL: 'test',
-      INTRA_TOKEN_URL: 'test',
-      INTRA_CLIENT_ID: 'test',
+      NODE_ENV: 'test',
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule, UsersModule, MockTypeOrmModule],
+      imports: [AuthModule, UsersModule, TypeOrmConfigModule],
     })
       .overrideGuard(AuthenticatedGuard)
       .useValue(mock_Guard)

@@ -34,4 +34,4 @@ backend-sh:
 
 db-console:
 	docker compose run db \
-		psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+		psql -h db -U ${DATABASE_USER} -d ${DATABASE_NAME}
