@@ -20,4 +20,11 @@ export class UsersService {
   async getUserById(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id });
   }
+
+  async getUserFriends(id: number): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: { friends: true },
+    });
+  }
 }

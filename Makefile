@@ -32,6 +32,9 @@ test:
 backend-sh:
 	docker compose run backend sh
 
+frontend-sh:
+	docker compose run frontend sh
+
 db-console:
 	docker compose run db \
 		psql -h db -U ${DATABASE_USER} -d ${DATABASE_NAME}
