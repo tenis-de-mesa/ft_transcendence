@@ -21,10 +21,10 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async getUserFriends(id: number): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { id },
-      relations: { friends: true },
+  async getUserFriends(id: number): Promise<User[]> {
+    const user = await this.getUserById(id);
+    return await this.userRepository.find({
+      where: { friends: user },
     });
   }
 }
