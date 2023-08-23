@@ -10,9 +10,16 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AppConfigModule } from './config/app-config.module';
 import { TypeOrmConfigModule } from './config/typeorm-config.module';
+import { FriendRequestModule } from './friend_requests/friend_request.module';
 
 @Module({
-  imports: [AppConfigModule, TypeOrmConfigModule, UsersModule, AuthModule],
+  imports: [
+    AppConfigModule,
+    TypeOrmConfigModule,
+    UsersModule,
+    AuthModule,
+    FriendRequestModule,
+  ],
   controllers: [AppController, UsersController],
   providers: [AppService],
 })
