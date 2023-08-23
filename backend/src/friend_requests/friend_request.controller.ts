@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { FriendRequestService } from './friend_request.service';
 import { CreateFriendRequestDto } from './friend_request.dto';
-import { AuthenticatedGuard } from 'src/auth/guards';
-import { GetUser } from 'src/decorators/get-user.decorator';
-import { User } from 'src/core/entities/user.entity';
+import { AuthenticatedGuard } from '../auth/guards';
+import { GetUser } from '../decorators/get-user.decorator';
+import { User } from '../core/entities/user.entity';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('friend_requests')
