@@ -44,13 +44,13 @@ export class TfaService {
     await this.usersService.updateUser(user.id, dto);
   }
 
-  // FIXME: Testing purposes only
-  async tfaDisable() {
+  async tfaDisable(user: User) {
     const dto: UpdateUserDto = {
       tfaEnabled: false,
+      tfaSecret: null,
     };
 
-    await this.usersService.updateUser(105273, dto);
+    await this.usersService.updateUser(user.id, dto);
   }
 
   tfaIsCodeValid(user: User, tfaCode: string): boolean {
