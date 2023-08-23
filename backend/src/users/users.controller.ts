@@ -12,8 +12,9 @@ export class UsersController {
     return req.user;
   }
 
-  @Get(':id/friends')
-  async getUserFriends(@Param('id') id: number) {
-    return this.usersService.getUserFriends(id);
+  @Get('/friends')
+  async getUserFriends(@Request() req: any) {
+    const currentUser = req.user;
+    return this.usersService.getUserFriends(currentUser);
   }
 }

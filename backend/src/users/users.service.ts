@@ -21,8 +21,7 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async getUserFriends(id: number): Promise<User[]> {
-    const user = await this.getUserById(id);
+  async getUserFriends(user: User): Promise<User[]> {
     return await this.userRepository.find({
       where: { friends: user },
     });
