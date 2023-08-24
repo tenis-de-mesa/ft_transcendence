@@ -24,7 +24,7 @@ export default function Root() {
         {user && <NavLink to={"logout"}>Sair</NavLink>}
         {!user && <NavLink to={"login"}>Entrar</NavLink>}
       </header>
-      <div className="container">{outlet || <Home user={user} />}</div>
+      <main>{outlet || <Home user={user} />}</main>
     </>
   );
 }

@@ -18,7 +18,7 @@ export class UsersController {
     return this.usersService.getUserFriends(currentUser);
   }
 
-  @Get('/friends')
+  @Get('/')
   async index() {
     return this.usersService.findAll();
   }
