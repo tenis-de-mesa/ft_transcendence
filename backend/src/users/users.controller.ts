@@ -17,4 +17,9 @@ export class UsersController {
     const currentUser = req.user;
     return this.usersService.getUserFriends(currentUser);
   }
+
+  @Get('/friends')
+  async index() {
+    return this.usersService.findAll();
+  }
 }
