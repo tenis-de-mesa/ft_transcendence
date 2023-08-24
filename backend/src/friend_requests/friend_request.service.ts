@@ -16,6 +16,13 @@ export class FriendRequestService {
     return await this.friendRequestRepository.find();
   }
 
+  async receivedByUser(user: User): Promise<FriendRequest[]> {
+    return await this.friendRequestRepository.find({
+      where: { receiver: user },
+      relations: { sender: true, receiver: true },
+    });
+  }
+
   async find(id: number) {
     return await this.friendRequestRepository.findOne({
       where: { id: id },
@@ -46,10 +53,12 @@ export class FriendRequestService {
     if (!friendRequest) {
       throw new NotFoundException(`Friend request with ID ${id} not found`);
     }
+    // Add each user to the other's friends list
     friendRequest.sender.friends.push(friendRequest.receiver);
     friendRequest.receiver.friends.push(friendRequest.sender);
     await this.userRepository.save(friendRequest.sender);
     await this.userRepository.save(friendRequest.receiver);
+    // Delete the friend request
     await this.friendRequestRepository.delete(id);
   }
 
