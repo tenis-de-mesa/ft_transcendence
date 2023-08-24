@@ -59,4 +59,8 @@ export class TfaService {
       secret: user.tfaSecret,
     });
   }
+
+  tfaKillSessions(user: User, exceptIds: string[] = []) {
+    return this.usersService.killAllSessionsByUserId(user.id, exceptIds);
+  }
 }

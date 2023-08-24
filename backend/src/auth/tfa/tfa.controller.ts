@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Post,
   Req,
   Res,
@@ -34,6 +33,7 @@ export class TfaController {
     }
     await this.tfaService.tfaEnable(req.user as User);
     (req.session as any).tfaAuthenticated = true;
+    await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
   }
 
   @Post('disable')
@@ -42,6 +42,8 @@ export class TfaController {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
     await this.tfaService.tfaDisable(req.user as User);
+    (req.session as any).tfaAuthenticated = false;
+    await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
   }
 
   @Post('authenticate')
