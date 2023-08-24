@@ -15,6 +15,8 @@ export class User {
   @Column({ nullable: true })
   tfaSecret: string;
 
-  @OneToMany(() => Session, (session) => session.user)
+  @OneToMany(() => Session, (session) => session.user, {
+    eager: true,
+  })
   sessions: Session[];
 }

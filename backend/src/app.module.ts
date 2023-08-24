@@ -22,6 +22,7 @@ import { TfaModule } from './auth/tfa/tfa.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      subscribers: [__dirname + '/**/*.subscriber{.ts,.js}'],
       synchronize: true,
     }),
     UsersModule,
