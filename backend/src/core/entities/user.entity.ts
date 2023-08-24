@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { Session } from './session.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -13,4 +14,7 @@ export class User {
 
   @Column({ nullable: true })
   tfaSecret: string;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 }

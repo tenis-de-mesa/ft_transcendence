@@ -4,8 +4,11 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class Session implements ISession {
@@ -21,4 +24,8 @@ export class Session implements ISession {
 
   @DeleteDateColumn()
   destroyedAt?: Date;
+
+  @ManyToOne(() => User, (user) => user.sessions)
+  @JoinColumn({name: 'user_id'})
+  user: User;
 }
