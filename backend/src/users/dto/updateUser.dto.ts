@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -8,4 +8,8 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   tfaEnabled?: boolean;
+
+  @IsArray()
+  @IsOptional()
+  tfaRecoveryCodes?: string[];
 }

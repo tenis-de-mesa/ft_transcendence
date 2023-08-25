@@ -20,10 +20,9 @@ export class TfaController {
 
   @Post('generate')
   async tfaGenerateSecret(@Res() res: Response, @Req() req: Request) {
-    const { otpAuthUrl } = await this.tfaService.tfaGenerateSecret(
-      req.user as User,
-    );
-    return await this.tfaService.tfaGenerateQrCode(res, otpAuthUrl);
+    const auth = await this.tfaService.tfaGenerateSecret(req.user as User);
+    res.setHeader('Content-Type', 'image/png');
+    await this.tfaService.tfaGenerateQrCode(res, auth.otpAuthUrl);
   }
 
   @Post('enable')
@@ -48,9 +47,29 @@ export class TfaController {
 
   @Post('authenticate')
   async tfaAuthenticate(@Req() req: Request, @Body() dto: TfaDto) {
-    if (!this.tfaService.tfaIsCodeValid(req.user as User, dto.tfaCode)) {
+    const isCodeValid = !this.tfaService.tfaIsCodeValid(
+      req.user as User,
+      dto.tfaCode,
+    );
+
+    if (!isCodeValid) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
+
+    (req.session as any).tfaAuthenticated = true;
+  }
+
+  @Post('recover')
+  async tfaRecover(@Req() req: Request, @Body() dto: TfaDto) {
+    const isCodeValid = await this.tfaService.tfaIsRecoveryCodeValid(
+      req.user as User,
+      dto.tfaCode,
+    );
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Invalid two factor recovery code');
+    }
+
     (req.session as any).tfaAuthenticated = true;
   }
 }

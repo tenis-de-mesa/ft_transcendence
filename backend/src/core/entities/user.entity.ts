@@ -15,6 +15,12 @@ export class User {
   @Column({ nullable: true })
   tfaSecret: string;
 
+  @Column('varchar', {
+    array: true,
+    nullable: true,
+  })
+  tfaRecoveryCodes: string[];
+
   @OneToMany(() => Session, (session) => session.user, {
     eager: true,
   })
