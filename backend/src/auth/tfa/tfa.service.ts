@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import * as argon from 'argon2';
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
@@ -22,7 +23,7 @@ export class TfaService {
     );
 
     const dto: UpdateUserDto = {
-      tfaSecret: secret,
+      tfaSecret: await argon.hash(secret),
     };
 
     await this.usersService.updateUser(user.id, dto);
@@ -39,9 +40,13 @@ export class TfaService {
 
   async tfaEnable(user: User): Promise<string[]> {
     const recoveryCodes = this.tfaGenerateRecoveryCodes();
+    const hashedRecoveryCodes = await Promise.all(
+      recoveryCodes.map((code) => argon.hash(code)),
+    );
+
     const dto: UpdateUserDto = {
       tfaEnabled: true,
-      tfaRecoveryCodes: recoveryCodes,
+      tfaRecoveryCodes: hashedRecoveryCodes,
     };
 
     await this.usersService.updateUser(user.id, dto);
@@ -66,10 +71,14 @@ export class TfaService {
     });
   }
 
-  async tfaIsRecoveryCodeValid(u: User, tfaCode: string): Promise<boolean> {
-    const user = await this.usersService.getUserById(u.id);
+  async tfaIsRecoveryCodeValid(user: User, tfaCode: string): Promise<boolean> {
+    for (const code of user.tfaRecoveryCodes) {
+      if (await argon.verify(code, tfaCode)) {
+        return true;
+      }
+    }
 
-    return user.tfaRecoveryCodes.includes(tfaCode);
+    return false;
   }
 
   async tfaKillSessions(user: User, exceptIds: string[] = []): Promise<void> {
