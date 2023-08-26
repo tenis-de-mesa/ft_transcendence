@@ -30,9 +30,9 @@ export class TfaController {
     if (!this.tfaService.tfaIsCodeValid(req.user as User, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
-    await this.tfaService.tfaEnable(req.user as User);
     (req.session as any).tfaAuthenticated = true;
     await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
+    return await this.tfaService.tfaEnable(req.user as User);
   }
 
   @Post('disable')
@@ -40,9 +40,9 @@ export class TfaController {
     if (!this.tfaService.tfaIsCodeValid(req.user as User, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
-    await this.tfaService.tfaDisable(req.user as User);
     (req.session as any).tfaAuthenticated = false;
     await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
+    await this.tfaService.tfaDisable(req.user as User);
   }
 
   @Post('authenticate')

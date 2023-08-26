@@ -37,16 +37,19 @@ export class TfaService {
     await toFileStream(res, otpAuthUrl);
   }
 
-  async tfaEnable(user: User) {
+  async tfaEnable(user: User): Promise<string[]> {
+    const recoveryCodes = this.tfaGenerateRecoveryCodes();
     const dto: UpdateUserDto = {
       tfaEnabled: true,
-      tfaRecoveryCodes: this.tfaGenerateRecoveryCodes(),
+      tfaRecoveryCodes: recoveryCodes,
     };
 
     await this.usersService.updateUser(user.id, dto);
+
+    return recoveryCodes;
   }
 
-  async tfaDisable(user: User) {
+  async tfaDisable(user: User): Promise<void> {
     const dto: UpdateUserDto = {
       tfaEnabled: false,
       tfaSecret: null,
@@ -69,8 +72,8 @@ export class TfaService {
     return user.tfaRecoveryCodes.includes(tfaCode);
   }
 
-  async tfaKillSessions(user: User, exceptIds: string[] = []) {
-    return await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
+  async tfaKillSessions(user: User, exceptIds: string[] = []): Promise<void> {
+    await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 
   private tfaGenerateRecoveryCodes(): string[] {
