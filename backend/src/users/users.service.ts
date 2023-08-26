@@ -33,11 +33,11 @@ export class UsersService {
     userId: number,
     exceptIds: string[] = [],
   ): Promise<DeleteResult> {
-    const builder = this.sessionRepository
+    const query = this.sessionRepository
       .createQueryBuilder()
       .delete()
-      .from(Session);
-    const query = builder.where('user_id = :userId', { userId });
+      .from(Session)
+      .where('user_id = :userId', { userId });
 
     if (exceptIds.length > 0) {
       query.andWhere('id NOT IN (:...except)', { except: exceptIds });
