@@ -22,6 +22,7 @@ export class TfaController {
   async tfaGenerateSecret(@Res() res: Response, @Req() req: Request) {
     const auth = await this.tfaService.tfaGenerateSecret(req.user as User);
     res.setHeader('Content-Type', 'image/png');
+    console.log({ secret: auth.secret });
     await this.tfaService.tfaGenerateQrCode(res, auth.otpAuthUrl);
   }
 
@@ -47,7 +48,7 @@ export class TfaController {
 
   @Post('authenticate')
   async tfaAuthenticate(@Req() req: Request, @Body() dto: TfaDto) {
-    const isCodeValid = !this.tfaService.tfaIsCodeValid(
+    const isCodeValid = this.tfaService.tfaIsCodeValid(
       req.user as User,
       dto.tfaCode,
     );
@@ -75,7 +76,7 @@ export class TfaController {
 
   @Post('regenerate-recovery-codes')
   async tfaRegenerateRecoveryCodes(@Req() req: Request, @Body() dto: TfaDto) {
-    const isCodeValid = !this.tfaService.tfaIsCodeValid(
+    const isCodeValid = this.tfaService.tfaIsCodeValid(
       req.user as User,
       dto.tfaCode,
     );

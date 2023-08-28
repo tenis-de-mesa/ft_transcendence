@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
+import { FriendRequest } from './friend_request.entity';
+import { ApiHideProperty } from '@nestjs/swagger';
 import { Session } from '.';
 
 @Entity({ name: 'users' })
@@ -25,4 +34,25 @@ export class User {
     eager: true,
   })
   sessions: Session[];
+
+  @ApiHideProperty()
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: 'friends',
+    joinColumn: {
+      name: 'user_id',
+    },
+    inverseJoinColumn: {
+      name: 'friend_id',
+    },
+  })
+  friends: User[];
+
+  @ApiHideProperty()
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
+  friend_requests_received: FriendRequest[];
+
+  @ApiHideProperty()
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
+  friend_requests_sent: FriendRequest[];
 }

@@ -9,9 +9,15 @@ import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
 import { AxiosExceptionFilter } from './filters';
 import { Session } from './core/entities';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Swagger
+  const config = new DocumentBuilder().setTitle('API Docs').build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
   const sessionRepository = app.get(DataSource).getRepository(Session);
 
@@ -32,6 +38,7 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new AxiosExceptionFilter());
 

@@ -45,4 +45,17 @@ export class UsersService {
 
     return await query.execute();
   }
+
+  async getUserFriends(user: User): Promise<User[]> {
+    const _user = await this.userRepository.findOne({
+      where: {
+        id: user.id,
+      },
+      relations: {
+        friends: true,
+      },
+    });
+
+    return _user.friends;
+  }
 }
