@@ -3,7 +3,7 @@ import {
   EventSubscriber,
   InsertEvent,
 } from 'typeorm';
-import { Session } from '../core/entities';
+import { Session } from '../entities';
 
 @EventSubscriber()
 export class SessionSubscriber implements EntitySubscriberInterface<Session> {
