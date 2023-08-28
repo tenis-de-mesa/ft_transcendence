@@ -8,7 +8,7 @@ import {
   ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '.';
 
 @Entity()
 export class Session implements ISession {
@@ -26,8 +26,8 @@ export class Session implements ISession {
   destroyedAt?: Date;
 
   @Column({nullable: true})
-  user_id: number; 
-  
+  user_id: number;
+
   @ManyToOne(() => User, (user) => user.sessions)
   @JoinColumn({name: 'user_id'})
   user: User;

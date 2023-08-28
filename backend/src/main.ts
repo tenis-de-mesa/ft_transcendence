@@ -7,7 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
-import { AxiosExceptionFilter } from './filters/axios-exception-filter';
+import { AxiosExceptionFilter } from './filters';
 import { Session } from './core/entities';
 
 async function bootstrap() {
@@ -23,7 +23,7 @@ async function bootstrap() {
       store: new TypeormStore().connect(sessionRepository),
       cookie: {
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      }
+      },
     }),
   );
   app.use(passport.initialize());

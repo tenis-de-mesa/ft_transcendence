@@ -1,5 +1,5 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../src/core/entities/user.entity';
+import { User } from '../src/core/entities';
 
 export default TypeOrmModule.forRoot({
   type: 'sqlite',
