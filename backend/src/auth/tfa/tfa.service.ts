@@ -39,14 +39,10 @@ export class TfaService {
   }
 
   async tfaEnable(user: User): Promise<string[]> {
-    const recoveryCodes = this.tfaGenerateRecoveryCodes();
-    const hashedRecoveryCodes = await Promise.all(
-      recoveryCodes.map((code) => argon.hash(code)),
-    );
+    const recoveryCodes = await this.tfaGenerateRecoveryCodes(user);
 
     const dto: UpdateUserDto = {
       tfaEnabled: true,
-      tfaRecoveryCodes: hashedRecoveryCodes,
     };
 
     await this.usersService.updateUser(user.id, dto);
@@ -85,12 +81,21 @@ export class TfaService {
     await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 
-  private tfaGenerateRecoveryCodes(): string[] {
+  async tfaGenerateRecoveryCodes(user: User): Promise<string[]> {
+    // TODO: Maybe extract hard coded values into constants
     const recoveryCodes = Array(12)
       .fill(0)
       .map(() => crypto.randomBytes(32).toString('hex').slice(0, 12));
 
-    // TODO: Maybe extract hard coded values into constants
+    const hashedRecoveryCodes = await Promise.all(
+      recoveryCodes.map((code) => argon.hash(code)),
+    );
+
+    const dto: UpdateUserDto = {
+      tfaRecoveryCodes: hashedRecoveryCodes,
+    };
+
+    await this.usersService.updateUser(user.id, dto);
 
     return recoveryCodes;
   }

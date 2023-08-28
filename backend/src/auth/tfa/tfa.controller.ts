@@ -72,4 +72,18 @@ export class TfaController {
 
     (req.session as any).tfaAuthenticated = true;
   }
+
+  @Post('regenerate-recovery-codes')
+  async tfaRegenerateRecoveryCodes(@Req() req: Request, @Body() dto: TfaDto) {
+    const isCodeValid = !this.tfaService.tfaIsCodeValid(
+      req.user as User,
+      dto.tfaCode,
+    );
+
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Invalid two factor authentication code');
+    }
+
+    return await this.tfaService.tfaGenerateRecoveryCodes(req.user as User);
+  }
 }
