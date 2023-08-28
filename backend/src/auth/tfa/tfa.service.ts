@@ -23,7 +23,7 @@ export class TfaService {
     );
 
     const dto: UpdateUserDto = {
-      tfaSecret: await argon.hash(secret),
+      tfaSecret: secret,
     };
 
     await this.usersService.updateUser(user.id, dto);
