@@ -23,7 +23,7 @@ export class TfaService {
     );
 
     const dto: UpdateUserDto = {
-      tfaSecret: secret,
+      tfaSecret: this.tfaEncrypt(secret, process.env.TFA_SECRET_KEY),
     };
 
     await this.usersService.updateUser(user.id, dto);
@@ -67,7 +67,7 @@ export class TfaService {
   tfaIsCodeValid(user: User, tfaCode: string): boolean {
     return authenticator.verify({
       token: tfaCode,
-      secret: user.tfaSecret,
+      secret: this.tfaDecrypt(user.tfaSecret, process.env.TFA_SECRET_KEY),
     });
   }
 
@@ -93,5 +93,31 @@ export class TfaService {
     // TODO: Maybe extract hard coded values into constants
 
     return recoveryCodes;
+  }
+
+  private tfaEncrypt(toEncrypt: string, secret: string): string {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(
+      'aes-256-cbc',
+      Buffer.from(secret),
+      iv,
+    );
+    let encrypted = cipher.update(toEncrypt, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return iv.toString('hex') + ':' + encrypted;
+  }
+
+  private tfaDecrypt(toDecrypt: string, secret: string): string {
+    const textParts = toDecrypt.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedData = textParts.join(':');
+    const decipher = crypto.createDecipheriv(
+      'aes-256-cbc',
+      Buffer.from(secret),
+      iv,
+    );
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
   }
 }
