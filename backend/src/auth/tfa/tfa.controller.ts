@@ -13,7 +13,7 @@ import { AuthenticatedGuard } from '../guards';
 import { TfaService } from './tfa.service';
 import { TfaDto } from '../dto';
 
-@Controller('tfa')
+@Controller('auth/tfa')
 @UseGuards(AuthenticatedGuard)
 export class TfaController {
   constructor(private readonly tfaService: TfaService) {}

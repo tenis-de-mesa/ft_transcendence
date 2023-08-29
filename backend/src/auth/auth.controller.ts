@@ -7,7 +7,7 @@ import { Request, Response } from 'express';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('login')
+  @Get('login/intra')
   @UseGuards(IntraAuthGuard)
   login(@Res() res: Response): void {
     res.redirect('back');
