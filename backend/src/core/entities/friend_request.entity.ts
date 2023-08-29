@@ -1,4 +1,4 @@
-import { User } from  './user.entity';
+import { User } from '.';
 import { Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'friend_requests' })

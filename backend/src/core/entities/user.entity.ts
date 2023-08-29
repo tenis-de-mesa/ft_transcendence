@@ -6,9 +6,8 @@ import {
   JoinTable,
   OneToMany,
 } from 'typeorm';
-import { FriendRequest } from './friend_request.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { Session } from '.';
+import { Session, FriendRequest } from '.';
 
 @Entity({ name: 'users' })
 export class User {
@@ -30,9 +29,7 @@ export class User {
   })
   tfaRecoveryCodes: string[];
 
-  @OneToMany(() => Session, (session) => session.user, {
-    eager: true,
-  })
+  @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
   @ApiHideProperty()
