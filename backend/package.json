@@ -30,8 +30,10 @@
     "@nestjs/mapped-types": "^2.0.2",
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.1.2",
+    "@nestjs/platform-socket.io": "^10.2.2",
     "@nestjs/swagger": "^7.1.8",
     "@nestjs/typeorm": "^10.0.0",
+    "@nestjs/websockets": "^10.2.2",
     "@types/express-session": "^1.17.7",
     "@types/passport": "^1.0.12",
     "axios": "^1.4.0",
@@ -43,6 +45,7 @@
     "pg": "^8.11.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.7.2",
     "typeorm": "^0.3.17"
   },
   "devDependencies": {
