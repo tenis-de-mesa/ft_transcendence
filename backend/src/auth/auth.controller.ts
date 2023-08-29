@@ -1,16 +1,20 @@
-import { Controller, Get, Request, Response, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { IntraAuthGuard } from './guards';
+import { AuthService } from './auth.service';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @Get('login')
   @UseGuards(IntraAuthGuard)
-  login(@Response() res: any): void {
+  login(@Res() res: Response): void {
     res.redirect('back');
   }
 
   @Get('logout')
-  logout(@Request() req: any, @Response() res: any) {
+  logout(@Req() req: Request, @Res() res: Response) {
     req.session.destroy(function () {
       res.clearCookie('connect.sid', { path: '/' }).redirect('back');
     });

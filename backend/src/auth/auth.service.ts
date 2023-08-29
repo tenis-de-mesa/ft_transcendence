@@ -4,7 +4,7 @@ import { IntraDto } from './dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   async validateIntraUser(dto: IntraDto): Promise<any> {
     let user = await this.usersService.getUserById(dto.id);

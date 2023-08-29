@@ -7,6 +7,7 @@ export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
 ): TypeOrmModuleOptions => {
   const entities = [__dirname + '/../**/*.entity{.ts,.js}'];
+  const subscribers = [__dirname + '/../**/*.subscriber{.ts,.js}'];
 
   if (config.getNodeEnv() == 'test') {
     return {
@@ -27,8 +28,9 @@ export const getTypeOrmModuleOptions = (
     password: config.getDatabasePassword(),
     database: config.getDatabaseName(),
     entities,
+    subscribers,
     synchronize: true,
-    logging: true,
+    // logging: true,
   };
 };
 

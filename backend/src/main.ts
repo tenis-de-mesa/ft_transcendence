@@ -4,8 +4,11 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
-import { AxiosExceptionFilter } from './filters/axios-exception-filter';
+import { AxiosExceptionFilter } from './filters';
+import { Session } from './core/entities';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -16,11 +19,17 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
+  const sessionRepository = app.get(DataSource).getRepository(Session);
+
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
+      store: new TypeormStore().connect(sessionRepository),
+      cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      },
     }),
   );
   app.use(passport.initialize());
@@ -29,6 +38,7 @@ async function bootstrap() {
     origin: true,
     credentials: true,
   });
+
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new AxiosExceptionFilter());
 

@@ -5,9 +5,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { TfaModule } from './auth/tfa/tfa.module';
 import { AppConfigModule } from './config/app-config.module';
 import { TypeOrmConfigModule } from './config/typeorm-config.module';
 import { FriendRequestModule } from './friend_requests/friend_request.module';
@@ -19,10 +19,11 @@ import { StatusModule } from './status/status.module';
     TypeOrmConfigModule,
     UsersModule,
     AuthModule,
+    TfaModule,
     FriendRequestModule,
     StatusModule,
   ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

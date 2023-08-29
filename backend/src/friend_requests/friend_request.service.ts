@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendRequest } from '../core/entities/friend_request.entity';
 import { DeleteResult, Repository } from 'typeorm';
-import { User } from '../core/entities/user.entity'
+import { User } from '../core/entities/user.entity';
 
 @Injectable()
 export class FriendRequestService {
@@ -18,7 +18,11 @@ export class FriendRequestService {
 
   async receivedByUser(user: User): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find({
-      where: { receiver: user },
+      where: {
+        receiver: {
+          id: user.id,
+        },
+      },
       relations: { sender: true, receiver: true },
     });
   }

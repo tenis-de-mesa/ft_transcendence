@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FriendRequestService } from './friend_request.service';
-import { CreateFriendRequestDto } from './friend_request.dto';
+import { CreateFriendRequestDto } from './dto';
 import { AuthenticatedGuard } from '../auth/guards';
-import { GetUser } from '../decorators/get-user.decorator';
+import { GetUser } from '../core/decorators';
 import { User } from '../core/entities/user.entity';
 
 @UseGuards(AuthenticatedGuard)
@@ -24,7 +24,7 @@ export class FriendRequestController {
   async index(@GetUser() user: User) {
     return await this.friendRequestService.receivedByUser(user);
   }
-  
+
   @Post()
   create(@Body() body: CreateFriendRequestDto, @GetUser() user: User) {
     return this.friendRequestService.save(user.id, body.receiver_id);
