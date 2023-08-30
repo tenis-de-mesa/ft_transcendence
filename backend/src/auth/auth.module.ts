@@ -3,7 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-import { IntraStrategy } from './strategies/intra.strategy';
+import { IntraStrategy, GuestStrategy } from './strategies';
 import { SessionSerializer } from './session.serializer';
 import { AppConfigModule } from '../config/app-config.module';
 
@@ -14,6 +14,6 @@ import { AppConfigModule } from '../config/app-config.module';
     PassportModule.register({ session: true }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, IntraStrategy, SessionSerializer],
+  providers: [AuthService, IntraStrategy, GuestStrategy, SessionSerializer],
 })
 export class AuthModule {}

@@ -1,5 +1,5 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
-import { IntraAuthGuard } from './guards';
+import { GuestGuard, IntraAuthGuard } from './guards';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 
@@ -9,7 +9,13 @@ export class AuthController {
 
   @Get('login/intra')
   @UseGuards(IntraAuthGuard)
-  async login(@Res() res: Response): Promise<void> {
+  async loginAsIntra(@Res() res: Response): Promise<void> {
+    res.redirect('back');
+  }
+
+  @Get('login/guest')
+  @UseGuards(GuestGuard)
+  async loginAsGuest(@Res() res: Response): Promise<void> {
     res.redirect('back');
   }
 

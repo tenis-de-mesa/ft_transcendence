@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class IntraAuthGuard extends AuthGuard('intra') {
+export class GuestGuard extends AuthGuard('guest') {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     if (request.isAuthenticated()) return true;
