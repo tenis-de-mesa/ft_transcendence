@@ -9,7 +9,7 @@ export class AuthController {
 
   @Get('login/intra')
   @UseGuards(IntraAuthGuard)
-  login(@Res() res: Response): void {
+  async login(@Res() res: Response): Promise<void> {
     res.redirect('back');
   }
 

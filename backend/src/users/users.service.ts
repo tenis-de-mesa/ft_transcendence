@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { IntraDto } from '../auth/dto';
-import { UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import { User, Session } from '../core/entities';
 
 @Injectable()
@@ -14,19 +13,27 @@ export class UsersService {
     private readonly sessionRepository: Repository<Session>,
   ) {}
 
-  async createUser(dto: IntraDto): Promise<User> {
-    return await this.userRepository.save({
-      id: dto.id,
-      login: dto.login,
-    });
+  async createUser(dto: CreateUserDto): Promise<User> {
+    return await this.userRepository.save({ ...dto });
   }
 
   async getUserById(id: number): Promise<User> {
-    return await this.userRepository.findOneBy({ id });
+    return await this.userRepository.findOneBy({ id: id });
+  }
+
+  async getUserByIntraId(id: number): Promise<User> {
+    return await this.userRepository.findOneBy({ intraId: id });
   }
 
   async updateUser(id: number, dto: UpdateUserDto): Promise<UpdateResult> {
     return await this.userRepository.update(id, { ...dto });
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await Promise.all([
+      this.killAllSessionsByUserId(id),
+      this.userRepository.delete(id),
+    ]);
   }
 
   async killAllSessionsByUserId(
@@ -37,7 +44,7 @@ export class UsersService {
       .createQueryBuilder()
       .delete()
       .from(Session)
-      .where('user_id = :userId', { userId });
+      .where('userId = :userId', { userId });
 
     if (exceptIds.length > 0) {
       query.andWhere('id NOT IN (:...except)', { except: exceptIds });

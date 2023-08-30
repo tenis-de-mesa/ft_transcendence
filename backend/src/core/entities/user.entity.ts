@@ -1,21 +1,39 @@
 import {
   Entity,
   Column,
-  PrimaryColumn,
   ManyToMany,
   JoinTable,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Session, FriendRequest } from '.';
 
+export enum AuthProvider {
+  INTRA = 'intra',
+  GUEST = 'guest',
+}
+
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    nullable: true,
+    unique: true,
+  })
+  intraId: number;
 
   @Column({ unique: true })
   login: string;
+
+  @Column({
+    type: 'enum',
+    enum: AuthProvider,
+    default: AuthProvider.GUEST,
+  })
+  provider: AuthProvider;
 
   @Column({ default: false })
   tfaEnabled: boolean;

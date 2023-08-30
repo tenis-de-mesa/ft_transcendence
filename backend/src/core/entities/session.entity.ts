@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { User } from '.';
 
-@Entity()
+@Entity({ name: 'sessions' })
 export class Session implements ISession {
   @Index()
   @Column('bigint')
@@ -25,10 +25,10 @@ export class Session implements ISession {
   @DeleteDateColumn()
   destroyedAt?: Date;
 
-  @Column({nullable: true})
-  user_id: number;
+  @Column({ nullable: true })
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.sessions)
-  @JoinColumn({name: 'user_id'})
+  @JoinColumn({ name: 'userId' })
   user: User;
 }
