@@ -1,6 +1,6 @@
 export default async function rootLoader() {
   const response: Response = await fetch(
-    `${process.env.BACKEND_HOSTNAME}/users/me`,
+    `http://localhost:3001/users/me`,
     {
       credentials: "include",
     },

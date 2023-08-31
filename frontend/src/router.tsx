@@ -25,7 +25,6 @@ const router = createBrowserRouter([
         path: "users",
         element: <Users />,
         loader: async ({}) => {
-          console.log("fetching users");
           return fetch(`http://localhost:3001/users/`);
         },
       },

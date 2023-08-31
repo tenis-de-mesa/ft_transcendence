@@ -35,6 +35,9 @@ export class User {
   })
   sessions: Session[];
 
+  @Column({ default: 'offline' })
+  status: string;
+
   @ApiHideProperty()
   @ManyToMany(() => User)
   @JoinTable({

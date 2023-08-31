@@ -12,4 +12,8 @@ export class UpdateUserDto {
   @IsArray()
   @IsOptional()
   tfaRecoveryCodes?: string[];
+
+  @IsString()
+  @IsOptional()
+  status?: string;
 }

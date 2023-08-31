@@ -15,7 +15,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Swagger
-  const config = new DocumentBuilder().setTitle('API Docs').build();
+  const config = new DocumentBuilder().setTitle('API Docs').addOAuth2().build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
