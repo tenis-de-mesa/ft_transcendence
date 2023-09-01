@@ -8,6 +8,7 @@ import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users/users.service';
 import { Session } from '../core/entities';
+import { UserStatus } from '../core/entities';
 import * as cookie from 'cookie';
 
 @WebSocketGateway({
@@ -31,9 +32,10 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const session = await this.getSession(client);
     if (!session) return;
 
-    this.updateSession(session, client.id);
-    this.updateUser(session.user_id, 'online');
-    this.emitUserStatus(session.user_id, 'online');
+    const userId = session.user_id;
+    this.sessionService.updateSession(session.id, { socketId: client.id });
+    this.userService.updateUser(userId, { status: UserStatus.ONLINE });
+    this.emitUserStatus(userId, UserStatus.ONLINE);
   }
 
   // Called when a client disconnects from the server
@@ -41,27 +43,20 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const session = await this.sessionService.getSessionBySocketId(client.id);
     if (!session) return;
 
-    this.updateSession(session, null);
-    this.updateUser(session.user_id, 'offline');
-    this.emitUserStatus(session.user_id, 'offline');
-  }
-
-  async getSession(client: Socket): Promise<Session> {
-    const sessionId = this.getSessionId(client);
-    return await this.sessionService.getSessionById(sessionId);
-  }
-
-  updateSession(session: Session, socketId: string | null) {
-    this.sessionService.updateSession(session.id, { socketId });
-  }
-
-  updateUser(user_id: number, status: string) {
-    this.userService.updateUser(user_id, { status });
+    const userId = session.user_id;
+    this.sessionService.updateSession(session.id, { socketId: null });
+    this.userService.updateUser(userId, { status: UserStatus.OFFLINE });
+    this.emitUserStatus(userId, UserStatus.OFFLINE);
   }
 
   // Emit user status to all clients connected via websocket
   emitUserStatus(user_id: number, status: string) {
     this.server.emit('userStatus', { id: user_id, status });
+  }
+
+  async getSession(client: Socket): Promise<Session> {
+    const sessionId = this.getSessionId(client);
+    return await this.sessionService.getSessionById(sessionId);
   }
 
   getSessionId(client: Socket): string {

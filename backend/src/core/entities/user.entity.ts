@@ -10,6 +10,11 @@ import { FriendRequest } from './friend_request.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Session } from '.';
 
+export enum UserStatus {
+  OFFLINE = 'offline',
+  ONLINE = 'online',
+}
+
 @Entity({ name: 'users' })
 export class User {
   @PrimaryColumn()
@@ -30,13 +35,17 @@ export class User {
   })
   tfaRecoveryCodes: string[];
 
+  @Column({
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.OFFLINE,
+  })
+  status: UserStatus;
+
   @OneToMany(() => Session, (session) => session.user, {
     eager: true,
   })
   sessions: Session[];
-
-  @Column({ default: 'offline' })
-  status: string;
 
   @ApiHideProperty()
   @ManyToMany(() => User)
