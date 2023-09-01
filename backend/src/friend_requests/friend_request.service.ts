@@ -57,7 +57,7 @@ export class FriendRequestService {
     if (!friendRequest) {
       throw new NotFoundException(`Friend request with ID ${id} not found`);
     }
-    
+
     // Add each user to the other's friends list
     friendRequest.sender.friends.push(friendRequest.receiver);
     friendRequest.receiver.friends.push(friendRequest.sender);

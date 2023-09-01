@@ -20,9 +20,7 @@ export default function Root() {
         <Link to={"/"} style={{ textDecoration: "none" }}>
           🐱 🐱 🐱
         </Link>
-        <Link to={"/users"}>
-          Users
-        </Link>
+        <Link to={"/users"}>Users</Link>
         {user && <NavLink to={"logout"}>Sair</NavLink>}
         {!user && <NavLink to={"login"}>Entrar</NavLink>}
       </header>
