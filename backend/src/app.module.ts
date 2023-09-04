@@ -11,6 +11,7 @@ import { TfaModule } from './auth/tfa/tfa.module';
 import { AppConfigModule } from './config/app-config.module';
 import { TypeOrmConfigModule } from './config/typeorm-config.module';
 import { FriendRequestModule } from './friend_requests/friend_request.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { FriendRequestModule } from './friend_requests/friend_request.module';
     AuthModule,
     TfaModule,
     FriendRequestModule,
+    StatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

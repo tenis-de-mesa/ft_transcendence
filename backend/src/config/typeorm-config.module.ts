@@ -9,16 +9,16 @@ export const getTypeOrmModuleOptions = (
   const entities = [__dirname + '/../**/*.entity{.ts,.js}'];
   const subscribers = [__dirname + '/../**/*.subscriber{.ts,.js}'];
 
-  if (config.getNodeEnv() == 'test') {
-    return {
-      type: 'sqlite',
-      database: ':memory:',
-      entities,
-      dropSchema: true,
-      synchronize: true,
-      logging: false,
-    };
-  }
+  // if (config.getNodeEnv() == 'test') {
+  //   return {
+  //     type: 'better-sqlite3',
+  //     database: ':memory:',
+  //     entities,
+  //     dropSchema: true,
+  //     synchronize: true,
+  //     logging: false,
+  //   };
+  // }
 
   return {
     type: 'postgres',

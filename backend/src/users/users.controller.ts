@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { AuthenticatedGuard } from '../auth/guards';
 import { UsersService } from './users.service';
 
@@ -16,5 +16,10 @@ export class UsersController {
   async getUserFriends(@Request() req: any) {
     const currentUser = req.user;
     return this.usersService.getUserFriends(currentUser);
+  }
+
+  @Get('/')
+  async index() {
+    return this.usersService.findAll();
   }
 }
