@@ -15,7 +15,7 @@ export default function Home({
     <div style={containerStyle}>
       <div>
         <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
-        <div>Welcome {user?.login}</div>
+        {user && <div>Welcome {user.login}</div>}
       </div>
     </div>
   );
