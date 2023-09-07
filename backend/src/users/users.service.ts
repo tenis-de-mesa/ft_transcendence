@@ -19,15 +19,16 @@ export class UsersService {
   }
 
   async createUser(dto: IntraDto): Promise<User> {
-    let login = dto.login;
+    let nickname = dto.login;
 
-    while (!(await this.checkLoginAvailable(login))) {
-      login = dto.login + '-1';
+    while (!(await this.checkNicknameAvailable(nickname))) {
+      nickname = dto.login + '-1';
     }
 
     return await this.userRepository.save({
       id: dto.id,
-      login,
+      login: dto.login,
+      nickname,
     });
   }
 
@@ -35,8 +36,8 @@ export class UsersService {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async checkLoginAvailable(login: string): Promise<boolean> {
-    const user = await this.userRepository.findOneBy({ login });
+  async checkNicknameAvailable(nickname: string): Promise<boolean> {
+    const user = await this.userRepository.findOneBy({ nickname });
     return !user ? true : false;
   }
 

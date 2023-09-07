@@ -20,5 +20,5 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
-  login?: string;
+  nickname?: string;
 }

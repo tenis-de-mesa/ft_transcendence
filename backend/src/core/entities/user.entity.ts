@@ -23,6 +23,9 @@ export class User {
   @Column({ unique: true })
   login: string;
 
+  @Column({ unique: true })
+  nickname: string;
+
   @Column({ default: false })
   tfaEnabled: boolean;
 
