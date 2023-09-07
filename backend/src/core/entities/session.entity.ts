@@ -25,10 +25,13 @@ export class Session implements ISession {
   @DeleteDateColumn()
   destroyedAt?: Date;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   user_id: number;
 
   @ManyToOne(() => User, (user) => user.sessions)
-  @JoinColumn({name: 'user_id'})
+  @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @Column({ nullable: true })
+  socketId: string;
 }

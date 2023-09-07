@@ -4,6 +4,7 @@ import Root from "./routes/root.tsx";
 import rootLoader from "./routes/rootLoader.tsx";
 import { loader as loginLoader } from "./routes/login.tsx";
 import { loader as logoutLoader } from "./routes/logout.tsx";
+import Users from "./routes/users/users.tsx";
 
 // import ErrorPage from "./error-page.tsx";
 const router = createBrowserRouter([
@@ -19,6 +20,13 @@ const router = createBrowserRouter([
       {
         path: "logout",
         loader: logoutLoader,
+      },
+      {
+        path: "users",
+        element: <Users />,
+        loader: async () => {
+          return fetch(`http://localhost:3001/users/`);
+        },
       },
     ],
   },

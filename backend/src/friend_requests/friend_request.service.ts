@@ -57,11 +57,13 @@ export class FriendRequestService {
     if (!friendRequest) {
       throw new NotFoundException(`Friend request with ID ${id} not found`);
     }
+
     // Add each user to the other's friends list
     friendRequest.sender.friends.push(friendRequest.receiver);
     friendRequest.receiver.friends.push(friendRequest.sender);
     await this.userRepository.save(friendRequest.sender);
     await this.userRepository.save(friendRequest.receiver);
+
     // Delete the friend request
     await this.friendRequestRepository.delete(id);
   }

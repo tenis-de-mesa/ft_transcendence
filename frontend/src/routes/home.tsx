@@ -4,16 +4,19 @@ export default function Home({
   user?: { id: number; login: string };
 }) {
   const containerStyle: React.CSSProperties = {
-    display: "inline-flex",
+    display: "grid",
     justifyContent: "center",
     alignItems: "center",
+    textAlign: "center",
     height: "100vh",
-    width: "100%",
   };
 
   return (
     <div style={containerStyle}>
-      <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
+      <div>
+        <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
+        {user && <div>Welcome {user.login}</div>}
+      </div>
     </div>
   );
 }

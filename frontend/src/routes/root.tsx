@@ -1,5 +1,5 @@
-import { Link, useLoaderData, useOutlet } from "react-router-dom";
 import Home from "./home";
+import { Link, useLoaderData, useOutlet } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 export default function Root() {
@@ -20,11 +20,11 @@ export default function Root() {
         <Link to={"/"} style={{ textDecoration: "none" }}>
           🐱 🐱 🐱
         </Link>
-        {user && <span>{user.login}</span>}
+        <Link to={"/users"}>Users</Link>
         {user && <NavLink to={"logout"}>Sair</NavLink>}
         {!user && <NavLink to={"login"}>Entrar</NavLink>}
       </header>
-      <div className="container">{outlet || <Home user={user} />}</div>
+      {outlet || <Home user={user} />}
     </>
   );
 }
