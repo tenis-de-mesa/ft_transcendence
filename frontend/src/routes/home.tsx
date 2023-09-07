@@ -1,3 +1,5 @@
+import { UpdateUser } from './users'
+
 export default function Home({
   user,
 }: {
@@ -17,6 +19,7 @@ export default function Home({
         <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
         {user && <div>Welcome {user.login}</div>}
       </div>
+      <UpdateUser user={user?.login ?? ''} />
     </div>
   );
 }
