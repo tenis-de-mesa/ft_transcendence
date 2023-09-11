@@ -4,7 +4,11 @@ import { NavLink } from "react-router-dom";
 
 export default function Root() {
   const outlet = useOutlet();
-  const user = useLoaderData() as { id: number; login: string };
+  const user = useLoaderData() as {
+    id: number;
+    login: string;
+    nickname: string;
+  };
   const headerStyle: React.CSSProperties = {
     backgroundColor: "#a161d1",
     color: "white",

@@ -1,7 +1,9 @@
+import { UpdateUser } from "./users";
+
 export default function Home({
   user,
 }: {
-  user?: { id: number; login: string };
+  user?: { id: number; login: string; nickname: string };
 }) {
   const containerStyle: React.CSSProperties = {
     display: "grid",
@@ -16,7 +18,9 @@ export default function Home({
       <div>
         <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
         {user && <div>Welcome {user.login}</div>}
+        {user && <div>Nickname {user.nickname}</div>}
       </div>
+      <UpdateUser nickname={user?.nickname ?? ""} />
     </div>
   );
 }
