@@ -15,14 +15,13 @@ export class AuthController {
 
   @Get('login/guest')
   @UseGuards(GuestGuard)
-  async loginAsGuest(@Res() res: Response): Promise<void> {
+  async loginAsGuest(@Req() req: Request, @Res() res: Response): Promise<void> {
+    req.session.cookie.maxAge = null;
     res.redirect('back');
   }
 
   @Get('logout')
-  logout(@Req() req: Request, @Res() res: Response) {
-    req.session.destroy(function () {
-      res.clearCookie('connect.sid', { path: '/' }).redirect('back');
-    });
+  async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
+    await this.authService.logout(req, res);
   }
 }
