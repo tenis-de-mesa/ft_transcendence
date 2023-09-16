@@ -9,19 +9,25 @@ export class SessionSerializer extends PassportSerializer {
     super();
   }
 
-  serializeUser(user: User, done: (err: Error, id: number) => void): any {
-    done(null, user.id);
+  serializeUser(user: User, done: (err: Error, user: any) => void): any {
+    done(null, {
+      id: user.id,
+      provider: user.provider,
+    });
   }
 
   async deserializeUser(
-    id: number,
+    user: any,
     done: (err: Error, user: User) => void,
   ): Promise<any> {
     await this.usersService
-      .getUserById(id)
+      .getUserById(user.id)
       .then((user) => {
         if (!user) {
-          done(new NotFoundException(`User with ID '${id}' not found`), null);
+          done(
+            new NotFoundException(`User with ID '${user.id}' not found`),
+            null,
+          );
         } else {
           done(null, user);
         }

@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
 import { AxiosExceptionFilter } from './filters';
-import { Session } from './core/entities';
+import { AuthProvider, Session } from './core/entities';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -26,11 +26,17 @@ async function bootstrap() {
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
-      store: new TypeormStore().connect(sessionRepository),
-      cookie: {
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      },
-      rolling: true,
+      store: new TypeormStore({
+        cleanupLimit: 2,
+        ttl(_store, sess, _sid) {
+          const fifteenMinutes = 900;
+          const thirtyDays = 2592000;
+          const provider = sess.passport.user.provider;
+
+          return provider === AuthProvider.GUEST ? fifteenMinutes : thirtyDays;
+        },
+      }).connect(sessionRepository),
+      // rolling: true, // TODO: Check with team if we need this
     }),
   );
   app.use(passport.initialize());
