@@ -9,8 +9,7 @@ export class AuthController {
 
   @Get('login/intra')
   @UseGuards(IntraAuthGuard)
-  async loginAsIntra(@Req() req: Request, @Res() res: Response): Promise<void> {
-    req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+  async loginAsIntra(@Res() res: Response): Promise<void> {
     res.redirect('back');
   }
 
