@@ -1,23 +1,25 @@
 import { useState } from "react";
-
-const updateUser = async (nickname: string) => {
-  await fetch("http://localhost:3001/users/", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ nickname }),
-    credentials: "include",
-  });
-};
+import { Form, useNavigate } from "react-router-dom";
 
 export default function Update(props: { nickname: string }) {
   const [nickname, setNickname] = useState(props.nickname ?? "");
+  const navigate = useNavigate();
+
+  const updateUser = async (nickname: string) => {
+    await fetch("http://localhost:3001/users/", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nickname }),
+      credentials: "include",
+    });
+    navigate("..");
+  };
 
   return (
-    <form>
-      <h1>Update</h1>
+    <Form>
       <label>
         Nickname:
         <input
@@ -29,12 +31,12 @@ export default function Update(props: { nickname: string }) {
       </label>
       <br />
       <button
-        onClick={() => {
+        onClick={(e) => {
           updateUser(nickname);
         }}
       >
-        Update
+        Atualizar
       </button>
-    </form>
+    </Form>
   );
 }

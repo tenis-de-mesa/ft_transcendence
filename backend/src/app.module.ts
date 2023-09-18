@@ -12,6 +12,7 @@ import { AppConfigModule } from './config/app-config.module';
 import { TypeOrmConfigModule } from './config/typeorm-config.module';
 import { FriendRequestModule } from './friend_requests/friend_request.module';
 import { StatusModule } from './status/status.module';
+import { StaticFilesModule } from './config/static-files.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { StatusModule } from './status/status.module';
     TfaModule,
     FriendRequestModule,
     StatusModule,
+    StaticFilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

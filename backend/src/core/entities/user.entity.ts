@@ -32,6 +32,11 @@ export class User {
   @Column({ nullable: true })
   tfaSecret: string;
 
+  @Column({ nullable: true })
+  avatarPath: string;
+
+  avatarUrl: string;
+
   @Column('varchar', {
     array: true,
     nullable: true,

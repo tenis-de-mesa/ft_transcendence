@@ -1,34 +1,20 @@
-import Home from "./home";
-import { Link, useLoaderData, useOutlet } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import Home from "./Home";
+import { useLoaderData, useOutlet } from "react-router-dom";
+import { User } from "../types/types";
+import Login from "./Login";
+import Header from "./Header";
 
 export default function Root() {
   const outlet = useOutlet();
-  const user = useLoaderData() as {
-    id: number;
-    login: string;
-    nickname: string;
-  };
-  const headerStyle: React.CSSProperties = {
-    backgroundColor: "#a161d1",
-    color: "white",
-    padding: "20px",
-    textAlign: "center",
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: "1.5em",
-  };
+  const user = useLoaderData() as User;
+  if (!user) {
+    return <Login />;
+  }
+
   return (
     <>
-      <header style={headerStyle}>
-        <Link to={"/"} style={{ textDecoration: "none" }}>
-          🐱 🐱 🐱
-        </Link>
-        <Link to={"/users"}>Users</Link>
-        {user && <NavLink to={"logout"}>Sair</NavLink>}
-        {!user && <NavLink to={"login"}>Entrar</NavLink>}
-      </header>
-      {outlet || <Home user={user} />}
+      <Header user={user}></Header>
+      <div className="container">{outlet || <Home user={user} />}</div>
     </>
   );
 }

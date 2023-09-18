@@ -4,6 +4,8 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { IntraDto } from '../auth/dto';
 import { UpdateUserDto } from './dto';
 import { User, Session } from '../core/entities';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +45,33 @@ export class UsersService {
 
   async updateUser(id: number, dto: UpdateUserDto): Promise<UpdateResult> {
     return await this.userRepository.update(id, { ...dto });
+  }
+
+  async updateAvatar(
+    user: User,
+    file: Express.Multer.File,
+  ): Promise<UpdateResult> {
+    const dirPath = path.join('./public/avatars', user.login);
+    // const absoluteDirPath = path.resolve(dirPath);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+    const filePath = path.join(dirPath, file.originalname);
+    await fs.promises.writeFile(filePath, file.buffer);
+    if (user.avatarPath) {
+      const avatarPath = path.join('public', user.avatarPath);
+      try {
+        await fs.promises.access(avatarPath);
+        await fs.promises.unlink(avatarPath);
+      } catch (error) {
+        console.error(`Error deleting avatar: ${error}`);
+      }
+    }
+    // remove the inicial /public/ from the path
+    const avatarPath = filePath.slice(7);
+    return await this.userRepository.update(user.id, {
+      avatarPath: avatarPath,
+    });
   }
 
   async killAllSessionsByUserId(
