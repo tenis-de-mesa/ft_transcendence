@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { User, Session } from '../core/entities';
+import { User, Session, AuthProvider } from '../core/entities';
 
 @Injectable()
 export class UsersService {
@@ -58,7 +58,7 @@ export class UsersService {
     // or no sessions at all attached to them
     const guestUsers = await this.userRepository
       .createQueryBuilder('user')
-      .where('user.provider = :provider', { provider: 'guest' })
+      .where('user.provider = :provider', { provider: AuthProvider.GUEST })
       .leftJoin('user.sessions', 'session')
       .andWhere(
         new Brackets((qb) => {
