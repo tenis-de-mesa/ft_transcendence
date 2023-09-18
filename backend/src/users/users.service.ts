@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { User, Session } from '../core/entities';
 
@@ -51,6 +51,25 @@ export class UsersService {
     }
 
     return await query.execute();
+  }
+
+  async findObsoleteGuestUsers(): Promise<User[]> {
+    // Query to find guest users that have expired sessions
+    // or no sessions at all attached to them
+    const guestUsers = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.provider = :provider', { provider: 'guest' })
+      .leftJoin('user.sessions', 'session')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('session.expiredAt <= :currentTime', {
+            currentTime: Date.now(),
+          }).orWhere('session.id IS NULL');
+        }),
+      )
+      .getMany();
+
+    return guestUsers;
   }
 
   async getUserFriends(user: User): Promise<User[]> {
