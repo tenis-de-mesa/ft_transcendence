@@ -6,7 +6,7 @@ interface AvatarProps {
 }
 
 export default function Avatar({ login, path }: AvatarProps) {
-  // If the user has an avatarUrl, use that
+  // If the user has an avatarPath, use that
   if (path) {
     const avatarUrl = `http://localhost:3001/${path}`;
     return <img className="avatar" src={avatarUrl} alt="avatar" />;

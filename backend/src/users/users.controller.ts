@@ -35,10 +35,6 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   @Get('me')
   async getMe(@GetUser() user: User) {
-    if (user.avatarPath) {
-      const avatarUrl = `http://localhost:3001` + user.avatarPath;
-      user.avatarUrl = avatarUrl;
-    }
     return user;
   }
 

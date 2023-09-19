@@ -4,7 +4,6 @@ export type User = {
   status: string;
   nickname: string;
   avatarPath: string;
-  avatarUrl: string;
 };
 
 export type UserStatus = {
