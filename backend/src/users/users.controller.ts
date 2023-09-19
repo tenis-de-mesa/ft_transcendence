@@ -14,14 +14,10 @@ import { GetUser } from '../core/decorators';
 import { UpdateUserDto } from './dto';
 import { User } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { EnvironmentConfigService } from '../config/env.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly config: EnvironmentConfigService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('/')
   async index() {
