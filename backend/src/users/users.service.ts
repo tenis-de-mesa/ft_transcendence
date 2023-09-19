@@ -52,7 +52,6 @@ export class UsersService {
     file: Express.Multer.File,
   ): Promise<UpdateResult> {
     const dirPath = path.join('./public/avatars', user.login);
-    // const absoluteDirPath = path.resolve(dirPath);
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }

@@ -30,13 +30,7 @@ export default function Update(props: { nickname: string }) {
         />
       </label>
       <br />
-      <button
-        onClick={(e) => {
-          updateUser(nickname);
-        }}
-      >
-        Atualizar
-      </button>
+      <button onClick={() => updateUser(nickname)}>Atualizar</button>
     </Form>
   );
 }

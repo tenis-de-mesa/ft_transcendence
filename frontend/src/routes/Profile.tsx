@@ -11,8 +11,14 @@ export default function Profile() {
 
   const [avatarPath, setAvatarPath] = useState(user.avatarPath);
 
-  const handleUpdateAvatar = async (event: any) => {
-    const file = event.target.files[0];
+  const handleUpdateAvatar = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      console.error("No file selected");
+      return;
+    }
     const formData = new FormData();
     formData.append("file", file);
     const response = await fetch("http://localhost:3001/users/avatar", {

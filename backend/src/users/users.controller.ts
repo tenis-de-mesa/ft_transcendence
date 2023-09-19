@@ -15,7 +15,6 @@ import { UpdateUserDto } from './dto';
 import { User } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EnvironmentConfigService } from '../config/env.service';
-import * as path from 'path';
 
 @Controller('users')
 export class UsersController {
