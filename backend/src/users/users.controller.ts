@@ -60,7 +60,7 @@ export class UsersController {
   ) {
     await this.usersService.updateAvatar(user, file);
     const updatedUser = await this.usersService.getUserById(user.id);
-    const avatarPath = updatedUser.avatarPath;
-    return { avatarPath };
+    const avatarUrl = updatedUser.avatarUrl;
+    return { avatarUrl };
   }
 }

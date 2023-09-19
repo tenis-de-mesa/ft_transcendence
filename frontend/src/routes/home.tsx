@@ -11,7 +11,7 @@ export default function Home({ user }: HomeProps) {
     <div className="container">
       <div className="card">
         <center>
-          <Avatar login={user.login} path={user.avatarPath} />
+          <Avatar login={user.login} avatarUrl={user.avatarUrl} />
         </center>
         <h1>Welcome {user.nickname}!</h1>
         <p>
@@ -21,7 +21,7 @@ export default function Home({ user }: HomeProps) {
           <strong>Nickname:</strong> {user.nickname}
         </p>
         <p>
-          <strong>Avatar:</strong> {user.avatarPath}
+          <strong>Avatar:</strong> {user.avatarUrl}
         </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <Link to={"profile"}>Editar</Link>

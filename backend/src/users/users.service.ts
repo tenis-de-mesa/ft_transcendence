@@ -4,8 +4,8 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { IntraDto } from '../auth/dto';
 import { UpdateUserDto } from './dto';
 import { User, Session } from '../core/entities';
-import * as fs from 'fs';
-import * as path from 'path';
+import { s3Client } from '../lib/aws/s3Client';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class UsersService {
@@ -51,25 +51,16 @@ export class UsersService {
     user: User,
     file: Express.Multer.File,
   ): Promise<UpdateResult> {
-    const dirPath = path.join('./public/avatars', user.login);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-    const filePath = path.join(dirPath, file.originalname);
-    await fs.promises.writeFile(filePath, file.buffer);
-    if (user.avatarPath) {
-      const avatarPath = path.join('public', user.avatarPath);
-      try {
-        await fs.promises.access(avatarPath);
-        await fs.promises.unlink(avatarPath);
-      } catch (error) {
-        console.error(`Error deleting avatar: ${error}`);
-      }
-    }
-    // remove the inicial /public/ from the path
-    const avatarPath = filePath.slice(7);
+    const imageKey = user.id + file.originalname;
+    const command = new PutObjectCommand({
+      Bucket: 'transcendence-images',
+      Key: imageKey,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    });
+    await s3Client.send(command);
     return await this.userRepository.update(user.id, {
-      avatarPath: avatarPath,
+      avatarUrl: `https://transcendence-images.s3.amazonaws.com/${imageKey}`,
     });
   }
 

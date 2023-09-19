@@ -3,7 +3,7 @@ export type User = {
   login: string;
   status: string;
   nickname: string;
-  avatarPath: string;
+  avatarUrl: string;
 };
 
 export type UserStatus = {

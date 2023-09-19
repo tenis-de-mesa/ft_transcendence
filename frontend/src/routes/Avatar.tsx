@@ -2,13 +2,12 @@ import "./Avatar.css";
 
 interface AvatarProps {
   login?: string;
-  path?: string;
+  avatarUrl?: string;
 }
 
-export default function Avatar({ login, path }: AvatarProps) {
-  // If the user has an avatarPath, use that
-  if (path) {
-    const avatarUrl = `http://localhost:3001/${path}`;
+export default function Avatar({ login, avatarUrl }: AvatarProps) {
+  // If the user has a custom avatar, use that
+  if (avatarUrl) {
     return <img className="avatar" src={avatarUrl} alt="avatar" />;
   }
 

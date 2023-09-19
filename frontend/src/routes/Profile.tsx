@@ -9,7 +9,7 @@ import Avatar from "./Avatar";
 export default function Profile() {
   const user = useRouteLoaderData("root") as User;
 
-  const [avatarPath, setAvatarPath] = useState(user.avatarPath);
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
 
   const handleUpdateAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -31,7 +31,7 @@ export default function Profile() {
       return;
     }
     const data = await response.json();
-    setAvatarPath(data.avatarPath);
+    setAvatarUrl(data.avatarUrl);
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +44,7 @@ export default function Profile() {
     <div className="profile">
       <div className="card">
         <center>
-          <Avatar login={user.login} path={avatarPath} />
+          <Avatar login={user.login} avatarUrl={avatarUrl} />
         </center>
         <center>
           <button onClick={handleChooseAvatar}>Alterar avatar</button>

@@ -33,7 +33,7 @@ export class User {
   tfaSecret: string;
 
   @Column({ nullable: true })
-  avatarPath: string;
+  avatarUrl: string;
 
   @Column('varchar', {
     array: true,
