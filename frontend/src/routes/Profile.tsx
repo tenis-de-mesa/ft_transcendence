@@ -12,7 +12,7 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
 
   const handleUpdateAvatar = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) {
