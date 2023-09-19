@@ -1,5 +1,14 @@
-import { redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export async function loader() {
-  return redirect("http://localhost:3001/auth/login");
+export default function Login() {
+  return (
+    <div className="container">
+      <div className="card">
+        <center>
+          <h2>PONG</h2>
+        </center>
+        <Link to={"login"}>Login using intra</Link>
+      </div>
+    </div>
+  );
 }

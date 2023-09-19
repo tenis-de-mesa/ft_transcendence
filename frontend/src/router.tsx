@@ -1,25 +1,29 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, redirect } from "react-router-dom";
 
-import Root from "./routes/root.tsx";
+import Root from "./routes/Root.tsx";
 import rootLoader from "./routes/rootLoader.tsx";
-import { loader as loginLoader } from "./routes/login.tsx";
-import { loader as logoutLoader } from "./routes/logout.tsx";
 import Users from "./routes/users/users.tsx";
+import Profile from "./routes/Profile.tsx";
 
 // import ErrorPage from "./error-page.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
+    id: "root",
     element: <Root />,
     loader: rootLoader,
     children: [
       {
         path: "login",
-        loader: loginLoader,
+        loader: async () => {
+          return redirect("http://localhost:3001/auth/login");
+        },
       },
       {
         path: "logout",
-        loader: logoutLoader,
+        loader: async () => {
+          return redirect("http://localhost:3001/auth/logout");
+        },
       },
       {
         path: "users",
@@ -27,6 +31,10 @@ const router = createBrowserRouter([
         loader: async () => {
           return fetch(`http://localhost:3001/users/`);
         },
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },

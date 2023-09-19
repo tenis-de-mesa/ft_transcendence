@@ -1,26 +1,33 @@
-import { UpdateUser } from "./users";
+import Avatar from "./Avatar";
+import { User } from "../types/types";
+import { Link } from "react-router-dom";
 
-export default function Home({
-  user,
-}: {
-  user?: { id: number; login: string; nickname: string };
-}) {
-  const containerStyle: React.CSSProperties = {
-    display: "grid",
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-    height: "100vh",
-  };
+interface HomeProps {
+  user: User;
+}
 
+export default function Home({ user }: HomeProps) {
   return (
-    <div style={containerStyle}>
-      <div>
-        <h1>ft_transcendence {user ? "🔓" : "🔐"}</h1>
-        {user && <div>Welcome {user.login}</div>}
-        {user && <div>Nickname {user.nickname}</div>}
+    <div className="container">
+      <div className="card">
+        <center>
+          <Avatar login={user.login} avatarUrl={user.avatarUrl} />
+        </center>
+        <h1>Welcome {user.nickname}!</h1>
+        <p>
+          <strong>Login:</strong> {user.login}
+        </p>
+        <p>
+          <strong>Nickname:</strong> {user.nickname}
+        </p>
+        <p>
+          <strong>Avatar:</strong> {user.avatarUrl}
+        </p>
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <Link to={"profile"}>Editar</Link>
+          <Link to={"logout"}>Sair</Link>
+        </div>
       </div>
-      <UpdateUser nickname={user?.nickname ?? ""} />
     </div>
   );
 }
