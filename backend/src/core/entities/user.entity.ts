@@ -14,6 +14,11 @@ export enum AuthProvider {
   GUEST = 'guest',
 }
 
+export enum UserStatus {
+  OFFLINE = 'offline',
+  ONLINE = 'online',
+}
+
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -27,6 +32,12 @@ export class User {
 
   @Column({ unique: true })
   login: string;
+
+  @Column({ unique: true })
+  nickname: string;
+
+  @Column({ nullable: true })
+  avatarUrl: string;
 
   @Column({
     type: 'enum',
@@ -46,6 +57,13 @@ export class User {
     nullable: true,
   })
   tfaRecoveryCodes: string[];
+
+  @Column({
+    type: 'enum',
+    enum: UserStatus,
+    default: UserStatus.OFFLINE,
+  })
+  status: UserStatus;
 
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];

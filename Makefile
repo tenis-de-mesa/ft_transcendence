@@ -2,17 +2,26 @@ include .env
 
 all: up
 
+re: down clean up
+
 up: .env backend/.env backend/node_modules frontend/node_modules
 	docker compose up
 
 down:
 	docker compose down
 
+clean: down
+	docker compose rm -f
+	rm -rf backend/node_modules 
+	rm -rf backend/.pnpm-store
+	rm -rf frontend/node_modules
+	rm -rf frontend/.pnpm-store
+
 backend/node_modules:
-	docker compose run backend pnpm install --frozen-lockfile
+	docker compose run backend pnpm install
 
 frontend/node_modules:
-	docker compose run frontend pnpm install --frozen-lockfile
+	docker compose run frontend pnpm install
 
 backend/.env: .env
 	cp .env backend/.env

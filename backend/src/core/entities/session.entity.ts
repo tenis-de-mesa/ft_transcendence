@@ -31,4 +31,7 @@ export class Session implements ISession {
   @ManyToOne(() => User, (user) => user.sessions)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column({ nullable: true })
+  socketId: string;
 }

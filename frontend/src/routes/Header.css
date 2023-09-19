@@ -1,0 +1,15 @@
+.header {
+  background-color: #a161d1;
+  color: aliceblue;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 4rem;
+  font-size: 1.5em;
+  padding: 0 1rem;
+}
+
+.header a {
+  color: aliceblue;
+  text-decoration: none;
+}
