@@ -94,4 +94,10 @@ export class UserEntity {
     (friend_request) => friend_request.sender,
   )
   friend_requests_sent: FriendRequestEntity[];
+
+  constructor(user?: UserEntity) {
+    this.id = user?.id;
+    this.login = user?.login;
+    this.nickname = user?.nickname;
+  }
 }
