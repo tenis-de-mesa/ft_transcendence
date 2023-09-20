@@ -34,9 +34,19 @@ format:
 	docker compose run backend pnpm format
 
 test:
+	docker stop transcendence-db-test && docker rm transcendence-db-test || true
+	docker run -d \
+		--name="transcendence-db-test" \
+		-p 5555:5432 \
+		-e POSTGRES_DB=postgres \
+		-e POSTGRES_USER=postgres \
+		-e POSTGRES_PASSWORD=postgres \
+		--network=transcendence-network-internal \
+		postgres:alpine
 	docker compose run frontend pnpm test
 	docker compose run backend pnpm test
 	docker compose run backend pnpm test:e2e
+	docker stop transcendence-db-test && docker rm transcendence-db-test || true
 
 backend-sh:
 	docker compose run backend sh

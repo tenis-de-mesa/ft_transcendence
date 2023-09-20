@@ -9,9 +9,9 @@ describe('AppController (e2e)', () => {
 
   let app: INestApplication;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     process.env = {
-      NODE_ENV: 'test',
+      NODE_ENV: 'local',
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -33,9 +33,5 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect('Hello World!');
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });

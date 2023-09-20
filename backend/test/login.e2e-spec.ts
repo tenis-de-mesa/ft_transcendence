@@ -12,7 +12,7 @@ describe('OAuth in Intranet', () => {
 
     beforeAll(async () => {
       process.env = {
-        NODE_ENV: 'test',
+        NODE_ENV: 'local',
       };
 
       const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -42,9 +42,9 @@ describe('OAuth in Intranet', () => {
 
     let app: INestApplication;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       process.env = {
-        NODE_ENV: 'test',
+        NODE_ENV: 'local',
       };
 
       const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -58,10 +58,6 @@ describe('OAuth in Intranet', () => {
 
       app = moduleFixture.createNestApplication();
       await app.init();
-    });
-
-    afterAll(async () => {
-      await app.close();
     });
 
     it('check status', async () => {

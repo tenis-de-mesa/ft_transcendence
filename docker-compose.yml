@@ -42,4 +42,5 @@ services:
 
 networks:
   internal:
+    name: transcendence-network-internal
     driver: bridge
