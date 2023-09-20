@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { Session, FriendRequest } from '.';
+import { SessionEntity, FriendRequest } from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -65,8 +65,8 @@ export class UserEntity {
   })
   status: UserStatus;
 
-  @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
+  @OneToMany(() => SessionEntity, (session) => session.user)
+  sessions: SessionEntity[];
 
   @ApiHideProperty()
   @ManyToMany(() => UserEntity)
