@@ -11,10 +11,13 @@ import { TfaModule } from './auth/tfa/tfa.module';
 import { AppConfigModule } from './config/app-config.module';
 import { TypeOrmConfigModule } from './config/typeorm-config.module';
 import { FriendRequestModule } from './friend_requests/friend_request.module';
+import { GuestCleanupService } from './guest-cleanup/guest-cleanup.service';
+import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './status/status.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     AppConfigModule,
     TypeOrmConfigModule,
     UsersModule,
@@ -24,6 +27,6 @@ import { StatusModule } from './status/status.module';
     StatusModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GuestCleanupService],
 })
 export class AppModule {}

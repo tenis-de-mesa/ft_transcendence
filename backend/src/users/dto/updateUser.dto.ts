@@ -1,5 +1,5 @@
 import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
-import { UserStatus } from '../../core/entities/user.entity';
+import { UserStatus } from '../../core/entities';
 
 export class UpdateUserDto {
   @IsString()

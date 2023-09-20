@@ -7,7 +7,11 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Delete,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
+
 import { AuthenticatedGuard } from '../auth/guards';
 import { UsersService } from './users.service';
 import { GetUser } from '../core/decorators';
@@ -39,7 +43,12 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('friends')
+  @Delete(':id')
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.deleteUser(id);
+  }
+
+  @Get('/friends')
   async getUserFriends(@Request() req: any) {
     const currentUser = req.user;
     return this.usersService.getUserFriends(currentUser);

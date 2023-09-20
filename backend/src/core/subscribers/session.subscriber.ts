@@ -19,8 +19,8 @@ export class SessionSubscriber implements EntitySubscriberInterface<Session> {
    */
   beforeInsert(event: InsertEvent<Session>) {
     const json = JSON.parse(event.entity.json);
-    const user_id = json.passport.user;
+    const userId = json.passport.user;
     const manager = event.manager;
-    manager.merge(Session, event.entity, { user_id: user_id });
+    manager.merge(Session, event.entity, { userId: userId });
   }
 }

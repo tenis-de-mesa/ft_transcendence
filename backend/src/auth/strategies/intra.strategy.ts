@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { Strategy } from 'passport-oauth2';
+import { Strategy, VerifyCallback } from 'passport-oauth2';
 import { AuthService } from '../auth.service';
-import { IntraDto } from '../dto';
 import { EnvironmentConfigService } from '../../config/env.service';
+import { CreateUserDto } from '../../users/dto';
+import { AuthProvider } from '../../core/entities';
 
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
@@ -17,24 +18,32 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       tokenURL: config.getTokenURL(),
       clientID: config.getClientID(),
       clientSecret: config.getClientSecret(),
-      callbackURL: config.getBackendHostname() + '/auth/login',
+      callbackURL: config.getBackendHostname() + '/auth/login/intra',
     });
   }
 
-  async validate(token: string): Promise<any> {
+  async validate(
+    accessToken: string,
+    _refreshToken: string,
+    _profile: any,
+    callback: VerifyCallback,
+  ): Promise<any> {
     const endpoint = this.config.getFetchURL();
 
     const response = await axios.get(endpoint, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    const dto: IntraDto = {
-      id: response.data.id,
+    const dto: CreateUserDto = {
+      intraId: response.data.id,
       login: response.data.login,
+      provider: AuthProvider.INTRA,
     };
 
-    return this.authService.validateIntraUser(dto);
+    const user = await this.authService.loginAsIntra(dto);
+
+    callback(null, user);
   }
 }

@@ -16,7 +16,7 @@ const router = createBrowserRouter([
       {
         path: "login",
         loader: async () => {
-          return redirect("http://localhost:3001/auth/login");
+          return redirect("http://localhost:3001/auth/login/intra");
         },
       },
       {

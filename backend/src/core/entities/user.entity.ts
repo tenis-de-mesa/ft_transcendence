@@ -1,14 +1,18 @@
 import {
   Entity,
   Column,
-  PrimaryColumn,
   ManyToMany,
   JoinTable,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { FriendRequest } from './friend_request.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { Session } from '.';
+import { Session, FriendRequest } from '.';
+
+export enum AuthProvider {
+  INTRA = 'intra',
+  GUEST = 'guest',
+}
 
 export enum UserStatus {
   OFFLINE = 'offline',
@@ -17,8 +21,14 @@ export enum UserStatus {
 
 @Entity({ name: 'users' })
 export class User {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    nullable: true,
+    unique: true,
+  })
+  intraId: number;
 
   @Column({ unique: true })
   login: string;
@@ -26,14 +36,21 @@ export class User {
   @Column({ unique: true })
   nickname: string;
 
+  @Column({ nullable: true })
+  avatarUrl: string;
+
+  @Column({
+    type: 'enum',
+    enum: AuthProvider,
+    default: AuthProvider.GUEST,
+  })
+  provider: AuthProvider;
+
   @Column({ default: false })
   tfaEnabled: boolean;
 
   @Column({ nullable: true })
   tfaSecret: string;
-
-  @Column({ nullable: true })
-  avatarUrl: string;
 
   @Column('varchar', {
     array: true,
@@ -48,9 +65,7 @@ export class User {
   })
   status: UserStatus;
 
-  @OneToMany(() => Session, (session) => session.user, {
-    eager: true,
-  })
+  @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
   @ApiHideProperty()
