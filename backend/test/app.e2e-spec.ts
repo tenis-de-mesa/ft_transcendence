@@ -6,14 +6,9 @@ import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
 
 describe('AppController (e2e)', () => {
   const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
-
   let app: INestApplication;
 
   beforeEach(async () => {
-    process.env = {
-      NODE_ENV: 'local',
-    };
-
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -26,6 +21,10 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 
   it('/ (GET)', () => {

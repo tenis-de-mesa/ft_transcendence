@@ -7,14 +7,9 @@ import { AppModule } from '../src/app.module';
 describe('OAuth in Intranet', () => {
   describe('not logged', () => {
     const mock_Guard: CanActivate = { canActivate: jest.fn(() => false) };
-
     let app: INestApplication;
 
-    beforeAll(async () => {
-      process.env = {
-        NODE_ENV: 'local',
-      };
-
+    beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
       })
@@ -28,7 +23,7 @@ describe('OAuth in Intranet', () => {
       await app.init();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       await app.close();
     });
 
@@ -39,14 +34,9 @@ describe('OAuth in Intranet', () => {
 
   describe('logged', () => {
     const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
-
     let app: INestApplication;
 
     beforeEach(async () => {
-      process.env = {
-        NODE_ENV: 'local',
-      };
-
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
       })
@@ -58,6 +48,10 @@ describe('OAuth in Intranet', () => {
 
       app = moduleFixture.createNestApplication();
       await app.init();
+    });
+
+    afterEach(async () => {
+      await app.close();
     });
 
     it('check status', async () => {
