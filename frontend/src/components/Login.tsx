@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
+import "./Login.css";
 
 export default function Login() {
   return (
-    <div className="container">
-      <div className="card">
+    <div className="container closed">
+      <div className="login">
         <center>
           <h2>PONG</h2>
         </center>
-        <hr />
-        <Link to={"login"}>Login using intra</Link>
+        <div className="card">
+          <Link to={"/login/intra"}>Login using intra</Link>
+          <hr />
+          <Link to={"/login/guest"}>Login as guest</Link>
+        </div>
       </div>
     </div>
   );

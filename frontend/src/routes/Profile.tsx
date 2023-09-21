@@ -25,7 +25,7 @@ export default function Profile() {
           <strong>Nickname:</strong> {user.nickname}
         </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <Link to={"logout"}>Sair</Link>
+          <Link to={"/logout"}>Sair</Link>
         </div>
       </div>
       <h2>
