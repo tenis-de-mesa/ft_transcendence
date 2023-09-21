@@ -1,63 +1,39 @@
-import { useRouteLoaderData } from "react-router-dom";
-import { UpdateUser } from "./users";
+import { Link, useRouteLoaderData } from "react-router-dom";
 import { User } from "../types/types";
+import UserForm from "../components/UserForm";
 
-import "./shared.css";
-import { useRef, useState } from "react";
-import Avatar from "./Avatar";
+import "./Profile.css";
+import Avatar from "../components/Avatar";
 
 export default function Profile() {
   const user = useRouteLoaderData("root") as User;
-
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
-
-  const handleUpdateAvatar = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await fetch("http://localhost:3001/users/avatar", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
-    if (!response.ok) {
-      console.error("Failed to upload image");
-      return;
-    }
-    const data = await response.json();
-    setAvatarUrl(data.avatarUrl);
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleChooseAvatar = () => {
-    fileInputRef.current?.click();
-  };
 
   return (
     <div className="profile">
       <div className="card">
         <center>
-          <Avatar login={user.login} avatarUrl={avatarUrl} />
+          <Avatar login={user.login} avatarUrl={user.avatarUrl} />
         </center>
         <center>
-          <button onClick={handleChooseAvatar}>Alterar avatar</button>
+          <h1>{user.nickname}</h1>
         </center>
         <hr />
-        <UpdateUser nickname={user.nickname} />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleUpdateAvatar}
-          ref={fileInputRef}
-          style={{ display: "none" }}
-        />
+        <p>
+          <strong>Login:</strong> {user.login}
+        </p>
+        <p>
+          <strong>Nickname:</strong> {user.nickname}
+        </p>
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <Link to={"logout"}>Sair</Link>
+        </div>
+      </div>
+      <h2>
+        TODO:
+        <br /> Botão de edit troca o card acima pelo abaixo
+      </h2>
+      <div className="card">
+        <UserForm user={user} />
       </div>
     </div>
   );

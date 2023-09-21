@@ -7,6 +7,7 @@ export default function Login() {
         <center>
           <h2>PONG</h2>
         </center>
+        <hr />
         <Link to={"login"}>Login using intra</Link>
       </div>
     </div>

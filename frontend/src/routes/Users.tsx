@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router-dom";
-import { socket } from "../../socket";
+import { socket } from "../socket";
 import { useEffect, useState } from "react";
-import { User, UserStatus } from "../../types/types";
+import { User, UserStatus } from "../types/types";
 
 export default function Users() {
   const initialUsers: User[] = useLoaderData() as User[];
