@@ -99,5 +99,7 @@ export class UserEntity {
     this.id = user?.id;
     this.login = user?.login;
     this.nickname = user?.nickname;
+    this.intraId = user?.intraId;
+    this.provider = user?.provider;
   }
 }

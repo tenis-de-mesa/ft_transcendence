@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserEntity, SessionEntity } from '../core/entities';
+import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -21,11 +22,13 @@ const usersEntityList: UserEntity[] = [
   } as UserEntity),
 ];
 
-describe('AppController', () => {
+describe('UsersService', () => {
+  let app: TestingModule;
   let usersService: UsersService;
+  let userRepository: Repository<UserEntity>;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    app = await Test.createTestingModule({
       providers: [
         UsersService,
         {
@@ -48,10 +51,18 @@ describe('AppController', () => {
     }).compile();
 
     usersService = app.get<UsersService>(UsersService);
+    userRepository = app.get<Repository<UserEntity>>(
+      getRepositoryToken(UserEntity),
+    );
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 
   it('should be defined', async () => {
     expect(usersService).toBeDefined();
+    expect(userRepository).toBeDefined();
   });
 
   describe('findAll', () => {
@@ -63,6 +74,56 @@ describe('AppController', () => {
 
       // Assert
       expect(result).toEqual(usersEntityList);
+    });
+  });
+
+  describe('createUser', () => {
+    it('creating a user', async () => {
+      // Arrange
+      const dataUser = {
+        login: 'test',
+        provider: AuthProvider.GUEST,
+        intraId: 1,
+      };
+
+      const user: UserEntity = new UserEntity(dataUser as UserEntity);
+      jest
+        .spyOn(userRepository, 'save')
+        .mockImplementationOnce(
+          async (user: UserEntity) => new UserEntity({ ...user }),
+        );
+
+      // Act
+      const result = await usersService.createUser(user);
+
+      // Assert
+      expect(result).toEqual({ ...dataUser, nickname: dataUser.login });
+    });
+    it('creating a user with a nickname already filled in', async () => {
+      // Arrange
+      const dataUser = {
+        login: 'test',
+        provider: AuthProvider.GUEST,
+        intraId: 1,
+      };
+
+      const user: UserEntity = new UserEntity(dataUser as UserEntity);
+
+      jest
+        .spyOn(userRepository, 'save')
+        .mockImplementationOnce(
+          async (user: UserEntity) => new UserEntity({ ...user }),
+        );
+
+      jest
+        .spyOn(usersService, 'checkNicknameAvailable')
+        .mockResolvedValueOnce(false);
+
+      // Act
+      const result = await usersService.createUser(user);
+
+      // Assert
+      expect(result).toEqual({ ...dataUser, nickname: dataUser.login + '-1' });
     });
   });
 });
