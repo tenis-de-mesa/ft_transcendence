@@ -1,8 +1,8 @@
 import { CanActivate, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
-import { AppModule } from '../src/app.module';
+import { AuthenticatedGuard, IntraAuthGuard } from '../../src/auth/guards';
+import { AppModule } from '../../src/app.module';
 
 describe('OAuth in Intranet', () => {
   describe('not logged', () => {

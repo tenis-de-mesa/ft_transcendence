@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CanActivate, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
+import { AppModule } from '../../src/app.module';
+import { AuthenticatedGuard, IntraAuthGuard } from '../../src/auth/guards';
 
 describe('AppController (e2e)', () => {
   const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
