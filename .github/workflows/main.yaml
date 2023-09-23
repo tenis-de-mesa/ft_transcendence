@@ -63,6 +63,10 @@ jobs:
         working-directory: ./backend
         run: pnpm test
 
+      - name: test
+        working-directory: ./backend
+        run: pnpm test:integration
+
       - name: test e2e
         working-directory: ./backend
         run: pnpm test:e2e

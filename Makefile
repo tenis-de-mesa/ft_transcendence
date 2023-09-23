@@ -45,6 +45,7 @@ test:
 		postgres:alpine
 	docker compose run frontend pnpm test
 	docker compose run backend pnpm test
+	docker compose run backend pnpm test:integration:local
 	docker compose run backend pnpm test:e2e:local
 	docker stop transcendence-db-test && docker rm transcendence-db-test || true
 

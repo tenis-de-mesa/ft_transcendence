@@ -1,10 +1,15 @@
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 describe('Class', () => {
-  let app: TestingModule;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    app = await Test.createTestingModule({}).compile();
+    const moduleFixture: TestingModule = await Test.createTestingModule(
+      {},
+    ).compile();
+    app = moduleFixture.createNestApplication();
+    await app.init();
   });
 
   afterEach(async () => {

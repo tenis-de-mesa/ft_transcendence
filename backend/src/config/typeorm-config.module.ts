@@ -6,20 +6,6 @@ import { AppConfigModule } from './app-config.module';
 export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
 ): TypeOrmModuleOptions => {
-  const entities = [__dirname + '/../**/*.entity{.ts,.js}'];
-  const subscribers = [__dirname + '/../**/*.subscriber{.ts,.js}'];
-
-  // if (config.getNodeEnv() == 'test') {
-  //   return {
-  //     type: 'better-sqlite3',
-  //     database: ':memory:',
-  //     entities,
-  //     dropSchema: true,
-  //     synchronize: true,
-  //     logging: false,
-  //   };
-  // }
-
   return {
     type: 'postgres',
     host: config.getDatabaseHost(),
@@ -27,8 +13,8 @@ export const getTypeOrmModuleOptions = (
     username: config.getDatabaseUser(),
     password: config.getDatabasePassword(),
     database: config.getDatabaseName(),
-    entities,
-    subscribers,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    subscribers: [__dirname + '/../**/*.subscriber{.ts,.js}'],
     synchronize: true,
     // logging: true,
   };
