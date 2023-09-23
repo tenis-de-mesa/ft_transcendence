@@ -63,7 +63,7 @@ jobs:
         working-directory: ./backend
         run: pnpm test
 
-      - name: test
+      - name: test integration
         working-directory: ./backend
         run: pnpm test:integration
 
