@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
+import { s3ClientProvider } from '../lib/aws/s3Client';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -33,6 +34,7 @@ describe('UsersController', () => {
       controllers: [UsersController],
       providers: [
         UsersService,
+        s3ClientProvider,
         {
           provide: getRepositoryToken(UserEntity),
           useValue: {

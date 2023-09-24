@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { s3ClientProvider } from '../lib/aws/s3Client';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -31,6 +32,7 @@ describe('UsersService', () => {
     app = await Test.createTestingModule({
       providers: [
         UsersService,
+        s3ClientProvider,
         {
           provide: getRepositoryToken(UserEntity),
           useValue: {

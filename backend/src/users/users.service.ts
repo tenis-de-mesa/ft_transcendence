@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { s3Client } from '../lib/aws/s3Client';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
@@ -13,6 +12,7 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(SessionEntity)
     private readonly sessionRepository: Repository<SessionEntity>,
+    @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
@@ -100,7 +100,7 @@ export class UsersService {
       Body: file.buffer,
       ContentType: file.mimetype,
     });
-    await s3Client.send(command);
+    await this.s3Client.send(command);
     return await this.userRepository.update(user.id, {
       avatarUrl: `https://transcendence-images.s3.amazonaws.com/${imageKey}`,
     });
