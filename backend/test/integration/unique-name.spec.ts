@@ -26,6 +26,7 @@ describe('Unique Name', () => {
 
   it('should be defined', async () => {
     expect(app).toBeDefined();
+    expect(usersService).toBeDefined();
   });
 
   it('check unique nicknames', async () => {

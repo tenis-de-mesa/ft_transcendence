@@ -1,7 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { Provider } from '@nestjs/common';
 
-export const s3ClientProvider: Provider = {
+export const S3ClientProvider: Provider = {
   provide: S3Client,
   useFactory: () => {
     const REGION = 'sa-east-1';
