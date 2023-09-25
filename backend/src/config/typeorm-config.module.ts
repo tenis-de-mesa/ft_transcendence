@@ -23,8 +23,12 @@ export const getTypeOrmModuleOptions = (
     return { ...options, synchronize: false };
   }
 
+  if (config.getNodeEnv() == 'development') {
+    return { ...options, synchronize: true };
+  }
+
   if (config.getNodeEnv() == 'local') {
-    return { ...options, dropSchema: true, logger: 'file' };
+    return { ...options, dropSchema: true };
   }
 
   if (config.getNodeEnv() == 'test') {
