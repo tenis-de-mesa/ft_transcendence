@@ -4,11 +4,7 @@ import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
 import { AuthProvider, UserEntity } from '../../src/core/entities';
-import {
-  PutObjectCommand,
-  S3Client,
-  ServiceOutputTypes,
-} from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 describe('Default Avatar', () => {
   let app: INestApplication;
