@@ -13,6 +13,19 @@ services:
     networks:
       - internal
 
+  db-test:
+    profiles: ["test"]
+    image: "postgres:alpine"
+    restart: "always"
+    ports:
+      - 5555:5432
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    networks:
+      - internal
+
   backend:
     build: ./backend
     ports:
