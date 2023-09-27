@@ -8,32 +8,41 @@ import Avatar from "../components/Avatar";
 export default function Profile() {
   const user = useRouteLoaderData("root") as User;
 
+  const flipCard = () => {
+    const alternate = document.querySelector(".flip-card .wrapper");
+    if (alternate) {
+      alternate.classList.toggle("flipped");
+    }
+  };
+
   return (
     <div className="profile">
-      <div className="card">
-        <center>
-          <Avatar login={user.login} avatarUrl={user.avatarUrl} />
-        </center>
-        <center>
-          <h1>{user.nickname}</h1>
-        </center>
-        <hr />
-        <p>
-          <strong>Login:</strong> {user.login}
-        </p>
-        <p>
-          <strong>Nickname:</strong> {user.nickname}
-        </p>
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <Link to={"/logout"}>Sair</Link>
+      <div className="flip-card">
+        <div className="wrapper">
+          <div className="card back">
+            <UserForm user={user} />
+            <button onClick={flipCard} className="back-button">
+              Voltar
+            </button>
+          </div>
+          <div className="card front">
+            <center>
+              <Avatar login={user.login} avatarUrl={user.avatarUrl} />
+              <h1>{user.nickname}</h1>
+              <button onClick={flipCard} className="edit-button">
+                Editar
+              </button>
+            </center>
+            <hr />
+            <p>
+              <strong>Login:</strong> {user.login}
+            </p>
+            <p>
+              <strong>Nickname:</strong> {user.nickname}
+            </p>
+            <Link to={"/logout"}>Sair</Link>
+          </div>
         </div>
-      </div>
-      <h2>
-        TODO:
-        <br /> Botão de edit troca o card acima pelo abaixo
-      </h2>
-      <div className="card">
-        <UserForm user={user} />
       </div>
     </div>
   );
