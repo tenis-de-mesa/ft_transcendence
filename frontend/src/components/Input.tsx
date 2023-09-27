@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import classNames from "classnames";
 import { Typography } from "./Typography";
 
-export interface TextInputProps {
+export interface InputProps {
   type: "text" | "email" | "password";
   value: string;
   handleChange: (value: string) => void;
@@ -16,7 +16,7 @@ export interface TextInputProps {
   disabled?: boolean;
 }
 
-export const TextInput: FC<TextInputProps> = ({
+export const Input: FC<InputProps> = ({
   type,
   value,
   handleChange,

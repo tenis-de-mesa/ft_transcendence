@@ -1,22 +1,22 @@
 import React from "react";
 import { Meta } from "@storybook/react";
 import StoryLayout from "./StoryLayout";
-import { TextInput, TextInputProps } from "../components/TextInput";
+import { Input, InputProps } from "../components/Input";
 import { FiAlertCircle, FiHelpCircle, FiMail } from "react-icons/fi";
 
 const meta: Meta = {
-  title: "Components/TextInput",
-  component: TextInput,
+  title: "Components/Input",
+  component: Input,
   tags: ["autodocs"],
 };
 
 export default meta;
 
-interface Props extends TextInputProps {
+interface Props extends InputProps {
   darkMode: boolean;
 }
 
-const StoryTextInput = (args: Props) => {
+const StoryInput = (args: Props) => {
   const [text1, setText1] = React.useState<string>(args.value);
 
   const handleChange = (value: string) => {
@@ -26,7 +26,7 @@ const StoryTextInput = (args: Props) => {
   return (
     <StoryLayout {...args} className="flex space-x-8">
       <div>
-        <TextInput
+        <Input
           type="text"
           value={text1}
           handleChange={handleChange}
@@ -35,7 +35,7 @@ const StoryTextInput = (args: Props) => {
           disabled={args.disabled}
         />
         <div className="mb-11" />
-        <TextInput
+        <Input
           type="password"
           value={text1}
           handleChange={handleChange}
@@ -45,7 +45,7 @@ const StoryTextInput = (args: Props) => {
         />
       </div>
       <div>
-        <TextInput
+        <Input
           type="email"
           value={text1}
           handleChange={handleChange}
@@ -57,7 +57,7 @@ const StoryTextInput = (args: Props) => {
           disabled={args.disabled}
         />
         <div className="mb-4" />
-        <TextInput
+        <Input
           type="email"
           value={text1}
           handleChange={handleChange}
@@ -70,7 +70,7 @@ const StoryTextInput = (args: Props) => {
         />
       </div>
       <div>
-        <TextInput
+        <Input
           type="text"
           value={text1}
           handleChange={handleChange}
@@ -82,7 +82,7 @@ const StoryTextInput = (args: Props) => {
           disabled={args.disabled}
         />
         <div className="mb-4" />
-        <TextInput
+        <Input
           type="text"
           value={text1}
           handleChange={handleChange}
@@ -98,7 +98,7 @@ const StoryTextInput = (args: Props) => {
   );
 };
 
-export const Default = StoryTextInput.bind({});
+export const Default = StoryInput.bind({});
 
 Default.args = {
   darkMode: false,
