@@ -5,7 +5,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { SessionsService } from '../../sessions/sessions.service';
+import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
 import { SessionEntity } from '../../core/entities';
 import { UserStatus } from '../../core/entities';

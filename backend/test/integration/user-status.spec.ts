@@ -6,7 +6,7 @@ import { UsersService } from '../../src/users/users.service';
 import { AuthProvider, SessionEntity } from '../../src/core/entities';
 import { StatusGateway } from '../../src/users/status/status.gateway';
 import { StatusModule } from '../../src/users/status/status.module';
-import { SessionsService } from '../../src/sessions/sessions.service';
+import { SessionsService } from '../../src/users/sessions/sessions.service';
 
 describe('User Status', () => {
   let app: INestApplication;
