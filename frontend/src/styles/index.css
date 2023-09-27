@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.link {
+  @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300;
+}
+
+.active {
+  @apply text-primary-400 bg-primary-50 dark:bg-gray-600;
+}
+
+@layer components {
+  /* Badge */
+  .badge-base {
+    @apply inline-flex items-center font-medium rounded-2xl;
+  }
+
+  .badge-primary {
+    @apply bg-primary-50 text-primary-700;
+  }
+
+  .badge-success {
+    @apply bg-success-50 text-success-700;
+  }
+
+  .badge-info {
+    @apply bg-info-50 text-info-700;
+  }
+
+  .badge-warning {
+    @apply bg-warning-50 text-warning-700;
+  }
+
+  .badge-error {
+    @apply bg-error-50 text-error-700;
+  }
+
+  .badge-gray {
+    @apply text-gray-700 bg-gray-100;
+  }
+
+  .badge-sm {
+    @apply h-5 px-2 text-xs;
+  }
+
+  .badge-md {
+    @apply h-6 px-2.5 text-xs;
+  }
+
+  .badge-lg {
+    @apply px-3 text-sm h-7;
+  }
+
+  /* Button */
+  .btn-base {
+    @apply flex items-center font-medium rounded-lg select-none focus:outline-none whitespace-nowrap;
+  }
+
+  .btn-sm {
+    @apply h-9 px-3.5 text-sm;
+  }
+
+  .btn-md {
+    @apply h-10 px-4 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-4 h-11 text-md;
+  }
+
+  .btn-xl {
+    @apply h-12 px-5 text-md;
+  }
+
+  .btn-2xl {
+    @apply h-16 text-lg px-7;
+  }
+
+  .btn-icon-sm {
+    @apply h-9 w-9;
+  }
+
+  .btn-icon-md {
+    @apply w-10 h-10;
+  }
+
+  .btn-icon-lg {
+    @apply h-11 w-11;
+  }
+
+  .btn-icon-xl {
+    @apply w-12 h-12;
+  }
+
+  .btn-icon-2xl {
+    @apply w-16 h-16;
+  }
+
+  /* Primary */
+  .btn-primary {
+    @apply text-white bg-primary-600 dark:bg-primary-400 dark:text-white;
+  }
+
+  .btn-primary-hover {
+    @apply hover:bg-primary-700 dark:hover:bg-primary-700;
+  }
+
+  .btn-primary-focus {
+    @apply focus:ring-4 focus:ring-primary-100 dark:focus:ring-primary-100 dark:focus:ring-opacity-20;
+  }
+
+  .btn-primary-disabled {
+    @apply text-primary-600 bg-primary-100 dark:bg-primary-200 dark:text-primary-600;
+  }
+
+  /* Success */
+  .btn-success {
+    @apply text-white bg-success-600 dark:bg-success-400 dark:text-white;
+  }
+
+  .btn-success-hover {
+    @apply hover:bg-success-700 dark:hover:bg-success-700;
+  }
+
+  .btn-success-focus {
+    @apply focus:ring-4 focus:ring-success-100 dark:focus:ring-success-100 dark:focus:ring-opacity-20;
+  }
+
+  .btn-success-disabled {
+    @apply text-success-600 bg-success-100 dark:bg-success-200;
+  }
+
+  /* Info */
+  .btn-info {
+    @apply text-white bg-info-600 dark:bg-info-400 dark:text-white;
+  }
+
+  .btn-info-hover {
+    @apply hover:bg-info-700 dark:hover:bg-info-700;
+  }
+
+  .btn-info-focus {
+    @apply focus:ring-4 focus:ring-info-100 dark:focus:ring-info-100 dark:focus:ring-opacity-20;
+  }
+
+  .btn-info-disabled {
+    @apply text-info-900 bg-info-100 dark:bg-info-200;
+  }
+
+  /* Warning */
+  .btn-warning {
+    @apply text-white bg-warning-600 dark:bg-warning-400 dark:text-white;
+  }
+
+  .btn-warning-hover {
+    @apply hover:bg-warning-700 dark:hover:bg-warning-700;
+  }
+
+  .btn-warning-focus {
+    @apply focus:ring-4 focus:ring-warning-100 dark:focus:ring-warning-100 dark:focus:ring-opacity-20;
+  }
+
+  .btn-warning-disabled {
+    @apply text-warning-600 bg-warning-100 dark:bg-warning-200;
+  }
+
+  /* Error */
+  .btn-error {
+    @apply text-white bg-error-600 dark:bg-error-400 dark:text-white;
+  }
+
+  .btn-error-hover {
+    @apply hover:bg-error-700 dark:hover:bg-error-700;
+  }
+
+  .btn-error-focus {
+    @apply focus:ring-4 focus:ring-error-100 dark:focus:ring-error-100 dark:focus:ring-opacity-20;
+  }
+
+  .btn-error-disabled {
+    @apply text-error-600 bg-error-100 dark:bg-error-200;
+  }
+
+  /* Button group */
+  .btn-group {
+    @apply inline-flex items-center h-10 px-4 text-sm font-medium text-gray-700 border border-gray-300 whitespace-nowrap focus:outline-none hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-white dark:border-gray-500;
+  }
+
+  /* Navbar */
+  .navItem {
+    @apply flex items-center w-full h-10 py-2 transition-all duration-100 ease-out rounded-lg cursor-pointer select-none text-md whitespace-nowrap hover:bg-primary-50 dark:hover:bg-gray-100 dark:hover:bg-opacity-10;
+  }
+}
+
+@layer utilities {
+  @variants responsive {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+  }
+}
