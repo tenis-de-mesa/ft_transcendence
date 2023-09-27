@@ -10,7 +10,6 @@ export default function Avatar({ login, avatarUrl }: AvatarProps) {
   if (avatarUrl) {
     return <img className="avatar" src={avatarUrl} alt="avatar" />;
   }
-
   // Otherwise, generate an avatar using the user's login
   return (
     <img

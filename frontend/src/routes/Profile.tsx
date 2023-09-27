@@ -1,63 +1,48 @@
-import { useRouteLoaderData } from "react-router-dom";
-import { UpdateUser } from "./users";
+import { Link, useRouteLoaderData } from "react-router-dom";
 import { User } from "../types/types";
+import UserForm from "../components/UserForm";
 
-import "./shared.css";
-import { useRef, useState } from "react";
-import Avatar from "./Avatar";
+import "./Profile.css";
+import Avatar from "../components/Avatar";
 
 export default function Profile() {
   const user = useRouteLoaderData("root") as User;
 
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
-
-  const handleUpdateAvatar = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
+  const flipCard = () => {
+    const alternate = document.querySelector(".flip-card .wrapper");
+    if (alternate) {
+      alternate.classList.toggle("flipped");
     }
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await fetch("http://localhost:3001/users/avatar", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
-    if (!response.ok) {
-      console.error("Failed to upload image");
-      return;
-    }
-    const data = await response.json();
-    setAvatarUrl(data.avatarUrl);
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleChooseAvatar = () => {
-    fileInputRef.current?.click();
   };
 
   return (
     <div className="profile">
-      <div className="card">
-        <center>
-          <Avatar login={user.login} avatarUrl={avatarUrl} />
-        </center>
-        <center>
-          <button onClick={handleChooseAvatar}>Alterar avatar</button>
-        </center>
-        <hr />
-        <UpdateUser nickname={user.nickname} />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleUpdateAvatar}
-          ref={fileInputRef}
-          style={{ display: "none" }}
-        />
+      <div className="flip-card">
+        <div className="wrapper">
+          <div className="card back">
+            <UserForm user={user} />
+            <button onClick={flipCard} className="back-button">
+              Voltar
+            </button>
+          </div>
+          <div className="card front">
+            <center>
+              <Avatar login={user.login} avatarUrl={user.avatarUrl} />
+              <h1>{user.nickname}</h1>
+              <button onClick={flipCard} className="edit-button">
+                Editar
+              </button>
+            </center>
+            <hr />
+            <p>
+              <strong>Login:</strong> {user.login}
+            </p>
+            <p>
+              <strong>Nickname:</strong> {user.nickname}
+            </p>
+            <Link to={"/logout"}>Sair</Link>
+          </div>
+        </div>
       </div>
     </div>
   );
