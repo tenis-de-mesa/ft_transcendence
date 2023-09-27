@@ -6,11 +6,13 @@ import { UsersService } from '../../src/users/users.service';
 import { AuthProvider, Session } from '../../src/core/entities';
 import { StatusGateway } from '../../src/status/status.gateway';
 import { StatusModule } from '../../src/status/status.module';
+import { SessionsService } from '../../src/sessions/sessions.service';
 
 describe('User Status', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let statusGateway: StatusGateway;
+  let sessionsService: SessionsService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -19,6 +21,7 @@ describe('User Status', () => {
     app = moduleFixture.createNestApplication();
     usersService = app.get(UsersService);
     statusGateway = app.get(StatusGateway);
+    sessionsService = app.get(SessionsService);
     await app.init();
   });
 
@@ -30,6 +33,7 @@ describe('User Status', () => {
     expect(app).toBeDefined();
     expect(usersService).toBeDefined();
     expect(statusGateway).toBeDefined();
+    expect(sessionsService).toBeDefined();
   });
 
   it('default status', async () => {
@@ -53,19 +57,24 @@ describe('User Status', () => {
       intraId: 2,
     });
 
-    const mockSession = jest
+    const mockStatusGateway = jest
       .spyOn(statusGateway, 'getSession')
       .mockResolvedValueOnce(new Session({ userId: id } as Session));
+
+    const mockSessionUpdate = jest
+      .spyOn(sessionsService, 'updateSession')
+      .mockImplementationOnce(jest.fn());
+
+    const handleConnectionSpy = jest.spyOn(statusGateway, 'handleConnection');
+
     // Act
-
-    // TODO: simulate statusGateway.handleConnection
-    // statusGateway.handleConnection(new Socket());
-
+    await statusGateway.handleConnection({ id: 'test' } as any);
     const user = await usersService.getUserById(id);
 
     // Assert
-
-    //expect(mockSession).toBeCalled();
-    //expect(user.status).toEqual('online');
+    expect(mockStatusGateway).toBeCalled();
+    expect(mockSessionUpdate).toBeCalled();
+    expect(handleConnectionSpy).toBeCalled();
+    expect(user.status).toEqual('online');
   });
 });
