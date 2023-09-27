@@ -48,7 +48,7 @@ services:
     build: ./frontend
     container_name: storybook
     init: true
-    command: pnpm run storybook
+    command: pnpm run storybook --disable-telemetry
     ports:
       - 6006:6006
     volumes:
