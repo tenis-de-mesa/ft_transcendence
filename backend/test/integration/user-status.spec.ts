@@ -4,8 +4,8 @@ import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
 import { AuthProvider, Session } from '../../src/core/entities';
-import { StatusGateway } from '../../src/status/status.gateway';
-import { StatusModule } from '../../src/status/status.module';
+import { StatusGateway } from '../../src/users/status/status.gateway';
+import { StatusModule } from '../../src/users/status/status.module';
 import { SessionsService } from '../../src/sessions/sessions.service';
 
 describe('User Status', () => {

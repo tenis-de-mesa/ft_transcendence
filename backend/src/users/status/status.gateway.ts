@@ -5,10 +5,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { SessionsService } from '../sessions/sessions.service';
-import { UsersService } from '../users/users.service';
-import { Session } from '../core/entities';
-import { UserStatus } from '../core/entities';
+import { SessionsService } from '../../sessions/sessions.service';
+import { UsersService } from '../users.service';
+import { Session } from '../../core/entities';
+import { UserStatus } from '../../core/entities';
 import * as cookie from 'cookie';
 
 @WebSocketGateway({
