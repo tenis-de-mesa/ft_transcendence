@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
-import { User, FriendRequest } from '../../core/entities';
+import { UserEntity, FriendRequest } from '../../core/entities';
 
 @Injectable()
 export class FriendRequestService {
   @InjectRepository(FriendRequest)
   readonly friendRequestRepository: Repository<FriendRequest>;
 
-  @InjectRepository(User)
-  readonly userRepository: Repository<User>;
+  @InjectRepository(UserEntity)
+  readonly userRepository: Repository<UserEntity>;
 
   async all(): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find();
   }
 
-  async receivedByUser(user: User): Promise<FriendRequest[]> {
+  async receivedByUser(user: UserEntity): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find({
       where: {
         receiver: {

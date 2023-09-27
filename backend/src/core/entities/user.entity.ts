@@ -20,7 +20,7 @@ export enum UserStatus {
 }
 
 @Entity({ name: 'users' })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -69,7 +69,7 @@ export class User {
   sessions: Session[];
 
   @ApiHideProperty()
-  @ManyToMany(() => User)
+  @ManyToMany(() => UserEntity)
   @JoinTable({
     name: 'friends',
     joinColumn: {
@@ -79,7 +79,7 @@ export class User {
       name: 'friend_id',
     },
   })
-  friends: User[];
+  friends: UserEntity[];
 
   @ApiHideProperty()
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
@@ -89,7 +89,7 @@ export class User {
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
 
-  constructor(user?: User) {
+  constructor(user?: UserEntity) {
     this.id = user?.id;
     this.login = user?.login;
     this.nickname = user?.nickname;

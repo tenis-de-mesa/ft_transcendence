@@ -3,23 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { User, Session, AuthProvider } from '../core/entities';
+import { UserEntity, Session, AuthProvider } from '../core/entities';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find();
   }
 
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async createUser(dto: CreateUserDto): Promise<UserEntity> {
     let nickname = dto.login;
 
     while (!(await this.checkNicknameAvailable(nickname))) {
@@ -29,11 +29,11 @@ export class UsersService {
     return await this.userRepository.save({ ...dto, nickname });
   }
 
-  async getUserById(id: number): Promise<User> {
+  async getUserById(id: number): Promise<UserEntity> {
     return await this.userRepository.findOneBy({ id: id });
   }
 
-  async getUserByIntraId(id: number): Promise<User> {
+  async getUserByIntraId(id: number): Promise<UserEntity> {
     return await this.userRepository.findOneBy({ intraId: id });
   }
 
@@ -65,7 +65,7 @@ export class UsersService {
     return await query.execute();
   }
 
-  async findObsoleteGuestUsers(): Promise<User[]> {
+  async findObsoleteGuestUsers(): Promise<UserEntity[]> {
     // Query to find guest users that have expired sessions
     // or no sessions at all attached to them
     const guestUsers = await this.userRepository
@@ -90,7 +90,7 @@ export class UsersService {
   }
 
   async updateAvatar(
-    user: User,
+    user: UserEntity,
     file: Express.Multer.File,
   ): Promise<UpdateResult> {
     const imageKey = user.id + file.originalname;
@@ -106,7 +106,7 @@ export class UsersService {
     });
   }
 
-  async getUserFriends(user: User): Promise<User[]> {
+  async getUserFriends(user: UserEntity): Promise<UserEntity[]> {
     const _user = await this.userRepository.findOne({
       where: {
         id: user.id,
