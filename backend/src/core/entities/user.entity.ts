@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { SessionEntity, FriendRequest } from '.';
+import { SessionEntity, FriendRequestEntity } from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -82,12 +82,18 @@ export class UserEntity {
   friends: UserEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
-  friend_requests_received: FriendRequest[];
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friend_request) => friend_request.receiver,
+  )
+  friend_requests_received: FriendRequestEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
-  friend_requests_sent: FriendRequest[];
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friend_request) => friend_request.sender,
+  )
+  friend_requests_sent: FriendRequestEntity[];
 
   constructor(user?: UserEntity) {
     this.id = user?.id;

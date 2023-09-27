@@ -2,7 +2,7 @@ import { UserEntity } from '.';
 import { Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'friend_requests' })
-export class FriendRequest {
+export class FriendRequestEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
