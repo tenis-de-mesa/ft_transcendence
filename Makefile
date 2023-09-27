@@ -37,7 +37,7 @@ test:
 	docker compose --profile test up db-test -d
 	docker compose run --no-deps frontend pnpm test
 	docker compose run --no-deps backend pnpm test
-	docker compose --profile test run --no-deps backend pnpm test:integration:local
+	docker compose run --no-deps backend pnpm test:integration:local
 	docker compose run --no-deps backend pnpm test:e2e:local
 	docker compose --profile test down db-test
 
