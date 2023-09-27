@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { Pagination } from "react-headless-pagination";
 import classNames from "classnames";

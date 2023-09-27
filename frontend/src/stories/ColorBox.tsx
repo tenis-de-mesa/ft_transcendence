@@ -1,5 +1,3 @@
-import React from "react";
-
 import { IColor } from "../@interfaces";
 import { Typography } from "../components/Typography";
 

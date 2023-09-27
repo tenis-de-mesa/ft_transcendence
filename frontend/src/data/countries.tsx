@@ -1,4 +1,3 @@
-import React from "react";
 import { IOption } from "../@interfaces";
 import { CountryISO, images } from "./images";
 

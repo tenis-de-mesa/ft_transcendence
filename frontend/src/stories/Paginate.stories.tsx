@@ -22,6 +22,7 @@ const StoryPagination = (args: Props) => {
     if (page >= 0 && page <= 10) {
       setPage(args.page);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [args.page]);
 
   return (

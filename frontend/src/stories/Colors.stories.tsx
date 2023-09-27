@@ -1,8 +1,6 @@
 import type { Meta } from "@storybook/react";
 
 import { ColorBox } from "./ColorBox";
-import React from "react";
-
 import { colors } from "../data/colors";
 import StoryLayout from "./StoryLayout";
 

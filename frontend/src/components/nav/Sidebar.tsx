@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 import { useLocation } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
@@ -37,7 +37,7 @@ export const Sidebar: FC<ISidebarProps> = ({
 
   const { pathname } = useLocation();
 
-  const Sidebar_animation = isTab
+  const SidebarAnimation = isTab
     ? {
         open: {
           x: 0,
@@ -78,9 +78,13 @@ export const Sidebar: FC<ISidebarProps> = ({
     }
   }, [isTab]);
 
-  useEffect(() => {
+  const closeMobileMenu = useCallback((isTab: boolean) => {
     isTab && setIsOpen(false);
-  }, [pathname]);
+  }, []);
+
+  useEffect(() => {
+    closeMobileMenu(isTab);
+  }, [pathname, isTab, closeMobileMenu]);
 
   return (
     <div>
@@ -96,7 +100,7 @@ export const Sidebar: FC<ISidebarProps> = ({
       ></div>
 
       <motion.div
-        variants={Sidebar_animation}
+        variants={SidebarAnimation}
         initial={{ x: isTab ? -250 : 0 }}
         animate={isOpen ? "open" : "closed"}
         className={classNames(

@@ -1,4 +1,3 @@
-import React from "react";
 import { Meta } from "@storybook/react";
 import { FiStar, FiArrowRight } from "react-icons/fi";
 import { Button, ButtonProps } from "../components/Button";
