@@ -11,7 +11,7 @@ import {
 import { UserEntity } from '.';
 
 @Entity({ name: 'sessions' })
-export class Session implements ISession {
+export class SessionEntity implements ISession {
   @Index()
   @Column('bigint')
   expiredAt: number;
@@ -35,7 +35,7 @@ export class Session implements ISession {
   @Column({ nullable: true })
   socketId: string;
 
-  constructor(session?: Session) {
+  constructor(session?: SessionEntity) {
     this.id = session?.id;
     this.expiredAt = session?.expiredAt;
     this.json = session?.json;

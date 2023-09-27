@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Session, UserEntity } from '../core/entities';
+import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
@@ -46,7 +46,7 @@ describe('UsersController', () => {
           },
         },
         {
-          provide: getRepositoryToken(Session),
+          provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
           },

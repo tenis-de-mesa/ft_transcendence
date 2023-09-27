@@ -3,15 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { UserEntity, Session, AuthProvider } from '../core/entities';
+import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(Session)
-    private readonly sessionRepository: Repository<Session>,
+    @InjectRepository(SessionEntity)
+    private readonly sessionRepository: Repository<SessionEntity>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
@@ -55,7 +55,7 @@ export class UsersService {
     const query = this.sessionRepository
       .createQueryBuilder()
       .delete()
-      .from(Session)
+      .from(SessionEntity)
       .where('userId = :userId', { userId });
 
     if (exceptIds.length > 0) {
