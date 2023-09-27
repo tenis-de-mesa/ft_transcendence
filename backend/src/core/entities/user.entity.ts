@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { SessionEntity, FriendRequestEntity } from '.';
+import { Session, FriendRequest } from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -20,7 +20,7 @@ export enum UserStatus {
 }
 
 @Entity({ name: 'users' })
-export class UserEntity {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -65,11 +65,11 @@ export class UserEntity {
   })
   status: UserStatus;
 
-  @OneToMany(() => SessionEntity, (session) => session.user)
-  sessions: SessionEntity[];
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 
   @ApiHideProperty()
-  @ManyToMany(() => UserEntity)
+  @ManyToMany(() => User)
   @JoinTable({
     name: 'friends',
     joinColumn: {
@@ -79,23 +79,17 @@ export class UserEntity {
       name: 'friend_id',
     },
   })
-  friends: UserEntity[];
+  friends: User[];
 
   @ApiHideProperty()
-  @OneToMany(
-    () => FriendRequestEntity,
-    (friend_request) => friend_request.receiver,
-  )
-  friend_requests_received: FriendRequestEntity[];
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
+  friend_requests_received: FriendRequest[];
 
   @ApiHideProperty()
-  @OneToMany(
-    () => FriendRequestEntity,
-    (friend_request) => friend_request.sender,
-  )
-  friend_requests_sent: FriendRequestEntity[];
+  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
+  friend_requests_sent: FriendRequest[];
 
-  constructor(user?: UserEntity) {
+  constructor(user?: User) {
     this.id = user?.id;
     this.login = user?.login;
     this.nickname = user?.nickname;

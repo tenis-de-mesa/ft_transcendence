@@ -7,7 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users/users.service';
-import { SessionEntity } from '../core/entities';
+import { Session } from '../core/entities';
 import { UserStatus } from '../core/entities';
 import * as cookie from 'cookie';
 
@@ -54,7 +54,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('userStatus', { id: userId, status });
   }
 
-  async getSession(client: Socket): Promise<SessionEntity> {
+  async getSession(client: Socket): Promise<Session> {
     const sessionId = this.getSessionId(client);
     return await this.sessionService.getSessionById(sessionId);
   }

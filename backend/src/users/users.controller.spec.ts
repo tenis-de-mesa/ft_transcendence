@@ -1,33 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { SessionEntity, UserEntity } from '../core/entities';
+import { Session, User } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 
-const usersEntityList: UserEntity[] = [
-  new UserEntity({
+const usersEntityList: User[] = [
+  new User({
     id: 1,
     login: 'login-1',
     nickname: 'login-1',
-  } as UserEntity),
-  new UserEntity({
+  } as User),
+  new User({
     id: 2,
     login: 'login-2',
     nickname: 'login-2',
-  } as UserEntity),
-  new UserEntity({
+  } as User),
+  new User({
     id: 3,
     login: 'login-3',
     nickname: 'login-3',
-  } as UserEntity),
+  } as User),
 ];
 
 describe('UsersController', () => {
   let app: TestingModule;
   let usersController: UsersController;
-  let userRepository: Repository<UserEntity>;
+  let userRepository: Repository<User>;
 
   beforeEach(async () => {
     app = await Test.createTestingModule({
@@ -36,7 +36,7 @@ describe('UsersController', () => {
         UsersService,
         S3ClientProvider,
         {
-          provide: getRepositoryToken(UserEntity),
+          provide: getRepositoryToken(User),
           useValue: {
             find: jest.fn(),
             save: jest.fn(),
@@ -46,7 +46,7 @@ describe('UsersController', () => {
           },
         },
         {
-          provide: getRepositoryToken(SessionEntity),
+          provide: getRepositoryToken(Session),
           useValue: {
             createQueryBuilder: jest.fn(),
           },
@@ -55,9 +55,7 @@ describe('UsersController', () => {
     }).compile();
 
     usersController = app.get<UsersController>(UsersController);
-    userRepository = app.get<Repository<UserEntity>>(
-      getRepositoryToken(UserEntity),
-    );
+    userRepository = app.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(async () => {

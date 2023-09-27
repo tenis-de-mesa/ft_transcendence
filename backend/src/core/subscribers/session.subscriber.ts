@@ -3,26 +3,24 @@ import {
   EventSubscriber,
   InsertEvent,
 } from 'typeorm';
-import { SessionEntity } from '../entities';
+import { Session } from '../entities';
 
 @EventSubscriber()
-export class SessionSubscriber
-  implements EntitySubscriberInterface<SessionEntity>
-{
+export class SessionSubscriber implements EntitySubscriberInterface<Session> {
   /**
    * Indicates that this subscriber only listen to Session events.
    */
   listenTo() {
-    return SessionEntity;
+    return Session;
   }
 
   /**
    * Called before Session insertion.
    */
-  beforeInsert(event: InsertEvent<SessionEntity>) {
+  beforeInsert(event: InsertEvent<Session>) {
     const json = JSON.parse(event.entity.json);
     const userId = json.passport.user;
     const manager = event.manager;
-    manager.merge(SessionEntity, event.entity, { userId: userId });
+    manager.merge(Session, event.entity, { userId: userId });
   }
 }

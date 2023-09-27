@@ -1,16 +1,16 @@
-import { UserEntity } from '.';
+import { User } from '.';
 import { Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'friend_requests' })
-export class FriendRequestEntity {
+export class FriendRequest {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.friend_requests_received)
+  @ManyToOne(() => User, (user) => user.friend_requests_received)
   @JoinColumn({ name: 'receiver_id' })
-  receiver: UserEntity;
+  receiver: User;
 
-  @ManyToOne(() => UserEntity, (user) => user.friend_requests_sent)
+  @ManyToOne(() => User, (user) => user.friend_requests_sent)
   @JoinColumn({ name: 'sender_id' })
-  sender: UserEntity;
+  sender: User;
 }
