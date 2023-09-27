@@ -3,6 +3,7 @@ version: "3.9"
 services:
   db:
     image: "postgres:alpine"
+    container_name: db
     restart: "always"
     ports:
       - 5432:5432
@@ -15,6 +16,7 @@ services:
 
   backend:
     build: ./backend
+    container_name: backend
     ports:
       - 3001:3001
       - 9229:9229
@@ -31,6 +33,7 @@ services:
 
   frontend:
     build: ./frontend
+    container_name: frontend
     ports:
       - 3000:3000
     volumes:
@@ -39,6 +42,17 @@ services:
       - backend
     networks:
       - internal
+
+  storybook:
+    image: storybook
+    build: ./frontend
+    container_name: storybook
+    init: true
+    command: pnpm run storybook
+    ports:
+      - 6006:6006
+    volumes:
+      - ./frontend:/frontend
 
 networks:
   internal:
