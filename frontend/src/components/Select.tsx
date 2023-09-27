@@ -83,9 +83,7 @@ export const Select: FC<SelectProps> = ({
                         },
                       )}
                     >
-                      <div className="flex items-center">
-                        {option.label}
-                      </div>
+                      <div className="flex items-center">{option.label}</div>
                       {selected ? (
                         <FiCheck className="ml-5 text-primary-600 dark:text-white" />
                       ) : null}

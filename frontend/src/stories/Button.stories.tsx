@@ -7,7 +7,7 @@ import StoryLayout from "./StoryLayout";
 const meta: Meta = {
   title: "Components/Button",
   component: Button,
-  tags: ['autodocs']
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -19,8 +19,12 @@ interface Props extends ButtonProps {
 const StoryButton = (args: Props) => (
   <StoryLayout {...args} className="space-y-2">
     <Button {...args}>Button</Button>
-    <Button {...args} LeadingIcon={<FiStar />}>Button</Button>
-    <Button {...args} TrailingIcon={<FiArrowRight />}>Button</Button>
+    <Button {...args} LeadingIcon={<FiStar />}>
+      Button
+    </Button>
+    <Button {...args} TrailingIcon={<FiArrowRight />}>
+      Button
+    </Button>
     <Button {...args} IconOnly={<FiArrowRight />} />
   </StoryLayout>
 );
@@ -36,6 +40,6 @@ Default.args = {
 
 Default.parameters = {
   controls: {
-    exclude: ["LeadingIcon", "TrailingIcon", "IconOnly"]
-  }
+    exclude: ["LeadingIcon", "TrailingIcon", "IconOnly"],
+  },
 };

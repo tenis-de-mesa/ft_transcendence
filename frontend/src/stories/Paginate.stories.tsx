@@ -42,11 +42,11 @@ Default.args = {
   darkMode: false,
   page: 0,
   totalPages: 10,
-  isMobile: false
+  isMobile: false,
 };
 
 Default.parameters = {
   controls: {
-    exclude: ["setPage"]
-  }
+    exclude: ["setPage"],
+  },
 };

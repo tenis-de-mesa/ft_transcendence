@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
-import classNames from 'classnames'
+import React, { FC } from "react";
+import classNames from "classnames";
 
-import { NavLink } from 'react-router-dom'
+import { NavLink } from "react-router-dom";
 
-import { Typography } from '../Typography'
-import { INavitem } from '../../@interfaces';
+import { Typography } from "../Typography";
+import { INavitem } from "../../@interfaces";
 
 interface INavitemProps {
   isOpen: boolean;
@@ -17,18 +17,18 @@ export const Navitem: FC<INavitemProps> = ({
   isOpen,
   item,
   onClick,
-  isActive
+  isActive,
 }) => {
   return (
     <>
       <li onClick={() => onClick(item.label)}>
-        <NavLink 
-          to={item.path!} 
-          className="link"
-        >
-          <item.icon.type size={23} className={classNames("text-gray-900 min-w-max dark:text-white", {
-            "text-primary-400": isActive
-          })} />
+        <NavLink to={item.path!} className="link">
+          <item.icon.type
+            size={23}
+            className={classNames("text-gray-900 min-w-max dark:text-white", {
+              "text-primary-400": isActive,
+            })}
+          />
           <Typography
             variant="lg"
             className={classNames({
@@ -41,5 +41,5 @@ export const Navitem: FC<INavitemProps> = ({
         </NavLink>
       </li>
     </>
-  )
-}
+  );
+};

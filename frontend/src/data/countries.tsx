@@ -42,7 +42,7 @@ export const countries: IOption[] = countriesData.map((country) => ({
   value: country.countryISO,
   label: (
     <>
-      <img src={images[country.countryISO]} className="w-5 h-5 mr-2"/>{" "}
+      <img src={images[country.countryISO]} className="w-5 h-5 mr-2" />{" "}
       {`${country.city}, ${country.countryISO}`}
     </>
   ),

@@ -1,7 +1,13 @@
 import React, { FC } from "react";
 import classNames from "classnames";
 
-type BadgeVariant = "primary" | "info" | "success" | "warning" | "error" | "gray";
+type BadgeVariant =
+  | "primary"
+  | "info"
+  | "success"
+  | "warning"
+  | "error"
+  | "gray";
 type BadgeSize = "sm" | "md" | "lg";
 
 export interface BadgeProps {

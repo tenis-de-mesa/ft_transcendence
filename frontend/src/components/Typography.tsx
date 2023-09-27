@@ -8,14 +8,13 @@ type TypographyVariant =
   | "md"
   | "lg"
   | "xl"
-  // Display
+  // Headings
   | "h6"
   | "h5"
   | "h4"
   | "h3"
   | "h2"
   | "h1";
-
 
 const TypographyVariantClasses: Record<TypographyVariant, string> = {
   xs: "text-xs",
@@ -31,10 +30,23 @@ const TypographyVariantClasses: Record<TypographyVariant, string> = {
   h1: "text-h1",
 };
 
-type TypographyWeightOption = "light" | "regular" | "medium" | "semibold" | "bold";
-type TypographyWeightValue = "font-light" | "font-normal" | "font-medium" | "font-semibold" | "font-bold";
+type TypographyWeightOption =
+  | "light"
+  | "regular"
+  | "medium"
+  | "semibold"
+  | "bold";
+type TypographyWeightValue =
+  | "font-light"
+  | "font-normal"
+  | "font-medium"
+  | "font-semibold"
+  | "font-bold";
 
-const TypographyWeightClasses: Record<TypographyWeightOption, TypographyWeightValue> = {
+const TypographyWeightClasses: Record<
+  TypographyWeightOption,
+  TypographyWeightValue
+> = {
   light: "font-light",
   regular: "font-normal",
   medium: "font-medium",
@@ -63,11 +75,16 @@ export const Typography: FC<TypographyProps> = ({
   const TypographyWeightClassName = TypographyWeightClasses[customWeight];
 
   const isHeading = variant.startsWith("h");
-  const Component = as ? as : ((isHeading ? variant : "p") as keyof JSX.IntrinsicElements);
+  const Component = as
+    ? as
+    : ((isHeading ? variant : "p") as keyof JSX.IntrinsicElements);
 
   return (
     <Component
-      className={classNames(TypographyVariantClassName, TypographyWeightClassName, className,
+      className={classNames(
+        TypographyVariantClassName,
+        TypographyWeightClassName,
+        className,
         {
           ["tracking-tight"]: ["h1", "h2", "h3"].includes(variant),
           ["text-black dark:text-white"]: !customColor,

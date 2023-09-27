@@ -7,7 +7,7 @@ import { FiAlertCircle, FiHelpCircle, FiMail } from "react-icons/fi";
 const meta: Meta = {
   title: "Components/TextInput",
   component: TextInput,
-  tags: ["autodocs"]
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -102,7 +102,7 @@ export const Default = StoryTextInput.bind({});
 
 Default.args = {
   darkMode: false,
-  disabled: false
+  disabled: false,
 };
 
 Default.parameters = {

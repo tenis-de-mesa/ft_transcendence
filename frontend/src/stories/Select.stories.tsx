@@ -11,7 +11,7 @@ import { prices } from "../data/prices";
 const meta: Meta = {
   title: "Components/Select",
   component: Select,
-  tags: ["autodocs"]
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -21,7 +21,9 @@ interface Props extends SelectProps {
 }
 
 const StorySelect = (args: Props) => {
-  const [selectedCountry, setSelectedCountry] = React.useState<IOption>(countries[0]);
+  const [selectedCountry, setSelectedCountry] = React.useState<IOption>(
+    countries[0],
+  );
   const [selectedDate, setSelectedDate] = React.useState<IOption>();
   const [selectedPrice, setSelectedPrice] = React.useState<IOption>();
 
@@ -79,6 +81,13 @@ Default.args = {
 
 Default.parameters = {
   controls: {
-    exclude: ["options", "selectedOption", "setSelectedOption", "LeadingIcon", "width", "placeholder"]
-  }
+    exclude: [
+      "options",
+      "selectedOption",
+      "setSelectedOption",
+      "LeadingIcon",
+      "width",
+      "placeholder",
+    ],
+  },
 };

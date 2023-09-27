@@ -49,7 +49,11 @@ export const TextInput: FC<TextInputProps> = ({
         })}
       >
         <div className="h-11 shadow-sm rounded-lg w-full absolute flex items-center justify-between px-3.5 pointer-events-none">
-          {LeadingIcon ? ( <LeadingIcon.type className="text-gray-500" /> ) : ( <div /> )}
+          {LeadingIcon ? (
+            <LeadingIcon.type className="text-gray-500" />
+          ) : (
+            <div />
+          )}
           {TrailingIcon ? (
             <TrailingIcon.type
               className={classNames({

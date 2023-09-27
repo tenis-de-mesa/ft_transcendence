@@ -10,7 +10,7 @@ import { Typography } from "../components/Typography";
 const meta: Meta = {
   title: "Components/Sidebar",
   component: Sidebar,
-  tags: ["autodocs"]
+  tags: ["autodocs"],
 };
 
 export default meta;
@@ -34,10 +34,11 @@ const StorySidebar = (args: Props) => {
           <main className="flex-1 py-4 mx-auto">
             <Routes>
               {navitems.map((item) => (
-                <Route 
-                  key={item.label} 
-                  path={item.path} 
-                  element={<Typography variant="h3">{item.label}</Typography>} />
+                <Route
+                  key={item.label}
+                  path={item.path}
+                  element={<Typography variant="h3">{item.label}</Typography>}
+                />
               ))}
             </Routes>
           </main>
@@ -51,15 +52,11 @@ export const Default = StorySidebar.bind({});
 
 Default.args = {
   darkMode: false,
-  className: ""
+  className: "",
 };
 
 Default.parameters = {
   controls: {
-    exclude: [
-      "options",
-      "username",
-      "email"
-    ]
-  }
+    exclude: ["options", "username", "email"],
+  },
 };

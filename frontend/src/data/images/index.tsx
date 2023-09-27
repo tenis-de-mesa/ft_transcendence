@@ -1,5 +1,5 @@
-export type CountryISO = 
-  | "BR" 
+export type CountryISO =
+  | "BR"
   | "KR"
   | "AR"
   | "DE"
@@ -20,15 +20,17 @@ export type CountryISO =
   | "CM"
   | "PT"
   | "FR"
-  | "CN"
-;
+  | "CN";
 
 type image = "logoDark" | "logoLight" | "demoAvatar" | CountryISO;
 
 const prodImages: Record<image, string> = {
-  logoDark: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695391752/transcendence/logo-dark.svg",
-  logoLight: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695391752/transcendence/logo-light.svg",
-  demoAvatar: "https://res.cloudinary.com/tailwindcss/image/upload/v1634915122/demoAvatar_jooj6y.png",
+  logoDark:
+    "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695391752/transcendence/logo-dark.svg",
+  logoLight:
+    "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695391752/transcendence/logo-light.svg",
+  demoAvatar:
+    "https://res.cloudinary.com/tailwindcss/image/upload/v1634915122/demoAvatar_jooj6y.png",
 
   BR: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695390151/transcendence/BR.svg",
   KR: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695390151/transcendence/KR.svg",
@@ -51,7 +53,7 @@ const prodImages: Record<image, string> = {
   CM: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695389667/transcendence/CM.svg",
   PT: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695389667/transcendence/PT.svg",
   FR: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695389655/transcendence/FR.svg",
-  CN: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695389625/transcendence/CN.svg"
+  CN: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695389625/transcendence/CN.svg",
 };
 
 export const images = prodImages;

@@ -69,8 +69,7 @@ export const Paginate: FC<PaginationProps> = ({
       )}
       truncableText="..."
       truncableClassName="w-10 px-0.5 text-center dark:text-gray-500"
-
-      edgePageCount={1} 
+      edgePageCount={1}
       middlePagesSiblingCount={1}
     >
       <Pagination.PrevButton
@@ -91,7 +90,9 @@ export const Paginate: FC<PaginationProps> = ({
         <Pagination.PageButton
           activeClassName="bg-primary-50 dark:bg-gray-600 text-primary-600 dark:text-white"
           inactiveClassName="text-gray-500"
-          className={"flex items-center justify-center h-10 w-10 rounded-full cursor-pointer font-medium"}
+          className={
+            "flex items-center justify-center h-10 w-10 rounded-full cursor-pointer font-medium"
+          }
         />
       </div>
 

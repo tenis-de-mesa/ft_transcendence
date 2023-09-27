@@ -12,13 +12,13 @@ const meta: Meta = {
   argTypes: {
     variant: {
       control: "radio",
-      options: ["primary", "success", "info", "warning", "error", "gray"]
+      options: ["primary", "success", "info", "warning", "error", "gray"],
     },
     size: {
       control: "inline-radio",
-      options: ["sm", "md", "lg"]
-    }
-  }
+      options: ["sm", "md", "lg"],
+    },
+  },
 };
 
 export default meta;
@@ -53,6 +53,6 @@ Default.args = {
 
 Default.parameters = {
   controls: {
-    exclude: ["LeadingIcon", "TrailingIcon", "className"]
-  }
+    exclude: ["LeadingIcon", "TrailingIcon", "className"],
+  },
 };

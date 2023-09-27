@@ -1,11 +1,13 @@
 import React, { FC, ButtonHTMLAttributes } from "react";
 import classNames from "classnames";
 
-
 type ButtonVariant = "primary" | "success" | "info" | "warning" | "error";
 type ButtonState = "default" | "hover" | "focus" | "disabled";
 
-const ButtonVariantClasses: Record<ButtonVariant, Record<ButtonState, string>> = {
+const ButtonVariantClasses: Record<
+  ButtonVariant,
+  Record<ButtonState, string>
+> = {
   primary: {
     default: "btn-primary",
     hover: "btn-primary-hover",
@@ -35,7 +37,7 @@ const ButtonVariantClasses: Record<ButtonVariant, Record<ButtonState, string>> =
     hover: "btn-error-hover",
     focus: "btn-error-focus shadow-grayDark",
     disabled: "btn-error-disabled",
-  }
+  },
 };
 
 type ButtonSize = "sm" | "md" | "lg" | "xl" | "2xl";
@@ -87,8 +89,13 @@ export const Button: FC<ButtonProps> = ({
       className={classNames("btn-base", className, {
         [ButtonSizeClasses[size]]: !IconOnly,
         [classNames(ButtonIconSizeClassName, "justify-center")]: IconOnly,
-        [classNames(ButtonVariantClassName.default, ButtonVariantClassName.hover, ButtonVariantClassName.focus)]: !disabled,
-        [classNames(ButtonVariantClassName.disabled, "cursor-not-allowed")]: disabled,
+        [classNames(
+          ButtonVariantClassName.default,
+          ButtonVariantClassName.hover,
+          ButtonVariantClassName.focus,
+        )]: !disabled,
+        [classNames(ButtonVariantClassName.disabled, "cursor-not-allowed")]:
+          disabled,
       })}
     >
       {LeadingIcon ? (
