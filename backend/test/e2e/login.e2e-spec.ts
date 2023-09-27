@@ -1,20 +1,15 @@
 import { CanActivate, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AuthenticatedGuard, IntraAuthGuard } from '../src/auth/guards';
-import { AppModule } from '../src/app.module';
+import { AuthenticatedGuard, IntraAuthGuard } from '../../src/auth/guards';
+import { AppModule } from '../../src/app.module';
 
 describe('OAuth in Intranet', () => {
   describe('not logged', () => {
     const mock_Guard: CanActivate = { canActivate: jest.fn(() => false) };
-
     let app: INestApplication;
 
-    beforeAll(async () => {
-      process.env = {
-        NODE_ENV: 'test',
-      };
-
+    beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
       })
@@ -28,7 +23,7 @@ describe('OAuth in Intranet', () => {
       await app.init();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       await app.close();
     });
 
@@ -39,14 +34,9 @@ describe('OAuth in Intranet', () => {
 
   describe('logged', () => {
     const mock_Guard: CanActivate = { canActivate: jest.fn(() => true) };
-
     let app: INestApplication;
 
-    beforeAll(async () => {
-      process.env = {
-        NODE_ENV: 'test',
-      };
-
+    beforeEach(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [AppModule],
       })
@@ -60,7 +50,7 @@ describe('OAuth in Intranet', () => {
       await app.init();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       await app.close();
     });
 

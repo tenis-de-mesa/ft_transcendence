@@ -34,4 +34,14 @@ export class Session implements ISession {
 
   @Column({ nullable: true })
   socketId: string;
+
+  constructor(session?: Session) {
+    this.id = session?.id;
+    this.expiredAt = session?.expiredAt;
+    this.json = session?.json;
+    this.destroyedAt = session?.destroyedAt;
+    this.userId = session?.userId;
+    this.user = session?.user;
+    this.socketId = session?.socketId;
+  }
 }

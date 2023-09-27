@@ -88,4 +88,12 @@ export class User {
   @ApiHideProperty()
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
+
+  constructor(user?: User) {
+    this.id = user?.id;
+    this.login = user?.login;
+    this.nickname = user?.nickname;
+    this.intraId = user?.intraId;
+    this.provider = user?.provider;
+  }
 }

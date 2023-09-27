@@ -6,32 +6,36 @@ import { AppConfigModule } from './app-config.module';
 export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
 ): TypeOrmModuleOptions => {
-  const entities = [__dirname + '/../**/*.entity{.ts,.js}'];
-  const subscribers = [__dirname + '/../**/*.subscriber{.ts,.js}'];
-
-  // if (config.getNodeEnv() == 'test') {
-  //   return {
-  //     type: 'better-sqlite3',
-  //     database: ':memory:',
-  //     entities,
-  //     dropSchema: true,
-  //     synchronize: true,
-  //     logging: false,
-  //   };
-  // }
-
-  return {
+  const options: TypeOrmModuleOptions = {
     type: 'postgres',
     host: config.getDatabaseHost(),
     port: config.getDatabasePort(),
     username: config.getDatabaseUser(),
     password: config.getDatabasePassword(),
     database: config.getDatabaseName(),
-    entities,
-    subscribers,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    subscribers: [__dirname + '/../**/*.subscriber{.ts,.js}'],
     synchronize: true,
-    // logging: true,
+    logging: false,
   };
+
+  if (config.getNodeEnv() == 'production') {
+    return { ...options, synchronize: false };
+  }
+
+  if (config.getNodeEnv() == 'development') {
+    return { ...options, synchronize: true };
+  }
+
+  if (config.getNodeEnv() == 'local') {
+    return { ...options, dropSchema: true };
+  }
+
+  if (config.getNodeEnv() == 'test') {
+    return { ...options, dropSchema: true };
+  }
+
+  return options;
 };
 
 @Module({
