@@ -65,11 +65,11 @@ jobs:
 
       - name: test integration
         working-directory: ./backend
-        run: pnpm test:integration
+        run: pnpm test:integration:ci
 
       - name: test e2e
         working-directory: ./backend
-        run: pnpm test:e2e
+        run: pnpm test:e2e:ci
 
   frontend:
     needs: ["backend"]
