@@ -13,7 +13,7 @@ import { FriendRequestService } from './friend_request.service';
 import { CreateFriendRequestDto } from './dto';
 import { AuthenticatedGuard } from '../../auth/guards';
 import { GetUser } from '../../core/decorators';
-import { User } from '../../core/entities/user.entity';
+import { User } from '../../core/entities';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('friend_requests')

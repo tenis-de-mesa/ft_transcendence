@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IDatabaseConfig, IIntraConfig } from '../core/interfaces';
-import { ITfaConfig } from '../core/interfaces/tfa.interface';
+import { IDatabaseConfig, IIntraConfig, ITfaConfig } from '../core/interfaces';
 
 @Injectable()
 export class EnvironmentConfigService
