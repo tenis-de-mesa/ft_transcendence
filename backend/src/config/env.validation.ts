@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   validateSync,
 } from 'class-validator';
@@ -11,7 +12,7 @@ export enum EnvironmentEnum {
   Development = 'development',
   Production = 'production',
   Test = 'test',
-  Local = 'local',
+  CI = 'ci',
 }
 
 class EnvironmentVariables {
@@ -55,6 +56,13 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   TFA_SECRET_KEY: string;
+
+  @IsOptional()
+  @IsString()
+  AWS_ACCESS_KEY_ID: string;
+  @IsOptional()
+  @IsString()
+  AWS_SECRET_ACCESS_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {
