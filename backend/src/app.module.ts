@@ -13,9 +13,8 @@ import { TypeOrmConfigModule } from './config/typeorm-config.module';
 import { FriendRequestModule } from './users/friend_requests/friend_request.module';
 import { GuestCleanupService } from './users/guest-cleanup/guest-cleanup.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { StatusModule } from './status/status.module';
+import { StatusModule } from './users/status/status.module';
 import { ChatsModule } from './chats/chats.module';
-
 
 @Module({
   imports: [

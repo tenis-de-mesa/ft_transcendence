@@ -13,7 +13,7 @@ export class ChatsController {
 
   @Get()
   async findAll(@GetUser() user: User): Promise<ChatWithName[]> {
-    const chats = await this.chatsService.findAll();
+    const chats = await this.chatsService.findAll(user);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
 

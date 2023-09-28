@@ -24,13 +24,26 @@ export class ChatsService {
     return await this.chatRepository.save({ users });
   }
 
-  async findAll(): Promise<Chat[]> {
-    const chats = await this.chatRepository.find({
+  async findAll(user: User): Promise<Chat[]> {
+    const chatsWithoutUsers = await this.chatRepository.find({
       relations: {
         users: true,
       },
+      where: {
+        users: {
+          id: user.id,
+        },
+      },
     });
-    return chats;
+    const chatIds = chatsWithoutUsers.map((chat) => chat.id);
+    return await this.chatRepository.find({
+      relations: {
+        users: true,
+      },
+      where: {
+        id: In(chatIds),
+      },
+    });
   }
 
   mapChatsToChatsWithName(chats: Chat[], currentUser: User): ChatWithName[] {
