@@ -11,22 +11,27 @@ enum Environment {
   Development = 'development',
   Production = 'production',
   Test = 'test',
-  Provision = 'provision',
   Local = 'local',
 }
 
 class EnvironmentVariables {
+  @IsNotEmpty()
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
+  @IsNotEmpty()
   @IsString()
   DATABASE_HOST: string;
+  @IsNotEmpty()
   @IsNumber()
   DATABASE_PORT: number;
+  @IsNotEmpty()
   @IsString()
   DATABASE_NAME: string;
+  @IsNotEmpty()
   @IsString()
   DATABASE_USER: string;
+  @IsNotEmpty()
   @IsString()
   DATABASE_PASSWORD: string;
 
@@ -36,6 +41,8 @@ class EnvironmentVariables {
   INTRA_TOKEN_URL: string;
   @IsString()
   INTRA_FETCH_URL: string;
+
+  @IsNotEmpty()
   @IsString()
   INTRA_REDIRECT_URL: string;
   @IsNotEmpty()
@@ -44,6 +51,7 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   INTRA_CLIENT_SECRET: string;
+  @IsNotEmpty()
   @IsString()
   SESSION_SECRET: string;
 }

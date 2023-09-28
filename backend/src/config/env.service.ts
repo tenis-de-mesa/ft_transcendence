@@ -33,15 +33,24 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
   //intra
 
   getAuthURL(): string {
-    return this.configService.get<string>('INTRA_AUTH_URL');
+    return this.configService.get<string>(
+      'INTRA_AUTH_URL',
+      'https://api.intra.42.fr/oauth/authorize',
+    );
   }
 
   getTokenURL(): string {
-    return this.configService.get<string>('INTRA_TOKEN_URL');
+    return this.configService.get<string>(
+      'INTRA_TOKEN_URL',
+      'https://api.intra.42.fr/oauth/token',
+    );
   }
 
   getFetchURL(): string {
-    return this.configService.get<string>('INTRA_FETCH_URL');
+    return this.configService.get<string>(
+      'INTRA_FETCH_URL',
+      'https://api.intra.42.fr/v2/me',
+    );
   }
 
   getRedirectURL(): string {
