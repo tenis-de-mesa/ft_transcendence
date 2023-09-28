@@ -22,7 +22,7 @@ export default function Chat() {
         setChat({ ...chat });
       }
     });
-  }, []);
+  });
 
   return (
     <div className="card">
