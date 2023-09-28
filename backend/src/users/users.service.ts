@@ -3,23 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import { User, Session, AuthProvider } from '../core/entities';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(SessionEntity)
-    private readonly sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
-  async findAll(): Promise<UserEntity[]> {
+  async findAll(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
-  async createUser(dto: CreateUserDto): Promise<UserEntity> {
+  async createUser(dto: CreateUserDto): Promise<User> {
     let nickname = dto.login;
 
     while (!(await this.checkNicknameAvailable(nickname))) {
@@ -29,11 +29,11 @@ export class UsersService {
     return await this.userRepository.save({ ...dto, nickname });
   }
 
-  async getUserById(id: number): Promise<UserEntity> {
+  async getUserById(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id: id });
   }
 
-  async getUserByIntraId(id: number): Promise<UserEntity> {
+  async getUserByIntraId(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ intraId: id });
   }
 
@@ -55,7 +55,7 @@ export class UsersService {
     const query = this.sessionRepository
       .createQueryBuilder()
       .delete()
-      .from(SessionEntity)
+      .from(Session)
       .where('userId = :userId', { userId });
 
     if (exceptIds.length > 0) {
@@ -65,7 +65,7 @@ export class UsersService {
     return await query.execute();
   }
 
-  async findObsoleteGuestUsers(): Promise<UserEntity[]> {
+  async findObsoleteGuestUsers(): Promise<User[]> {
     // Query to find guest users that have expired sessions
     // or no sessions at all attached to them
     const guestUsers = await this.userRepository
@@ -90,7 +90,7 @@ export class UsersService {
   }
 
   async updateAvatar(
-    user: UserEntity,
+    user: User,
     file: Express.Multer.File,
   ): Promise<UpdateResult> {
     const imageKey = user.id + file.originalname;
@@ -106,7 +106,7 @@ export class UsersService {
     });
   }
 
-  async getUserFriends(user: UserEntity): Promise<UserEntity[]> {
+  async getUserFriends(user: User): Promise<User[]> {
     const _user = await this.userRepository.findOne({
       where: {
         id: user.id,

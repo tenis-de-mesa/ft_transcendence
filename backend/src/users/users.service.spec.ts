@@ -1,32 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import { User, Session, AuthProvider } from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 
-const usersEntityList: UserEntity[] = [
-  new UserEntity({
+const usersEntityList: User[] = [
+  new User({
     id: 1,
     login: 'login-1',
     nickname: 'login-1',
-  } as UserEntity),
-  new UserEntity({
+  } as User),
+  new User({
     id: 2,
     login: 'login-2',
     nickname: 'login-2',
-  } as UserEntity),
-  new UserEntity({
+  } as User),
+  new User({
     id: 3,
     login: 'login-3',
     nickname: 'login-3',
-  } as UserEntity),
+  } as User),
 ];
 
 describe('UsersService', () => {
   let app: TestingModule;
   let usersService: UsersService;
-  let userRepository: Repository<UserEntity>;
+  let userRepository: Repository<User>;
 
   beforeEach(async () => {
     app = await Test.createTestingModule({
@@ -34,7 +34,7 @@ describe('UsersService', () => {
         UsersService,
         S3ClientProvider,
         {
-          provide: getRepositoryToken(UserEntity),
+          provide: getRepositoryToken(User),
           useValue: {
             find: jest.fn().mockResolvedValue(usersEntityList),
             save: jest.fn(),
@@ -44,7 +44,7 @@ describe('UsersService', () => {
           },
         },
         {
-          provide: getRepositoryToken(SessionEntity),
+          provide: getRepositoryToken(Session),
           useValue: {
             createQueryBuilder: jest.fn(),
           },
@@ -53,9 +53,7 @@ describe('UsersService', () => {
     }).compile();
 
     usersService = app.get<UsersService>(UsersService);
-    userRepository = app.get<Repository<UserEntity>>(
-      getRepositoryToken(UserEntity),
-    );
+    userRepository = app.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(async () => {
@@ -88,12 +86,10 @@ describe('UsersService', () => {
         intraId: 1,
       };
 
-      const user: UserEntity = new UserEntity(dataUser as UserEntity);
+      const user: User = new User(dataUser as User);
       jest
         .spyOn(userRepository, 'save')
-        .mockImplementationOnce(
-          async (user: UserEntity) => new UserEntity({ ...user }),
-        );
+        .mockImplementationOnce(async (user: User) => new User({ ...user }));
 
       // Act
       const result = await usersService.createUser(user);
@@ -109,13 +105,11 @@ describe('UsersService', () => {
         intraId: 1,
       };
 
-      const user: UserEntity = new UserEntity(dataUser as UserEntity);
+      const user: User = new User(dataUser as User);
 
       jest
         .spyOn(userRepository, 'save')
-        .mockImplementationOnce(
-          async (user: UserEntity) => new UserEntity({ ...user }),
-        );
+        .mockImplementationOnce(async (user: User) => new User({ ...user }));
 
       jest
         .spyOn(usersService, 'checkNicknameAvailable')

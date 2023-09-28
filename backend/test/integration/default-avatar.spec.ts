@@ -3,14 +3,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
-import { AuthProvider, UserEntity } from '../../src/core/entities';
+import { AuthProvider, User } from '../../src/core/entities';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 describe('Default Avatar', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let s3Client: S3Client;
-  let userEntity: UserEntity;
+  let userEntity: User;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({

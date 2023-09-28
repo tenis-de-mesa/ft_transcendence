@@ -5,7 +5,7 @@ import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
 import { Response } from 'express';
 import { UpdateUserDto } from '../../users/dto';
-import { UserEntity } from '../../core/entities';
+import { User } from '../../core/entities';
 import { UsersService } from '../../users/users.service';
 import { EnvironmentConfigService } from '../../config/env.service';
 
@@ -17,7 +17,7 @@ export class TfaService {
   ) {}
 
   async tfaGenerateSecret(
-    user: UserEntity,
+    user: User,
   ): Promise<{ secret: string; otpAuthUrl: string }> {
     const secret = authenticator.generateSecret();
     const otpAuthUrl = authenticator.keyuri(
@@ -42,7 +42,7 @@ export class TfaService {
     await toFileStream(res, otpAuthUrl);
   }
 
-  async tfaEnable(user: UserEntity): Promise<string[]> {
+  async tfaEnable(user: User): Promise<string[]> {
     const recoveryCodes = await this.tfaGenerateRecoveryCodes(user);
 
     const dto: UpdateUserDto = {
@@ -54,7 +54,7 @@ export class TfaService {
     return recoveryCodes;
   }
 
-  async tfaDisable(user: UserEntity): Promise<void> {
+  async tfaDisable(user: User): Promise<void> {
     const dto: UpdateUserDto = {
       tfaEnabled: false,
       tfaSecret: null,
@@ -64,17 +64,14 @@ export class TfaService {
     await this.usersService.updateUser(user.id, dto);
   }
 
-  tfaIsCodeValid(user: UserEntity, tfaCode: string): boolean {
+  tfaIsCodeValid(user: User, tfaCode: string): boolean {
     return authenticator.verify({
       token: tfaCode,
       secret: this.tfaDecrypt(user.tfaSecret, this.config.getTfaSecret()),
     });
   }
 
-  async tfaIsRecoveryCodeValid(
-    user: UserEntity,
-    tfaCode: string,
-  ): Promise<boolean> {
+  async tfaIsRecoveryCodeValid(user: User, tfaCode: string): Promise<boolean> {
     for (const code of user.tfaRecoveryCodes) {
       if (await argon.verify(code, tfaCode)) {
         return true;
@@ -84,14 +81,11 @@ export class TfaService {
     return false;
   }
 
-  async tfaKillSessions(
-    user: UserEntity,
-    exceptIds: string[] = [],
-  ): Promise<void> {
+  async tfaKillSessions(user: User, exceptIds: string[] = []): Promise<void> {
     await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 
-  async tfaGenerateRecoveryCodes(user: UserEntity): Promise<string[]> {
+  async tfaGenerateRecoveryCodes(user: User): Promise<string[]> {
     // TODO: Maybe extract hard coded values into constants
     const recoveryCodes = Array(12)
       .fill(0)

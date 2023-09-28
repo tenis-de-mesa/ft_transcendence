@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
-import { UserEntity, FriendRequestEntity } from '../../core/entities';
+import { User, FriendRequest } from '../../core/entities';
 
 @Injectable()
 export class FriendRequestService {
-  @InjectRepository(FriendRequestEntity)
-  readonly friendRequestRepository: Repository<FriendRequestEntity>;
+  @InjectRepository(FriendRequest)
+  readonly friendRequestRepository: Repository<FriendRequest>;
 
-  @InjectRepository(UserEntity)
-  readonly userRepository: Repository<UserEntity>;
+  @InjectRepository(User)
+  readonly userRepository: Repository<User>;
 
-  async all(): Promise<FriendRequestEntity[]> {
+  async all(): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find();
   }
 
-  async receivedByUser(user: UserEntity): Promise<FriendRequestEntity[]> {
+  async receivedByUser(user: User): Promise<FriendRequest[]> {
     return await this.friendRequestRepository.find({
       where: {
         receiver: {
@@ -33,10 +33,7 @@ export class FriendRequestService {
     });
   }
 
-  async save(
-    sender_id: number,
-    receiver_id: number,
-  ): Promise<FriendRequestEntity> {
+  async save(sender_id: number, receiver_id: number): Promise<FriendRequest> {
     const sender = await this.userRepository.findOneBy({ id: sender_id });
     const receiver = await this.userRepository.findOneBy({ id: receiver_id });
     if (!sender) {

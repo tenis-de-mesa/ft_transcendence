@@ -2,20 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { UpdateSessionDto } from './dto';
-import { SessionEntity } from '../../core/entities';
+import { Session } from '../../core/entities';
 
 @Injectable()
 export class SessionsService {
   constructor(
-    @InjectRepository(SessionEntity)
-    private readonly sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
   ) {}
 
-  async getSessionById(id: string): Promise<SessionEntity> {
+  async getSessionById(id: string): Promise<Session> {
     return await this.sessionRepository.findOneBy({ id });
   }
 
-  async getSessionBySocketId(socketId: string): Promise<SessionEntity> {
+  async getSessionBySocketId(socketId: string): Promise<Session> {
     return await this.sessionRepository.findOne({
       where: { socketId: socketId },
       withDeleted: true,

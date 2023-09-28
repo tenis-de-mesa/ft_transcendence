@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto';
-import { AuthProvider, UserEntity } from '../core/entities';
+import { AuthProvider, User } from '../core/entities';
 import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
-  async loginAsIntra(dto: CreateUserDto): Promise<UserEntity> {
+  async loginAsIntra(dto: CreateUserDto): Promise<User> {
     let user = await this.usersService.getUserByIntraId(dto.intraId);
 
     if (!user) {
@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    const user = req.user as UserEntity;
+    const user = req.user as User;
 
     if (!user) {
       res.redirect('back');

@@ -8,10 +8,10 @@ import {
   ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
-import { UserEntity } from '.';
+import { User } from '.';
 
 @Entity({ name: 'sessions' })
-export class SessionEntity implements ISession {
+export class Session implements ISession {
   @Index()
   @Column('bigint')
   expiredAt: number;
@@ -28,14 +28,14 @@ export class SessionEntity implements ISession {
   @Column({ nullable: true })
   userId: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.sessions)
+  @ManyToOne(() => User, (user) => user.sessions)
   @JoinColumn({ name: 'userId' })
-  user: UserEntity;
+  user: User;
 
   @Column({ nullable: true })
   socketId: string;
 
-  constructor(session?: SessionEntity) {
+  constructor(session?: Session) {
     this.id = session?.id;
     this.expiredAt = session?.expiredAt;
     this.json = session?.json;
