@@ -20,8 +20,10 @@ class EnvironmentVariables {
   @IsEnum(EnvironmentEnum)
   NODE_ENV: EnvironmentEnum;
 
+  @IsOptional()
   @IsString()
   DATABASE_HOST: string;
+  @IsOptional()
   @IsNumber()
   DATABASE_PORT: number;
   @IsNotEmpty()
@@ -34,12 +36,16 @@ class EnvironmentVariables {
   @IsString()
   DATABASE_PASSWORD: string;
 
+  @IsOptional()
   @IsString()
   INTRA_AUTH_URL: string;
+  @IsOptional()
   @IsString()
   INTRA_TOKEN_URL: string;
+  @IsOptional()
   @IsString()
   INTRA_FETCH_URL: string;
+  @IsOptional()
   @IsString()
   INTRA_REDIRECT_URL: string;
 
