@@ -2,10 +2,10 @@ import { ActionFunctionArgs } from "react-router-dom";
 
 export async function createChat({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const formDataObj = Object.fromEntries(formData.entries());
+  const userId = formData.get("user") as string;
   const url = "http://localhost:3001/chats";
   const body = {
-    userIds: [formDataObj.user],
+    userIds: [userId],
   };
 
   return fetch(url, {
