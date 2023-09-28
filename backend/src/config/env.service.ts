@@ -54,7 +54,10 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
   }
 
   getRedirectURL(): string {
-    return this.configService.get<string>('INTRA_REDIRECT_URL');
+    return this.configService.get<string>(
+      'INTRA_REDIRECT_URL',
+      'http://localhost:3001',
+    );
   }
 
   getClientID(): string {
@@ -67,9 +70,5 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
 
   getSessionSecret(): string {
     return this.configService.get<string>('SESSION_SECRET');
-  }
-
-  getBackendHostname(): string {
-    return this.configService.get<string>('BACKEND_HOSTNAME');
   }
 }

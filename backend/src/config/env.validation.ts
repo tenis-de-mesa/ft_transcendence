@@ -41,10 +41,9 @@ class EnvironmentVariables {
   INTRA_TOKEN_URL: string;
   @IsString()
   INTRA_FETCH_URL: string;
-
-  @IsNotEmpty()
   @IsString()
   INTRA_REDIRECT_URL: string;
+
   @IsNotEmpty()
   @IsString()
   INTRA_CLIENT_ID: string;

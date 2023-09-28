@@ -18,7 +18,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       tokenURL: config.getTokenURL(),
       clientID: config.getClientID(),
       clientSecret: config.getClientSecret(),
-      callbackURL: config.getBackendHostname() + '/auth/login/intra',
+      callbackURL: config.getRedirectURL() + '/auth/login/intra',
     });
   }
 
