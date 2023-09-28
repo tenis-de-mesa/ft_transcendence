@@ -7,10 +7,14 @@ import { Response } from 'express';
 import { UpdateUserDto } from '../../users/dto';
 import { UserEntity } from '../../core/entities';
 import { UsersService } from '../../users/users.service';
+import { EnvironmentConfigService } from '../../config/env.service';
 
 @Injectable()
 export class TfaService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly config: EnvironmentConfigService,
+  ) {}
 
   async tfaGenerateSecret(
     user: UserEntity,
@@ -23,7 +27,7 @@ export class TfaService {
     );
 
     const dto: UpdateUserDto = {
-      tfaSecret: this.tfaEncrypt(secret, process.env.TFA_SECRET_KEY),
+      tfaSecret: this.tfaEncrypt(secret, this.config.getTfaSecret()),
     };
 
     await this.usersService.updateUser(user.id, dto);
@@ -63,7 +67,7 @@ export class TfaService {
   tfaIsCodeValid(user: UserEntity, tfaCode: string): boolean {
     return authenticator.verify({
       token: tfaCode,
-      secret: this.tfaDecrypt(user.tfaSecret, process.env.TFA_SECRET_KEY),
+      secret: this.tfaDecrypt(user.tfaSecret, this.config.getTfaSecret()),
     });
   }
 

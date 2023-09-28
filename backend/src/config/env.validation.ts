@@ -53,6 +53,10 @@ class EnvironmentVariables {
   @IsNotEmpty()
   @IsString()
   SESSION_SECRET: string;
+
+  @IsNotEmpty()
+  @IsString()
+  TFA_SECRET_KEY: string;
 }
 
 export function validate(config: Record<string, unknown>) {

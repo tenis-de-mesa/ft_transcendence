@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IDatabaseConfig, IIntraConfig } from '../core/interfaces';
+import { ITfaConfig } from '../core/interfaces/tfa.interface';
 
 @Injectable()
-export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
+export class EnvironmentConfigService
+  implements IDatabaseConfig, IIntraConfig, ITfaConfig
+{
   constructor(private configService: ConfigService) {}
 
   getNodeEnv(): string {
@@ -70,5 +73,11 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
 
   getSessionSecret(): string {
     return this.configService.get<string>('SESSION_SECRET');
+  }
+
+  // tfa
+
+  getTfaSecret(): string {
+    return this.configService.get<string>('TFA_SECRET_KEY');
   }
 }
