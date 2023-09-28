@@ -14,11 +14,11 @@ export class EnvironmentConfigService
   }
 
   getDatabaseHost(): string {
-    return this.configService.get<string>('DATABASE_HOST');
+    return this.configService.get<string>('DATABASE_HOST', 'localhost');
   }
 
   getDatabasePort(): number {
-    return this.configService.get<number>('DATABASE_PORT');
+    return this.configService.get<number>('DATABASE_PORT', 5432);
   }
 
   getDatabaseUser(): string {

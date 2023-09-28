@@ -7,7 +7,7 @@ import {
   validateSync,
 } from 'class-validator';
 
-enum Environment {
+export enum EnvironmentEnum {
   Development = 'development',
   Production = 'production',
   Test = 'test',
@@ -16,13 +16,11 @@ enum Environment {
 
 class EnvironmentVariables {
   @IsNotEmpty()
-  @IsEnum(Environment)
-  NODE_ENV: Environment;
+  @IsEnum(EnvironmentEnum)
+  NODE_ENV: EnvironmentEnum;
 
-  @IsNotEmpty()
   @IsString()
   DATABASE_HOST: string;
-  @IsNotEmpty()
   @IsNumber()
   DATABASE_PORT: number;
   @IsNotEmpty()
