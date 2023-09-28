@@ -90,7 +90,16 @@ export class User {
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
 
+
   @ManyToMany(() => Chat, (chat) => chat.users)
   @JoinTable()
   chats: Chat[];
+
+  constructor(user?: User) {
+    this.id = user?.id;
+    this.login = user?.login;
+    this.nickname = user?.nickname;
+    this.intraId = user?.intraId;
+    this.provider = user?.provider;
+  }
 }

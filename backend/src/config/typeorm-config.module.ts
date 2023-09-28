@@ -2,36 +2,41 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { EnvironmentConfigService } from './env.service';
 import { AppConfigModule } from './app-config.module';
+import { EnvironmentEnum } from './env.validation';
 
 export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
 ): TypeOrmModuleOptions => {
-  const entities = [__dirname + '/../**/*.entity{.ts,.js}'];
-  const subscribers = [__dirname + '/../**/*.subscriber{.ts,.js}'];
-
-  // if (config.getNodeEnv() == 'test') {
-  //   return {
-  //     type: 'better-sqlite3',
-  //     database: ':memory:',
-  //     entities,
-  //     dropSchema: true,
-  //     synchronize: true,
-  //     logging: false,
-  //   };
-  // }
-
-  return {
+  const options: TypeOrmModuleOptions = {
     type: 'postgres',
     host: config.getDatabaseHost(),
     port: config.getDatabasePort(),
     username: config.getDatabaseUser(),
     password: config.getDatabasePassword(),
     database: config.getDatabaseName(),
-    entities,
-    subscribers,
+    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    subscribers: [__dirname + '/../**/*.subscriber{.ts,.js}'],
     synchronize: true,
-    // logging: true,
+    logging: false,
   };
+
+  if (config.getNodeEnv() == EnvironmentEnum.Production) {
+    return { ...options, synchronize: false };
+  }
+
+  if (config.getNodeEnv() == EnvironmentEnum.Development) {
+    return { ...options, synchronize: true };
+  }
+
+  if (config.getNodeEnv() == EnvironmentEnum.CI) {
+    return { ...options, dropSchema: true };
+  }
+
+  if (config.getNodeEnv() == EnvironmentEnum.Test) {
+    return { ...options, dropSchema: true };
+  }
+
+  return options;
 };
 
 @Module({

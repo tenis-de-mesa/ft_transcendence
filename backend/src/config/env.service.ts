@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IDatabaseConfig, IIntraConfig } from '../core/interfaces';
+import { IDatabaseConfig, IIntraConfig, ITfaConfig } from '../core/interfaces';
 
 @Injectable()
-export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
+export class EnvironmentConfigService
+  implements IDatabaseConfig, IIntraConfig, ITfaConfig
+{
   constructor(private configService: ConfigService) {}
 
   getNodeEnv(): string {
@@ -11,11 +13,11 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
   }
 
   getDatabaseHost(): string {
-    return this.configService.get<string>('DATABASE_HOST');
+    return this.configService.get<string>('DATABASE_HOST', 'localhost');
   }
 
   getDatabasePort(): number {
-    return this.configService.get<number>('DATABASE_PORT');
+    return this.configService.get<number>('DATABASE_PORT', 5432);
   }
 
   getDatabaseUser(): string {
@@ -33,19 +35,31 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
   //intra
 
   getAuthURL(): string {
-    return this.configService.get<string>('INTRA_AUTH_URL');
+    return this.configService.get<string>(
+      'INTRA_AUTH_URL',
+      'https://api.intra.42.fr/oauth/authorize',
+    );
   }
 
   getTokenURL(): string {
-    return this.configService.get<string>('INTRA_TOKEN_URL');
+    return this.configService.get<string>(
+      'INTRA_TOKEN_URL',
+      'https://api.intra.42.fr/oauth/token',
+    );
   }
 
   getFetchURL(): string {
-    return this.configService.get<string>('INTRA_FETCH_URL');
+    return this.configService.get<string>(
+      'INTRA_FETCH_URL',
+      'https://api.intra.42.fr/v2/me',
+    );
   }
 
   getRedirectURL(): string {
-    return this.configService.get<string>('INTRA_REDIRECT_URL');
+    return this.configService.get<string>(
+      'INTRA_REDIRECT_URL',
+      'http://localhost:3001',
+    );
   }
 
   getClientID(): string {
@@ -60,7 +74,9 @@ export class EnvironmentConfigService implements IDatabaseConfig, IIntraConfig {
     return this.configService.get<string>('SESSION_SECRET');
   }
 
-  getBackendHostname(): string {
-    return this.configService.get<string>('BACKEND_HOSTNAME');
+  // tfa
+
+  getTfaSecret(): string {
+    return this.configService.get<string>('TFA_SECRET_KEY');
   }
 }
