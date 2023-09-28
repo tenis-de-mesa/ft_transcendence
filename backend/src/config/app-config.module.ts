@@ -9,8 +9,8 @@ import { EnvironmentConfigService } from './env.service';
       envFilePath:
         process.env.NODE_ENV == 'test'
           ? 'env/.test.env'
-          : process.env.NODE_ENV == 'local'
-          ? 'env/.local.env'
+          : process.env.NODE_ENV == 'ci'
+          ? 'env/.ci.env'
           : '.env',
       isGlobal: true,
       validate,

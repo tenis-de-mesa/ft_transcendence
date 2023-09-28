@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { EnvironmentConfigService } from './env.service';
 import { AppConfigModule } from './app-config.module';
+import { EnvironmentEnum } from './env.validation';
 
 export const getTypeOrmModuleOptions = (
   config: EnvironmentConfigService,
@@ -19,19 +20,19 @@ export const getTypeOrmModuleOptions = (
     logging: false,
   };
 
-  if (config.getNodeEnv() == 'production') {
+  if (config.getNodeEnv() == EnvironmentEnum.Production) {
     return { ...options, synchronize: false };
   }
 
-  if (config.getNodeEnv() == 'development') {
+  if (config.getNodeEnv() == EnvironmentEnum.Development) {
     return { ...options, synchronize: true };
   }
 
-  if (config.getNodeEnv() == 'local') {
+  if (config.getNodeEnv() == EnvironmentEnum.CI) {
     return { ...options, dropSchema: true };
   }
 
-  if (config.getNodeEnv() == 'test') {
+  if (config.getNodeEnv() == EnvironmentEnum.Test) {
     return { ...options, dropSchema: true };
   }
 

@@ -7,7 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
-import { AxiosExceptionFilter } from './filters';
+import { AxiosExceptionFilter } from './core/filters';
 import { AuthProvider, Session } from './core/entities';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -28,7 +28,7 @@ async function bootstrap() {
       saveUninitialized: false,
       store: new TypeormStore({
         cleanupLimit: 2,
-        ttl(_store, sess, _sid) {
+        ttl(_store, sess) {
           const fifteenMinutes = 900;
           const thirtyDays = 2592000;
           const provider = sess.passport.user.provider;
