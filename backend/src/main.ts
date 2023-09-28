@@ -28,7 +28,7 @@ async function bootstrap() {
       saveUninitialized: false,
       store: new TypeormStore({
         cleanupLimit: 2,
-        ttl(_store, sess, _sid) {
+        ttl(_store, sess) {
           const fifteenMinutes = 900;
           const thirtyDays = 2592000;
           const provider = sess.passport.user.provider;
