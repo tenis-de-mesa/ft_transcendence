@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
 import { useEffect, useState } from "react";
 import { User, UserStatus } from "../types/types";
@@ -33,6 +33,10 @@ export default function Users() {
             <span style={{ color: user.status === "online" ? "green" : "red" }}>
               {user.status}
             </span>
+            <Form method="post" action="/chats">
+              <input type="hidden" name="user" value={user.id} />
+              <button type="submit">Chat</button>
+            </Form>
           </li>
         ))}
       </ul>

@@ -1,11 +1,9 @@
-import { User } from "../types/types";
-
 import "./Home.css";
-interface HomeProps {
-  user: User;
-}
+import { RootUser } from "./Root";
 
-export default function Home({ user }: HomeProps) {
+export default function Home() {
+  const user = RootUser();
+
   return (
     <div className="home">
       <div className="card">

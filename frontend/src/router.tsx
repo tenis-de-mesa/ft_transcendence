@@ -1,24 +1,54 @@
-import { createBrowserRouter, redirect } from "react-router-dom";
-import { getCurrentUser, getUsers } from "./loaders";
+import { createBrowserRouter } from "react-router-dom";
+
+import {
+  loadRootUser,
+  loadUsersList,
+  loadChatList,
+  loadChat,
+  login,
+  logout,
+} from "./loaders";
+
+import { createChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
 import Users from "./routes/Users.tsx";
 import Profile from "./routes/Profile.tsx";
+import Chats from "./routes/Chats.tsx";
+import Chat from "./routes/Chat.tsx";
+import Home from "./routes/Home.tsx";
+import { sendChatMessage } from "./actions/sendChatMessage.ts";
 
-// loaders are used to fetch data BEFORE rendering the route,
-// so they are called only once, and before the component is rendered
 const router = createBrowserRouter([
   {
     path: "/",
     id: "root",
     element: <Root />,
-    loader: getCurrentUser,
+    loader: loadRootUser,
     children: [
+      {
+        index: true,
+        element: <Home />,
+      },
       {
         path: "users",
         element: <Users />,
-        loader: getUsers,
+        loader: loadUsersList,
+      },
+      {
+        path: "chats",
+        element: <Chats />,
+        loader: loadChatList,
+        action: createChat,
+        children: [
+          {
+            path: ":id",
+            element: <Chat />,
+            loader: loadChat,
+            action: sendChatMessage,
+          },
+        ],
       },
       {
         path: "profile/:id",
@@ -28,15 +58,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/login/:provider",
-    loader: ({ params }) => {
-      return redirect(`http://localhost:3001/auth/login/${params.provider}`);
-    },
+    loader: login,
   },
   {
     path: "/logout",
-    loader: () => {
-      return redirect("http://localhost:3001/auth/logout");
-    },
+    loader: logout,
   },
 ]);
 
