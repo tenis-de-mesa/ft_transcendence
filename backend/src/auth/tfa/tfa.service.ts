@@ -2,12 +2,20 @@ import * as crypto from 'crypto';
 import * as argon from 'argon2';
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
-import { toFileStream } from 'qrcode';
-import { Response } from 'express';
-import { UpdateUserDto } from '../../users/dto';
+import { toDataURL } from 'qrcode';
 import { User } from '../../core/entities';
 import { UsersService } from '../../users/users.service';
 import { EnvironmentConfigService } from '../../config/env.service';
+
+export type TfaGenerateResponse = {
+  secret: string;
+  qrCode: string;
+};
+
+type TfaRecoveryCodes = {
+  plain: string[];
+  hashed: string[];
+};
 
 @Injectable()
 export class TfaService {
@@ -16,52 +24,45 @@ export class TfaService {
     private readonly config: EnvironmentConfigService,
   ) {}
 
-  async tfaGenerateSecret(
-    user: User,
-  ): Promise<{ secret: string; otpAuthUrl: string }> {
+  async tfaGenerateSecret(user: User): Promise<TfaGenerateResponse> {
     const secret = authenticator.generateSecret();
+
     const otpAuthUrl = authenticator.keyuri(
       user.login,
       'ft_transcendence', // TODO: Maybe put this in .env
       secret,
     );
 
-    const dto: UpdateUserDto = {
-      tfaSecret: this.tfaEncrypt(secret, this.config.getTfaSecret()),
-    };
-
-    await this.usersService.updateUser(user.id, dto);
+    const [qrCode] = await Promise.all([
+      toDataURL(otpAuthUrl),
+      this.usersService.updateUser(user.id, {
+        tfaSecret: this.tfaEncrypt(secret, this.config.getTfaSecret()),
+      }),
+    ]);
 
     return {
       secret,
-      otpAuthUrl,
+      qrCode: qrCode.split(',')[1],
     };
-  }
-
-  async tfaGenerateQrCode(res: Response, otpAuthUrl: string): Promise<void> {
-    await toFileStream(res, otpAuthUrl);
   }
 
   async tfaEnable(user: User): Promise<string[]> {
     const recoveryCodes = await this.tfaGenerateRecoveryCodes(user);
 
-    const dto: UpdateUserDto = {
+    await this.usersService.updateUser(user.id, {
       tfaEnabled: true,
-    };
+      tfaRecoveryCodes: recoveryCodes.hashed,
+    });
 
-    await this.usersService.updateUser(user.id, dto);
-
-    return recoveryCodes;
+    return recoveryCodes.plain;
   }
 
   async tfaDisable(user: User): Promise<void> {
-    const dto: UpdateUserDto = {
+    await this.usersService.updateUser(user.id, {
       tfaEnabled: false,
       tfaSecret: null,
       tfaRecoveryCodes: null,
-    };
-
-    await this.usersService.updateUser(user.id, dto);
+    });
   }
 
   tfaIsCodeValid(user: User, tfaCode: string): boolean {
@@ -85,7 +86,7 @@ export class TfaService {
     await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 
-  async tfaGenerateRecoveryCodes(user: User): Promise<string[]> {
+  async tfaGenerateRecoveryCodes(user: User): Promise<TfaRecoveryCodes> {
     // TODO: Maybe extract hard coded values into constants
     const recoveryCodes = Array(12)
       .fill(0)
@@ -95,13 +96,10 @@ export class TfaService {
       recoveryCodes.map((code) => argon.hash(code)),
     );
 
-    const dto: UpdateUserDto = {
-      tfaRecoveryCodes: hashedRecoveryCodes,
+    return {
+      plain: recoveryCodes,
+      hashed: hashedRecoveryCodes,
     };
-
-    await this.usersService.updateUser(user.id, dto);
-
-    return recoveryCodes;
   }
 
   private tfaEncrypt(toEncrypt: string, secret: string): string {
