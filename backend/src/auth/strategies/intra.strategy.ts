@@ -36,13 +36,11 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
       },
     });
 
-    const dto: CreateUserDto = {
+    const user = await this.authService.loginAsIntra({
       intraId: response.data.id,
       login: response.data.login,
       provider: AuthProvider.INTRA,
-    };
-
-    const user = await this.authService.loginAsIntra(dto);
+    });
 
     callback(null, user);
   }
