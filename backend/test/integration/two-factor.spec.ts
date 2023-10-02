@@ -54,12 +54,6 @@ describe('Two-factor authentication Integration Test Suite', () => {
 
       app.useGlobalPipes(new ValidationPipe());
 
-      process.env.TFA_SECRET_KEY = crypto
-        .createHash('sha256')
-        .update('test')
-        .digest('base64')
-        .substring(0, 32);
-
       usersService = app.get(UsersService);
 
       await app.init();
@@ -84,7 +78,6 @@ describe('Two-factor authentication Integration Test Suite', () => {
     describe('GET /auth/tfa/generate', () => {
       it('should generate a QR code for enabling TFA', async () => {
         // Arrange
-        let qrCode: string;
 
         // Act
         const response = await request(app.getHttpServer()).get(
@@ -96,7 +89,7 @@ describe('Two-factor authentication Integration Test Suite', () => {
         expect(response.body).toHaveProperty('secret');
         tfaSecret = response.body.secret;
         expect(response.body).toHaveProperty('qrCode');
-        qrCode = response.body.qrCode;
+        const qrCode = response.body.qrCode;
         expect(tfaSecret).toMatch(/^[A-Z0-9]{16}$/);
         expect(isBase64(qrCode)).toBe(true);
       });
@@ -564,19 +557,12 @@ describe('Two-factor authentication Integration Test Suite', () => {
       })
         .overrideGuard(AuthenticatedGuard)
         .useValue({
-          canActivate: async (context: ExecutionContext) => {
-            context = context;
+          canActivate: async () => {
             throw new UnauthorizedException('User is not logged in');
           },
         })
         .compile();
       app = moduleFixture.createNestApplication();
-
-      process.env.TFA_SECRET_KEY = crypto
-        .createHash('sha256')
-        .update('test')
-        .digest('base64')
-        .substring(0, 32);
 
       await app.init();
     });
