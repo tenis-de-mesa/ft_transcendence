@@ -4,7 +4,6 @@ import { Injectable } from '@nestjs/common';
 import { Strategy, VerifyCallback } from 'passport-oauth2';
 import { AuthService } from '../auth.service';
 import { EnvironmentConfigService } from '../../config/env.service';
-import { CreateUserDto } from '../../users/dto';
 import { AuthProvider } from '../../core/entities';
 
 @Injectable()
