@@ -12,7 +12,7 @@ down:
 
 clean: down
 	docker compose rm -f
-	rm -rf backend/node_modules 
+	rm -rf backend/node_modules
 	rm -rf backend/.pnpm-store
 	rm -rf frontend/node_modules
 	rm -rf frontend/.pnpm-store
