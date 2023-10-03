@@ -1,5 +1,4 @@
 import * as request from 'supertest';
-import * as crypto from 'crypto';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import {
