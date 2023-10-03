@@ -33,12 +33,12 @@ export class TfaService {
       secret,
     );
 
-    const [qrCode] = await Promise.all([
-      toDataURL(otpAuthUrl),
-      this.usersService.updateUser(user.id, {
-        tfaSecret: this.tfaEncrypt(secret, this.config.getTfaSecret()),
-      }),
-    ]);
+    const qrCodePromise = toDataURL(otpAuthUrl);
+    const updateUserPromise = this.usersService.updateUser(user.id, {
+      tfaSecret: this.tfaEncrypt(secret, this.config.getTfaSecret()),
+    });
+
+    const [qrCode] = await Promise.all([qrCodePromise, updateUserPromise]);
 
     return {
       secret,
