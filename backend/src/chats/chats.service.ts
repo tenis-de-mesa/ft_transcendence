@@ -75,7 +75,7 @@ export class ChatsService {
 
   async addMessage(chatId: number, message: string): Promise<Message> {
     const chat = await this.chatRepository.findOneBy({ id: chatId });
-    const newMessage = this.messageRepository.create({
+    const newMessage = await this.messageRepository.create({
       content: message,
       chat,
     });
