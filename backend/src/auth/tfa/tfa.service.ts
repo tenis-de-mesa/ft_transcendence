@@ -47,7 +47,7 @@ export class TfaService {
   }
 
   async tfaEnable(user: User): Promise<string[]> {
-    const recoveryCodes = await this.tfaGenerateRecoveryCodes(user);
+    const recoveryCodes = await this.tfaGenerateRecoveryCodes();
 
     await this.usersService.updateUser(user.id, {
       tfaEnabled: true,
@@ -86,7 +86,7 @@ export class TfaService {
     await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 
-  async tfaGenerateRecoveryCodes(user: User): Promise<TfaRecoveryCodes> {
+  async tfaGenerateRecoveryCodes(): Promise<TfaRecoveryCodes> {
     // TODO: Maybe extract hard coded values into constants
     const recoveryCodes = Array(12)
       .fill(0)
