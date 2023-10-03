@@ -1,23 +1,23 @@
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+// import { getRepositoryToken } from '@nestjs/typeorm';
+// import { Repository } from 'typeorm';
 
 describe('Class', () => {
-  let app: INestApplication;
+  let module: TestingModule;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule(
-      {},
-    ).compile();
-    app = moduleFixture.createNestApplication();
-    await app.init();
-  });
-
-  afterEach(async () => {
-    await app.close();
+    module = await Test.createTestingModule({
+      providers: [
+        // {
+        //   provide: getRepositoryToken(/*Repository*/),
+        //   useClass: Repository,
+        // },
+      ],
+    }).compile();
   });
 
   it('should be defined', async () => {
-    expect(app).toBeDefined();
+    expect(module).toBeDefined();
   });
 
   describe('method', () => {
