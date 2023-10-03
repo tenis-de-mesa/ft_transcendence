@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Session, FriendRequest } from '.';
+import { Chat } from './chat.entity';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -88,6 +89,11 @@ export class User {
   @ApiHideProperty()
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
+
+
+  @ManyToMany(() => Chat, (chat) => chat.users)
+  @JoinTable()
+  chats: Chat[];
 
   constructor(user?: User) {
     this.id = user?.id;

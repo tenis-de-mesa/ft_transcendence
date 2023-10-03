@@ -14,6 +14,7 @@ import { FriendRequestModule } from './users/friend_requests/friend_request.modu
 import { GuestCleanupService } from './users/guest-cleanup/guest-cleanup.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './users/status/status.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StatusModule } from './users/status/status.module';
     TfaModule,
     FriendRequestModule,
     StatusModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService, GuestCleanupService],

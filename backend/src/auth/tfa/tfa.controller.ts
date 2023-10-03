@@ -106,7 +106,7 @@ export class TfaController {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
 
-    const { plain } = await this.tfaService.tfaGenerateRecoveryCodes(user);
+    const { plain } = await this.tfaService.tfaGenerateRecoveryCodes();
 
     return plain;
   }

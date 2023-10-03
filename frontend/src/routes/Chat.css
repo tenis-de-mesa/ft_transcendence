@@ -1,0 +1,30 @@
+.chat {
+  align-self: normal;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: 1em;
+  padding: 1em;
+  min-height: fit-content;
+
+  .messageInput {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+
+    & input {
+      flex: 1;
+      padding: 1em;
+    }
+  }
+
+  .card {
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+  .card::-webkit-scrollbar {
+    display: none;
+  }
+}
