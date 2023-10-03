@@ -1,3 +1,8 @@
+export type UserStatus = {
+  id: number;
+  status: string;
+};
+
 export type User = {
   id: number;
   login: string;
@@ -6,7 +11,21 @@ export type User = {
   avatarUrl: string;
 };
 
-export type UserStatus = {
+export type Message = {
   id: number;
-  status: string;
+  content: string;
+  chat?: Chat;
+};
+
+export type Chat = {
+  id: number;
+  name: string;
+  users: User[];
+  messages: Message[];
+  newMessage: string;
+};
+
+export type NewChatMessage = {
+  chatId: number;
+  message: string;
 };
