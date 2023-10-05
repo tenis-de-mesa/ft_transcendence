@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -19,13 +23,17 @@ export class ChatsService {
   ) {}
 
   async create(createchatsDto: CreateChatDto): Promise<Chat> {
-    const userIds = createchatsDto.userIds;
-    const users = await this.userRepository.findBy({ id: In(userIds) });
-    return await this.chatRepository.save({ users });
+    const userIds = [...new Set(createchatsDto.userIds)];
+    const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
+    if (chatUsers.length !== userIds.length) {
+      throw new NotFoundException('One or more users not found');
+    }
+    const chat = this.chatRepository.create({ users: chatUsers });
+    return this.chatRepository.save(chat);
   }
 
   async findAll(user: User): Promise<Chat[]> {
-    const chatsWithoutUsers = await this.chatRepository.find({
+    const chatsWithoutUsersRelation = await this.chatRepository.find({
       relations: {
         users: true,
       },
@@ -35,7 +43,7 @@ export class ChatsService {
         },
       },
     });
-    const chatIds = chatsWithoutUsers.map((chat) => chat.id);
+    const chatIds = chatsWithoutUsersRelation.map((chat) => chat.id);
     return await this.chatRepository.find({
       relations: {
         users: true,
@@ -63,18 +71,26 @@ export class ChatsService {
     return names.join(', ');
   }
 
-  findOne(id: number): Promise<Chat> {
-    return this.chatRepository.findOne({
+  async findOne(id: number): Promise<Chat> {
+    const chat = await this.chatRepository.findOne({
       relations: {
         users: true,
         messages: true,
       },
       where: { id: id },
     });
+    if (!chat) throw new NotFoundException('Chat not found');
+    return chat;
   }
 
   async addMessage(chatId: number, message: string): Promise<Message> {
     const chat = await this.chatRepository.findOneBy({ id: chatId });
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+    if (!message) {
+      throw new BadRequestException('Message cannot be empty');
+    }
     const newMessage = await this.messageRepository.create({
       content: message,
       chat,
