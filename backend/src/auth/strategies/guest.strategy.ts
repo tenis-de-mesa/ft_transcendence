@@ -18,6 +18,6 @@ export class GuestStrategy extends PassportStrategy(Strategy, 'guest') {
       provider: AuthProvider.GUEST,
     };
 
-    this.success(this.usersService.createUser(dto));
+    this.success(await this.usersService.createUser(dto));
   }
 }

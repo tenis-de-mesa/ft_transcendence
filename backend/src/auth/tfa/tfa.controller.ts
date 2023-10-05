@@ -1,90 +1,113 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
-  Req,
-  Res,
+  Session,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { User } from '../../core/entities';
-import { AuthenticatedGuard } from '../guards';
-import { TfaService } from './tfa.service';
+import {
+  AuthenticatedGuard,
+  TwoFactorDisabledGuard,
+  TwoFactorEnabledGuard,
+} from '../guards';
+import { TfaGenerateResponse, TfaService } from './tfa.service';
 import { TfaDto } from '../dto';
+import { User } from '../../core/entities';
+import { GetUser } from '../../core/decorators';
 
 @Controller('auth/tfa')
 @UseGuards(AuthenticatedGuard)
 export class TfaController {
   constructor(private readonly tfaService: TfaService) {}
 
-  @Post('generate')
-  async tfaGenerateSecret(@Res() res: Response, @Req() req: Request) {
-    const auth = await this.tfaService.tfaGenerateSecret(req.user as User);
-    res.setHeader('Content-Type', 'image/png');
-    console.log({ secret: auth.secret });
-    await this.tfaService.tfaGenerateQrCode(res, auth.otpAuthUrl);
+  @Get('generate')
+  @UseGuards(TwoFactorDisabledGuard)
+  async tfaGenerateSecret(@GetUser() user: User): Promise<TfaGenerateResponse> {
+    return await this.tfaService.tfaGenerateSecret(user);
   }
 
   @Post('enable')
-  async tfaEnable(@Req() req: Request, @Body() dto: TfaDto) {
-    if (!this.tfaService.tfaIsCodeValid(req.user as User, dto.tfaCode)) {
+  @UseGuards(TwoFactorDisabledGuard)
+  async tfaEnable(
+    @GetUser() user: User,
+    @Session() session: any,
+    @Body() dto: TfaDto,
+  ): Promise<string[]> {
+    if (!user.tfaSecret) {
+      throw new BadRequestException(
+        'Two factor authentication secret must be generated first',
+      );
+    }
+    if (!this.tfaService.tfaIsCodeValid(user, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
-    (req.session as any).tfaAuthenticated = true;
-    await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
-    return await this.tfaService.tfaEnable(req.user as User);
+    session.tfaAuthenticated = true;
+    await this.tfaService.tfaKillSessions(user, [session.id]);
+    return await this.tfaService.tfaEnable(user);
   }
 
   @Post('disable')
-  async tfaDisable(@Req() req: Request, @Body() dto: TfaDto) {
-    if (!this.tfaService.tfaIsCodeValid(req.user as User, dto.tfaCode)) {
+  @UseGuards(TwoFactorEnabledGuard)
+  async tfaDisable(
+    @GetUser() user: User,
+    @Session() session: any,
+    @Body() dto: TfaDto,
+  ): Promise<void> {
+    if (!this.tfaService.tfaIsCodeValid(user, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
-    (req.session as any).tfaAuthenticated = false;
-    await this.tfaService.tfaKillSessions(req.user as User, [req.session.id]);
-    await this.tfaService.tfaDisable(req.user as User);
+
+    await Promise.all([
+      this.tfaService.tfaKillSessions(user, [session.id]),
+      this.tfaService.tfaDisable(user),
+    ]);
+
+    session.tfaAuthenticated = false;
   }
 
   @Post('authenticate')
-  async tfaAuthenticate(@Req() req: Request, @Body() dto: TfaDto) {
-    const isCodeValid = this.tfaService.tfaIsCodeValid(
-      req.user as User,
-      dto.tfaCode,
-    );
-
-    if (!isCodeValid) {
+  @UseGuards(TwoFactorEnabledGuard)
+  async tfaAuthenticate(
+    @GetUser() user: User,
+    @Session() session: any,
+    @Body() dto: TfaDto,
+  ): Promise<void> {
+    if (!this.tfaService.tfaIsCodeValid(user, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
 
-    (req.session as any).tfaAuthenticated = true;
+    session.tfaAuthenticated = true;
   }
 
   @Post('recover')
-  async tfaRecover(@Req() req: Request, @Body() dto: TfaDto) {
-    const isCodeValid = await this.tfaService.tfaIsRecoveryCodeValid(
-      req.user as User,
-      dto.tfaCode,
-    );
-
-    if (!isCodeValid) {
+  @UseGuards(TwoFactorEnabledGuard)
+  async tfaRecover(
+    @GetUser() user: User,
+    @Session() session: any,
+    @Body() dto: TfaDto,
+  ): Promise<void> {
+    if (!(await this.tfaService.tfaIsRecoveryCodeValid(user, dto.tfaCode))) {
       throw new UnauthorizedException('Invalid two factor recovery code');
     }
 
-    (req.session as any).tfaAuthenticated = true;
+    session.tfaAuthenticated = true;
   }
 
   @Post('regenerate-recovery-codes')
-  async tfaRegenerateRecoveryCodes(@Req() req: Request, @Body() dto: TfaDto) {
-    const isCodeValid = this.tfaService.tfaIsCodeValid(
-      req.user as User,
-      dto.tfaCode,
-    );
-
-    if (!isCodeValid) {
+  @UseGuards(TwoFactorEnabledGuard)
+  async tfaRegenerateRecoveryCodes(
+    @GetUser() user: User,
+    @Body() dto: TfaDto,
+  ): Promise<string[]> {
+    if (!this.tfaService.tfaIsCodeValid(user, dto.tfaCode)) {
       throw new UnauthorizedException('Invalid two factor authentication code');
     }
 
-    return await this.tfaService.tfaGenerateRecoveryCodes(req.user as User);
+    const { plain } = await this.tfaService.tfaGenerateRecoveryCodes();
+
+    return plain;
   }
 }

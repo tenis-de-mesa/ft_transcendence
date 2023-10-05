@@ -19,10 +19,8 @@ export class AuthenticatedGuard implements CanActivate {
     }
 
     const user = request.user as User;
-    if (user.tfaEnabled) {
-      if (!request.session.tfaAuthenticated) {
-        throw new UnauthorizedException('User is not authenticated with 2FA');
-      }
+    if (user.tfaEnabled && !request.session.tfaAuthenticated) {
+      throw new UnauthorizedException('User is not authenticated with 2FA');
     }
     return true;
   }
