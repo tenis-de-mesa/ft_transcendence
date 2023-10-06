@@ -6,23 +6,23 @@ import {
 import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { User, Chat, Message } from '../core/entities';
+import { UserEntity, ChatEntity, MessageEntity } from '../core/entities';
 import { ChatWithName } from './dto/ChatWithName.dto';
 
 @Injectable()
 export class ChatsService {
   constructor(
-    @InjectRepository(User)
-    readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    readonly userRepository: Repository<UserEntity>,
 
-    @InjectRepository(Chat)
-    private readonly chatRepository: Repository<Chat>,
+    @InjectRepository(ChatEntity)
+    private readonly chatRepository: Repository<ChatEntity>,
 
-    @InjectRepository(Message)
-    private readonly messageRepository: Repository<Message>,
+    @InjectRepository(MessageEntity)
+    private readonly messageRepository: Repository<MessageEntity>,
   ) {}
 
-  async create(createchatsDto: CreateChatDto): Promise<Chat> {
+  async create(createchatsDto: CreateChatDto): Promise<ChatEntity> {
     const userIds = [...new Set(createchatsDto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
     if (chatUsers.length !== userIds.length) {
@@ -32,7 +32,7 @@ export class ChatsService {
     return this.chatRepository.save(chat);
   }
 
-  async findAll(user: User): Promise<Chat[]> {
+  async findAll(user: UserEntity): Promise<ChatEntity[]> {
     const chatsWithoutUsersRelation = await this.chatRepository.find({
       relations: {
         users: true,
@@ -54,14 +54,20 @@ export class ChatsService {
     });
   }
 
-  mapChatsToChatsWithName(chats: Chat[], currentUser: User): ChatWithName[] {
+  mapChatsToChatsWithName(
+    chats: ChatEntity[],
+    currentUser: UserEntity,
+  ): ChatWithName[] {
     return chats.map((chat) => ({
       ...chat,
       name: this.generateChatName(chat.users, currentUser),
     }));
   }
 
-  private generateChatName(users: User[], currentUser: User): string {
+  private generateChatName(
+    users: UserEntity[],
+    currentUser: UserEntity,
+  ): string {
     const otherUsers = users.filter((user) => user.id !== currentUser.id);
     // When a user creates a chat with himself
     if (otherUsers.length === 0) {
@@ -71,7 +77,7 @@ export class ChatsService {
     return names.join(', ');
   }
 
-  async findOne(id: number): Promise<Chat> {
+  async findOne(id: number): Promise<ChatEntity> {
     const chat = await this.chatRepository.findOne({
       relations: {
         users: true,
@@ -83,7 +89,7 @@ export class ChatsService {
     return chat;
   }
 
-  async addMessage(chatId: number, message: string): Promise<Message> {
+  async addMessage(chatId: number, message: string): Promise<MessageEntity> {
     const chat = await this.chatRepository.findOneBy({ id: chatId });
     if (!chat) {
       throw new NotFoundException('Chat not found');

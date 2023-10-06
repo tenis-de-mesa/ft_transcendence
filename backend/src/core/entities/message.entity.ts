@@ -1,18 +1,18 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Chat } from './chat.entity';
+import { ChatEntity } from '.';
 
 @Entity()
-export class Message {
+export class MessageEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   content: string;
 
-  @ManyToOne(() => Chat, (chat) => chat.messages)
-  chat: Chat;
+  @ManyToOne(() => ChatEntity, (chat) => chat.messages)
+  chat: ChatEntity;
 
-  constructor(message?: Message) {
+  constructor(message?: MessageEntity) {
     this.id = message?.id;
     this.content = message?.content;
     this.chat = message?.chat;

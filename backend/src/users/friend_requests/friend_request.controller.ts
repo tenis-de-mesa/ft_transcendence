@@ -13,7 +13,7 @@ import { FriendRequestService } from './friend_request.service';
 import { CreateFriendRequestDto } from './dto';
 import { AuthenticatedGuard } from '../../auth/guards';
 import { GetUser } from '../../core/decorators';
-import { User } from '../../core/entities';
+import { UserEntity } from '../../core/entities';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('friend_requests')
@@ -21,12 +21,12 @@ export class FriendRequestController {
   constructor(private readonly friendRequestService: FriendRequestService) {}
 
   @Get()
-  async index(@GetUser() user: User) {
+  async index(@GetUser() user: UserEntity) {
     return await this.friendRequestService.receivedByUser(user);
   }
 
   @Post()
-  create(@Body() body: CreateFriendRequestDto, @GetUser() user: User) {
+  create(@Body() body: CreateFriendRequestDto, @GetUser() user: UserEntity) {
     return this.friendRequestService.save(user.id, body.receiver_id);
   }
 

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
-import { AuthProvider, Session } from '../../src/core/entities';
+import { AuthProvider, SessionEntity } from '../../src/core/entities';
 import { StatusGateway } from '../../src/users/status/status.gateway';
 import { StatusModule } from '../../src/users/status/status.module';
 import { SessionsService } from '../../src/users/sessions/sessions.service';
@@ -59,7 +59,9 @@ describe('User Status', () => {
 
     const mockStatusGateway = jest
       .spyOn(statusGateway, 'getSession')
-      .mockResolvedValueOnce(new Session({ userId: id } as Session));
+      .mockResolvedValueOnce(
+        new SessionEntity({ userId: id } as SessionEntity),
+      );
 
     const mockSessionUpdate = jest
       .spyOn(sessionsService, 'updateSession')

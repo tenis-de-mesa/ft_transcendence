@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatsService } from './chats.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Chat, Message, User } from '../core/entities';
+import { ChatEntity, MessageEntity, UserEntity } from '../core/entities';
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ChatsService', () => {
   let module: TestingModule;
   let chatsService: ChatsService;
-  let userRepository: Repository<User>;
-  let chatRepository: Repository<Chat>;
-  let messageRepository: Repository<Message>;
+  let userRepository: Repository<UserEntity>;
+  let chatRepository: Repository<ChatEntity>;
+  let messageRepository: Repository<MessageEntity>;
 
   const TEST_USER_ID = 1;
   const TEST_CHAT_ID = 1;
-  const TEST_USER = new User({ id: TEST_USER_ID } as User);
-  const TEST_CHAT = new Chat({ id: TEST_CHAT_ID } as Chat);
+  const TEST_USER = new UserEntity({ id: TEST_USER_ID } as UserEntity);
+  const TEST_CHAT = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
   const TEST_MESSAGE_CONTENT = 'Hello World';
 
   beforeEach(async () => {
@@ -23,22 +23,22 @@ describe('ChatsService', () => {
       providers: [
         ChatsService,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(UserEntity),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Chat),
+          provide: getRepositoryToken(ChatEntity),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Message),
+          provide: getRepositoryToken(MessageEntity),
           useClass: Repository,
         },
       ],
     }).compile();
-    userRepository = module.get(getRepositoryToken(User));
-    chatRepository = module.get(getRepositoryToken(Chat));
-    messageRepository = module.get(getRepositoryToken(Message));
+    userRepository = module.get(getRepositoryToken(UserEntity));
+    chatRepository = module.get(getRepositoryToken(ChatEntity));
+    messageRepository = module.get(getRepositoryToken(MessageEntity));
     chatsService = module.get(ChatsService);
   });
 
@@ -54,10 +54,10 @@ describe('ChatsService', () => {
     // -- Success scenarios --
     it('should add a new message to the chat', async () => {
       // Arrange
-      const mockMessage = new Message({
+      const mockMessage = new MessageEntity({
         chat: TEST_CHAT,
         content: TEST_MESSAGE_CONTENT,
-      } as Message);
+      } as MessageEntity);
 
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
       jest.spyOn(messageRepository, 'create').mockReturnValueOnce(mockMessage);
@@ -99,7 +99,10 @@ describe('ChatsService', () => {
     it('should successfully create a chat', async () => {
       // Arrange
       const createChatDto = { userIds: [TEST_USER_ID] };
-      const mockChat = new Chat({ id: 1, users: [TEST_USER] } as Chat);
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [TEST_USER],
+      } as ChatEntity);
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER]);
       jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
@@ -153,7 +156,7 @@ describe('ChatsService', () => {
   describe('findOne', () => {
     it('should return a chat by its ID', async () => {
       // Arrange
-      const mockChat = new Chat({ id: TEST_CHAT_ID } as Chat);
+      const mockChat = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
       jest.spyOn(chatRepository, 'findOne').mockResolvedValueOnce(mockChat);
 
       // Act

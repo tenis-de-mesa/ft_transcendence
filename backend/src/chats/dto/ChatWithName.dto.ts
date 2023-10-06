@@ -1,5 +1,5 @@
-import { Chat } from '../../core/entities';
+import { ChatEntity } from '../../core/entities';
 
-export class ChatWithName extends Chat {
+export class ChatWithName extends ChatEntity {
   name: string;
 }
