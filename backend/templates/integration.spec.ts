@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../src/config/typeorm-config.module';
 
-describe('Test', () => {
+describe('Class', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -26,9 +26,11 @@ describe('Test', () => {
     expect(app).toBeDefined();
   });
 
-  it('test', async () => {
-    // Arrange
-    // Act
-    // Assert
+  describe('method', () => {
+    it('test', async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
   });
 });
