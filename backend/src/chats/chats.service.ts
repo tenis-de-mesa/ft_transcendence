@@ -3,11 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { UserEntity, ChatEntity, MessageEntity } from '../core/entities';
-import { ChatWithName } from './dto/ChatWithName.dto';
+import { CreateChatDto, ChatWithName } from './dto';
 
 @Injectable()
 export class ChatsService {
@@ -22,8 +21,8 @@ export class ChatsService {
     private readonly messageRepository: Repository<MessageEntity>,
   ) {}
 
-  async create(createchatsDto: CreateChatDto): Promise<ChatEntity> {
-    const userIds = [...new Set(createchatsDto.userIds)];
+  async create(dto: CreateChatDto): Promise<ChatEntity> {
+    const userIds = [...new Set(dto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');

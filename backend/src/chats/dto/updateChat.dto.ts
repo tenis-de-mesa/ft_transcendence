@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateChatDto } from './CreateChatDto.dto';
+import { CreateChatDto } from '.';
 
 export class UpdateChatDto extends PartialType(CreateChatDto) {}
