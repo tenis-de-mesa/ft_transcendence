@@ -16,7 +16,7 @@ import {
 import { TfaGenerateResponse, TfaService } from './tfa.service';
 import { TfaDto } from '../dto';
 import { UserEntity } from '../../core/entities';
-import { GetUser } from '../../core/decorators';
+import { User } from '../../core/decorators';
 
 @Controller('auth/tfa')
 @UseGuards(AuthenticatedGuard)
@@ -26,7 +26,7 @@ export class TfaController {
   @Get('generate')
   @UseGuards(TwoFactorDisabledGuard)
   async tfaGenerateSecret(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
   ): Promise<TfaGenerateResponse> {
     return await this.tfaService.tfaGenerateSecret(user);
   }
@@ -34,7 +34,7 @@ export class TfaController {
   @Post('enable')
   @UseGuards(TwoFactorDisabledGuard)
   async tfaEnable(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
     @Session() session: any,
     @Body() dto: TfaDto,
   ): Promise<string[]> {
@@ -54,7 +54,7 @@ export class TfaController {
   @Post('disable')
   @UseGuards(TwoFactorEnabledGuard)
   async tfaDisable(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
     @Session() session: any,
     @Body() dto: TfaDto,
   ): Promise<void> {
@@ -73,7 +73,7 @@ export class TfaController {
   @Post('authenticate')
   @UseGuards(TwoFactorEnabledGuard)
   async tfaAuthenticate(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
     @Session() session: any,
     @Body() dto: TfaDto,
   ): Promise<void> {
@@ -87,7 +87,7 @@ export class TfaController {
   @Post('recover')
   @UseGuards(TwoFactorEnabledGuard)
   async tfaRecover(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
     @Session() session: any,
     @Body() dto: TfaDto,
   ): Promise<void> {
@@ -101,7 +101,7 @@ export class TfaController {
   @Post('regenerate-recovery-codes')
   @UseGuards(TwoFactorEnabledGuard)
   async tfaRegenerateRecoveryCodes(
-    @GetUser() user: UserEntity,
+    @User() user: UserEntity,
     @Body() dto: TfaDto,
   ): Promise<string[]> {
     if (!this.tfaService.tfaIsCodeValid(user, dto.tfaCode)) {
