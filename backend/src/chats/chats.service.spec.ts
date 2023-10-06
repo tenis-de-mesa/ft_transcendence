@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChatsService } from './chats.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Chat, Message, User } from '../core/entities';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ChatsService', () => {

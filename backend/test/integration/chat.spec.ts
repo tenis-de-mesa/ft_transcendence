@@ -4,7 +4,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { ChatsModule } from '../../src/chats/chats.module';
 import { AuthModule } from '../../src/auth/auth.module';
-import { AuthenticatedGuard } from '../../src/auth/guards';
 
 describe('Chat', () => {
   let app: INestApplication;
