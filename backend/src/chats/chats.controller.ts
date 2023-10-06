@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { AuthenticatedGuard } from '../auth/guards';
@@ -24,7 +32,7 @@ export class ChatsController {
   }
 
   @Get(':id')
-  async show(@Param('id') id: string) {
-    return this.chatsService.findOne(+id);
+  async show(@Param('id', ParseIntPipe) id: number) {
+    return this.chatsService.findOne(id);
   }
 }

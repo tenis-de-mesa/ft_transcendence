@@ -12,4 +12,10 @@ export class Chat {
 
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
+
+  constructor(chat?: Chat) {
+    this.id = chat?.id;
+    this.users = chat?.users;
+    this.messages = chat?.messages;
+  }
 }
