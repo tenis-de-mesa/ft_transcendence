@@ -1,5 +1,5 @@
 import { socket } from "../socket";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData } from "react-router-dom";
 import { Chat, Message } from "../types/types";
 import { useEffect, useState } from "react";
 
@@ -14,6 +14,7 @@ export default function Chat() {
 
   useEffect(() => {
     socket.on(`newMessage`, (data: Message) => {
+
       // If the message is not from the current chat, ignore it
       if (data.chat!.id != chatId) return;
 
@@ -33,7 +34,11 @@ export default function Chat() {
       </center>
       <ul>
         {chat.messages.map((message) => (
-          <li key={message.id}>{message.content}</li>
+          <li key={message.id}>
+            <Link to={`/profile/${message.user?.id}`}>{message.user?.nickname}:</Link>
+            {" "}
+            {message.content}
+          </li>
         ))}
       </ul>
       <Form
