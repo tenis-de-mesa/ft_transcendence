@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Chat } from './chat.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Message {
@@ -11,6 +12,9 @@ export class Message {
 
   @ManyToOne(() => Chat, (chat) => chat.messages)
   chat: Chat;
+
+  @ManyToOne(() => User, (user) => user.id, { nullable: false })
+  user: User;
 
   constructor(message?: Message) {
     this.id = message?.id;
