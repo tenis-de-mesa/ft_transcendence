@@ -2,6 +2,7 @@ import { socket } from "../socket";
 import { Form, Link, useLoaderData } from "react-router-dom";
 import { Chat, Message } from "../types/types";
 import { useEffect, useState } from "react";
+import Avatar from "../components/Avatar";
 
 export default function Chat() {
   const [chat, setChat] = useState(useLoaderData() as Chat);
@@ -33,12 +34,18 @@ export default function Chat() {
       </center>
       <ul>
         {chat.messages.map((message) => (
-          <li key={message.id}>
-            <Link to={`/profile/${message.user?.id}`}>
-              {message.user?.nickname}:
-            </Link>{" "}
-            {message.content}
-          </li>
+          <div key={message.id}>
+            <div>
+              <Avatar
+                login={message.user?.login}
+                avatarUrl={message.user?.avatarUrl}
+              />
+              <Link to={`/profile/${message.user?.id}`}>
+                {message.user?.nickname}:
+              </Link>
+            </div>
+            {" "} {message.content}
+          </div>
         ))}
       </ul>
       <Form
