@@ -15,6 +15,7 @@ import { GuestCleanupService } from './users/guest-cleanup/guest-cleanup.service
 import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './users/status/status.module';
 import { ChatsModule } from './chats/chats.module';
+import { SecretsManager } from './lib/aws/SecretsManager';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { ChatsModule } from './chats/chats.module';
     ChatsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GuestCleanupService],
+  providers: [AppService, GuestCleanupService, SecretsManager],
 })
 export class AppModule {}
