@@ -1,4 +1,9 @@
-import { Link, useLoaderData, useParams, useRouteLoaderData } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useParams,
+  useRouteLoaderData,
+} from "react-router-dom";
 import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
@@ -19,54 +24,52 @@ export default function Profile() {
     }
   };
 
-  return (
-    userId == userMe.id ? (
-      <div className="profile">
-        <div className="flip-card">
-          <div className="wrapper">
-            <div className="card back">
-              <UserForm user={userMe} />
-              <button onClick={flipCard} className="back-button">
-                Voltar
+  return userId == userMe.id ? (
+    <div className="profile">
+      <div className="flip-card">
+        <div className="wrapper">
+          <div className="card back">
+            <UserForm user={userMe} />
+            <button onClick={flipCard} className="back-button">
+              Voltar
+            </button>
+          </div>
+          <div className="card front">
+            <center>
+              <Avatar login={userMe.login} avatarUrl={userMe.avatarUrl} />
+              <h1>{userMe.nickname}</h1>
+              <button onClick={flipCard} className="edit-button">
+                Editar
               </button>
-            </div>
-            <div className="card front">
-              <center>
-                <Avatar login={userMe.login} avatarUrl={userMe.avatarUrl} />
-                <h1>{userMe.nickname}</h1>
-                <button onClick={flipCard} className="edit-button">
-                  Editar
-                </button>
-              </center>
-              <hr />
-              <p>
-                <strong>Login:</strong> {userMe.login}
-              </p>
-              <p>
-                <strong>Nickname:</strong> {userMe.nickname}
-              </p>
-              <Link to={"/logout"}>Sair</Link>
-            </div>
+            </center>
+            <hr />
+            <p>
+              <strong>Login:</strong> {userMe.login}
+            </p>
+            <p>
+              <strong>Nickname:</strong> {userMe.nickname}
+            </p>
+            <Link to={"/logout"}>Sair</Link>
           </div>
         </div>
       </div>
-    ) : (
-      <div className="profile">
-        <div className="flip-card">
-          <div className="wrapper">
-            <div className="card front">
-              <center>
-                <Avatar login={userOther.login} avatarUrl={userOther.avatarUrl} />
-                <h1>{userOther.nickname}</h1>
-              </center>
-              <hr />
-              <p>
-                <strong>Nickname:</strong> {userOther.nickname}
-              </p>
-            </div>
+    </div>
+  ) : (
+    <div className="profile">
+      <div className="flip-card">
+        <div className="wrapper">
+          <div className="card front">
+            <center>
+              <Avatar login={userOther.login} avatarUrl={userOther.avatarUrl} />
+              <h1>{userOther.nickname}</h1>
+            </center>
+            <hr />
+            <p>
+              <strong>Nickname:</strong> {userOther.nickname}
+            </p>
           </div>
         </div>
       </div>
-    )
-  )
+    </div>
+  );
 }

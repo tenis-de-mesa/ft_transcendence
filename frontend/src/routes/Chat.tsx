@@ -14,7 +14,6 @@ export default function Chat() {
 
   useEffect(() => {
     socket.on(`newMessage`, (data: Message) => {
-
       // If the message is not from the current chat, ignore it
       if (data.chat!.id != chatId) return;
 
@@ -35,8 +34,9 @@ export default function Chat() {
       <ul>
         {chat.messages.map((message) => (
           <li key={message.id}>
-            <Link to={`/profile/${message.user?.id}`}>{message.user?.nickname}:</Link>
-            {" "}
+            <Link to={`/profile/${message.user?.id}`}>
+              {message.user?.nickname}:
+            </Link>{" "}
             {message.content}
           </li>
         ))}
