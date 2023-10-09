@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect, useState } from "react";
-
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import { motion } from "framer-motion";
 
@@ -13,19 +12,18 @@ import { INavitem } from "../../@interfaces";
 import classNames from "classnames";
 import { LuLogOut } from "react-icons/lu";
 import { Navitem } from "./Navitem";
+import { User } from "../../types/types";
 
 export interface ISidebarProps {
   options: INavitem[];
-  username: string;
-  email: string;
+  user: User;
   darkMode?: boolean;
   className?: string;
 }
 
 export const Sidebar: FC<ISidebarProps> = ({
   options,
-  username,
-  email,
+  user,
   className,
   darkMode,
 }) => {
@@ -36,6 +34,7 @@ export const Sidebar: FC<ISidebarProps> = ({
   const [activeNavitem, setActiveNavitem] = useState<string>("");
 
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const SidebarAnimation = isTab
     ? {
@@ -177,14 +176,14 @@ export const Sidebar: FC<ISidebarProps> = ({
                 customColor="text-gray-700 dark:text-white"
                 className="transition ease-in delay-150 opacity-100"
               >
-                {username}
+                {user.nickname}
               </Typography>
               <Typography
                 variant="xs"
                 customColor="text-gray-500 dark:text-gray-400"
                 className="transition ease-in delay-300 opacity-100 whitespace-nowrap"
               >
-                {email}
+                {user.nickname}
               </Typography>
               <LuLogOut
                 size={20}
@@ -199,18 +198,19 @@ export const Sidebar: FC<ISidebarProps> = ({
                 customColor="text-gray-700 dark:text-white"
                 className="opacity-0"
               >
-                {username}
+                {user.nickname}
               </Typography>
               <Typography
                 variant="xs"
                 customColor="text-gray-500"
                 className="opacity-0 whitespace-nowrap"
               >
-                {email}
+                {user.nickname}
               </Typography>
               <LuLogOut
                 size={20}
                 className="absolute top-0 right-0 opacity-0"
+                onClick={() => navigate("logout", { replace: true })}
               />
             </div>
           )}
