@@ -2,31 +2,26 @@ import { Outlet, useLoaderData, useOutletContext } from "react-router-dom";
 import { User } from "../types/types";
 
 import Login from "../components/Login";
-import Sidebar from "../components/Sidebar";
-import { useState } from "react";
 
 import "./Root.css";
+import { Sidebar } from "../components/nav/Sidebar";
+import { navitems } from "../data";
 
 export default function Root() {
   const user: User = useLoaderData() as User;
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (!user) {
     return <Login />;
   }
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
-    <div className={`container ${sidebarOpen ? "" : "closed"}`}>
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
-        ≡
-      </button>
-      <Sidebar user={user} sidebarOpen={sidebarOpen}></Sidebar>
-      <Outlet context={user} />
+    <div className="flex gap-5">
+      <Sidebar options={navitems} user={user} />
+      <main className="flex-1 py-4 mx-auto">
+        <Outlet context={user} />
+      </main>
     </div>
+
   );
 }
 
