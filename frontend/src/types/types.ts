@@ -15,7 +15,7 @@ export type Message = {
   id: number;
   content: string;
   chat?: Chat;
-  user?: User;
+  sender?: User;
 };
 
 export type Chat = {

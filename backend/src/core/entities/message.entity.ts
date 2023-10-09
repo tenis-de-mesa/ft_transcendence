@@ -1,7 +1,12 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Chat, User } from '.';
 
-@Entity()
+@Entity({ name: 'messages' })
 export class Message {
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,7 +18,7 @@ export class Message {
   chat: Chat;
 
   @ManyToOne(() => User, (user) => user.id, { nullable: false })
-  user: User;
+  sender: User;
 
   constructor(message?: Message) {
     this.id = message?.id;

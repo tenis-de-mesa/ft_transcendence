@@ -1,11 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
-import { User } from './user.entity';
-import { Message } from './message.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  Column,
+} from 'typeorm';
+import { User, Message } from '.';
 
-@Entity()
+enum ChatType {
+  PRIVATE = 'private',
+  CHANNEL = 'channel',
+}
+
+@Entity({ name: 'chats' })
 export class Chat {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'enum',
+    enum: ChatType,
+    default: ChatType.PRIVATE,
+  })
+  type: ChatType;
 
   @ManyToMany(() => User, (user) => user.chats)
   users: User[];

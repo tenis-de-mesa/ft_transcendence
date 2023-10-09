@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User, Chat, Message } from '../core/entities';
 import { ChatWithName } from './dto/ChatWithName.dto';
+import { CreateMessageDto } from './dto/createMessage.dto';
 
 @Injectable()
 export class ChatsService {
@@ -22,8 +23,8 @@ export class ChatsService {
     private readonly messageRepository: Repository<Message>,
   ) {}
 
-  async create(createchatsDto: CreateChatDto): Promise<Chat> {
-    const userIds = [...new Set(createchatsDto.userIds)];
+  async create(dto: CreateChatDto): Promise<Chat> {
+    const userIds = [...new Set(dto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
@@ -75,7 +76,7 @@ export class ChatsService {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
-      relations: ['users', 'messages', 'messages.user'],
+      relations: ['users', 'messages', 'messages.sender'],
       where: { id: id },
     });
 
@@ -83,26 +84,26 @@ export class ChatsService {
     return chat;
   }
 
-  async addMessage(
-    userId: number,
-    chatId: number,
-    message: string,
-  ): Promise<Message> {
-    const chat = await this.chatRepository.findOneBy({ id: chatId });
+  async addMessage(dto: CreateMessageDto): Promise<Message> {
+    const findUserPromise = this.userRepository.findOneBy({ id: dto.senderId });
+    const findChatPromise = this.chatRepository.findOneBy({ id: dto.chatId });
+
+    const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
+
     if (!chat) {
       throw new NotFoundException('Chat not found');
     }
-    if (!message) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!dto.content) {
       throw new BadRequestException('Message cannot be empty');
     }
 
-    const user = await this.userRepository.findOneBy({ id: userId });
-
-    const newMessage = await this.messageRepository.create({
-      content: message,
+    return this.messageRepository.save({
       chat,
-      user,
+      sender: user,
+      content: dto.content,
     });
-    return this.messageRepository.save(newMessage);
   }
 }

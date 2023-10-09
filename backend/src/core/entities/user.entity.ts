@@ -7,8 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { Session, FriendRequest } from '.';
-import { Chat } from './chat.entity';
+import { Session, FriendRequest, Message, Chat } from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -90,9 +89,20 @@ export class User {
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
 
-  @ManyToMany(() => Chat, (chat) => chat.users)
-  @JoinTable()
+  @ManyToMany(() => Chat, (chat) => chat.users, { cascade: true })
+  @JoinTable({
+    name: 'members',
+    joinColumn: {
+      name: 'userId',
+    },
+    inverseJoinColumn: {
+      name: 'chatId',
+    },
+  })
   chats: Chat[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 
   constructor(user?: User) {
     this.id = user?.id;

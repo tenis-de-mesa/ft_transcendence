@@ -74,26 +74,26 @@ export default function Chat() {
       )}
       <ul>
         {chat.messages.map((message) => {
-          const showAvatar = lastUser?.id != message.user?.id;
+          const showAvatar = lastUser?.id != message.sender?.id;
 
-          lastUser = message.user;
+          lastUser = message.sender;
 
           return (
             <div key={message.id}>
               {showAvatar && (
                 <div className="flex gap-4">
                   <Avatar
-                    login={message.user?.login}
-                    avatarUrl={message.user?.avatarUrl}
+                    login={message.sender?.login}
+                    avatarUrl={message.sender?.avatarUrl}
                   />
                   <button
                     onClick={() => {
                       setIsOpen(!isOpen);
-                      setUser(message.user);
+                      setUser(message.sender);
                     }}
                   >
                     <Typography variant="h6">
-                      {message.user?.nickname}:
+                      {message.sender?.nickname}:
                     </Typography>
                   </button>
                 </div>

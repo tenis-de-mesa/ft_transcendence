@@ -65,11 +65,11 @@ describe('ChatsService', () => {
       jest.spyOn(messageRepository, 'save').mockResolvedValueOnce(mockMessage);
 
       // Act
-      const result = await chatsService.addMessage(
-        TEST_USER_ID,
-        TEST_CHAT_ID,
-        TEST_MESSAGE_CONTENT,
-      );
+      const result = await chatsService.addMessage({
+        senderId: TEST_USER_ID,
+        chatId: TEST_CHAT_ID,
+        content: TEST_MESSAGE_CONTENT,
+      });
 
       // Assert
       expect(result).toEqual(mockMessage);
@@ -78,25 +78,46 @@ describe('ChatsService', () => {
     // -- Failure scenarios --
     it('should fail if the chat does not exist', async () => {
       // Arrange
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(TEST_USER);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(null);
 
       // Act & Assert
       await expect(
-        chatsService.addMessage(
-          TEST_USER_ID,
-          TEST_CHAT_ID,
-          TEST_MESSAGE_CONTENT,
-        ),
+        chatsService.addMessage({
+          senderId: TEST_USER_ID,
+          chatId: TEST_CHAT_ID,
+          content: TEST_MESSAGE_CONTENT,
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should fail if the user does not exist', async () => {
+      // Arrange
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(null);
+      jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
+
+      // Act & Assert
+      await expect(
+        chatsService.addMessage({
+          senderId: TEST_USER_ID,
+          chatId: TEST_CHAT_ID,
+          content: TEST_MESSAGE_CONTENT,
+        }),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should fail if the message content is empty', async () => {
       // Arrange
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(TEST_USER);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
 
       // Act & Assert
       await expect(
-        chatsService.addMessage(TEST_USER_ID, TEST_CHAT_ID, ''),
+        chatsService.addMessage({
+          senderId: TEST_USER_ID,
+          chatId: TEST_CHAT_ID,
+          content: '',
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });

@@ -26,9 +26,9 @@ export class ChatsController {
   }
 
   @Post()
-  create(@Body() createchatsDto: CreateChatDto, @GetUser() user: User) {
-    createchatsDto.userIds.push(user.id);
-    return this.chatsService.create(createchatsDto);
+  async create(@Body() dto: CreateChatDto, @GetUser() user: User) {
+    dto.userIds.push(user.id);
+    return await this.chatsService.create(dto);
   }
 
   @Get(':id')
