@@ -90,7 +90,6 @@ export class User {
   @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
   friend_requests_sent: FriendRequest[];
 
-
   @ManyToMany(() => Chat, (chat) => chat.users)
   @JoinTable()
   chats: Chat[];

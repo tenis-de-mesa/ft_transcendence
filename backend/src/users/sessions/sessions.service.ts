@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { UpdateSessionDto } from './dto';
 import { Session } from '../../core/entities';
+import { Socket } from 'socket.io';
+import { getSessionIdFromSocket } from '../../core/utils';
 
 @Injectable()
 export class SessionsService {
@@ -20,6 +22,11 @@ export class SessionsService {
       where: { socketId: socketId },
       withDeleted: true,
     });
+  }
+
+  async getSessionByClientSocket(client: Socket): Promise<Session> {
+    const sessionId = getSessionIdFromSocket(client);
+    return await this.getSessionById(sessionId);
   }
 
   async updateSession(

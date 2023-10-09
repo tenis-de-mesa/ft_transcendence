@@ -19,6 +19,7 @@ import Chats from "./routes/Chats.tsx";
 import Chat from "./routes/Chat.tsx";
 import Home from "./routes/Home.tsx";
 import { sendChatMessage } from "./actions/sendChatMessage.ts";
+import { loadUserById } from "./loaders/loadUserById.ts";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
       {
         path: "profile/:id",
         element: <Profile />,
+        loader: loadUserById,
       },
     ],
   },

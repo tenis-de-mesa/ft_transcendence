@@ -15,6 +15,7 @@ export type Message = {
   id: number;
   content: string;
   chat?: Chat;
+  user?: User;
 };
 
 export type Chat = {

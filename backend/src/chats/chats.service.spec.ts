@@ -59,12 +59,14 @@ describe('ChatsService', () => {
         content: TEST_MESSAGE_CONTENT,
       } as Message);
 
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(TEST_USER);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
       jest.spyOn(messageRepository, 'create').mockReturnValueOnce(mockMessage);
       jest.spyOn(messageRepository, 'save').mockResolvedValueOnce(mockMessage);
 
       // Act
       const result = await chatsService.addMessage(
+        TEST_USER_ID,
         TEST_CHAT_ID,
         TEST_MESSAGE_CONTENT,
       );
@@ -80,7 +82,11 @@ describe('ChatsService', () => {
 
       // Act & Assert
       await expect(
-        chatsService.addMessage(TEST_CHAT_ID, TEST_MESSAGE_CONTENT),
+        chatsService.addMessage(
+          TEST_USER_ID,
+          TEST_CHAT_ID,
+          TEST_MESSAGE_CONTENT,
+        ),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -89,9 +95,9 @@ describe('ChatsService', () => {
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
 
       // Act & Assert
-      await expect(chatsService.addMessage(TEST_CHAT_ID, '')).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(
+        chatsService.addMessage(TEST_USER_ID, TEST_CHAT_ID, ''),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
