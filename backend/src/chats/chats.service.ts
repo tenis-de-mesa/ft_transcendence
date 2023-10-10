@@ -25,19 +25,18 @@ export class ChatsService {
     createchatsDto: CreateChatDto,
     user: UserEntity,
   ): Promise<ChatEntity> {
-    // Add the current user's ID to the user IDs array if it is not already present
+    // Add the current user to the userIds
     if (!createchatsDto.userIds.includes(user.id)) {
       createchatsDto.userIds.push(user.id);
     }
-    // Get the chat users from the user IDs
+    // Check if all userIds are valid
     const userIds = [...new Set(createchatsDto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
-    // Check if all users were found
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
     const chat = this.chatRepository.create({ users: chatUsers });
-    // Add the first message to the chat if provided
+    // Add an aptional initial message to the chat
     if (createchatsDto.message) {
       chat.messages = [
         this.messageRepository.create({

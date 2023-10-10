@@ -9,7 +9,7 @@ export class ChatEntity {
   @ManyToMany(() => UserEntity, (user) => user.chats)
   users: UserEntity[];
 
-  @OneToMany(() => Message, (message) => message.chat, { cascade: true })
+  @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
 
   constructor(chat?: ChatEntity) {
