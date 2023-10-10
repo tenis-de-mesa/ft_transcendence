@@ -5,6 +5,7 @@ import { navitems } from "../data/navItems";
 import { Sidebar, ISidebarProps } from "../components/nav/Sidebar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Typography } from "../components/Typography";
+import { User } from "../types/types";
 
 const meta: Meta = {
   title: "Components/Sidebar",
@@ -19,6 +20,14 @@ interface Props extends ISidebarProps {
 }
 
 const StorySidebar = (args: Props) => {
+  const user: User = {
+    id: 1,
+    login: "frosa-ma",
+    nickname: "frosa-ma",
+    status: "",
+    avatarUrl: ""
+  };
+
   return (
     <StoryLayout {...args} className="flex flex-col h-screen" noPadding>
       <BrowserRouter>
@@ -26,8 +35,7 @@ const StorySidebar = (args: Props) => {
           <Sidebar
             {...args}
             options={navitems}
-            username="Veronica Woods"
-            email="frosa-ma@student.42sp.org.br"
+            user={user}
             className={args.className}
           />
           <main className="flex-1 py-4 mx-auto">

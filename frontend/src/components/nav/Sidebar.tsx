@@ -164,42 +164,55 @@ export const Sidebar: FC<ISidebarProps> = ({
             "h-screen": isMob,
           })}
         >
-          <img
-            src={images.demoAvatar}
-            className="w-10 h-10 rounded-full cursor-pointer select-none"
-          />
           {isOpen ? (
-            <div className="duration-100 ease-in transform">
-              <Typography
-                variant="sm"
-                customWeight="medium"
-                customColor="text-gray-700 dark:text-white"
-                className="transition ease-in delay-150 opacity-100"
-              >
-                {user.nickname}
-              </Typography>
+            <div className="w-full duration-100 ease-in transform">
+              <img
+                src={images.demoAvatar}
+                className="w-0 h-0 rounded-full transition duration-150 ease-in fixed bottom-4 opacity-0"
+              />
+              <div className="flex items-center justify-between py-1">
+                <Typography
+                  variant="sm"
+                  customWeight="medium"
+                  customColor="text-gray-700 dark:text-white"
+                  className="transition ease-in delay-150 opacity-100"
+                >
+                  {user.nickname}
+                </Typography>
+                <LuLogOut
+                  size={20}
+                  className="text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer hover:text-primary-400"
+                  onClick={() => navigate("/logout", { replace: true })}
+                />
+              </div>
               <Typography
                 variant="xs"
                 customColor="text-gray-500 dark:text-gray-400"
                 className="transition ease-in delay-300 opacity-100 whitespace-nowrap"
               >
-                {user.nickname}
+                {"frosa-ma@student.42sp.org.br"}
               </Typography>
-              <LuLogOut
-                size={20}
-                className="absolute top-0 text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer -right-1"
-              />
             </div>
           ) : (
             <div>
-              <Typography
-                variant="sm"
-                customWeight="medium"
-                customColor="text-gray-700 dark:text-white"
-                className="opacity-0"
-              >
-                {user.nickname}
-              </Typography>
+              <img
+                src={images.demoAvatar}
+                className="w-10 h-10 rounded-full cursor-pointer select-none fixed bottom-4 transition ease-in delay-300 opacity-100"
+              />
+              <div className="flex items-center justify-between">
+                <Typography
+                  variant="sm"
+                  customWeight="medium"
+                  customColor="text-gray-700 dark:text-white"
+                  className="opacity-0"
+                >
+                  {user.nickname}
+                </Typography>
+                <LuLogOut
+                  size={20}
+                  className="absolute top-0 right-0 opacity-0"
+                />
+              </div>
               <Typography
                 variant="xs"
                 customColor="text-gray-500"
@@ -207,11 +220,6 @@ export const Sidebar: FC<ISidebarProps> = ({
               >
                 {user.nickname}
               </Typography>
-              <LuLogOut
-                size={20}
-                className="absolute top-0 right-0 opacity-0"
-                onClick={() => navigate("logout", { replace: true })}
-              />
             </div>
           )}
         </div>
