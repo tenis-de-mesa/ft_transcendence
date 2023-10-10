@@ -21,13 +21,30 @@ export class ChatsService {
     private readonly messageRepository: Repository<MessageEntity>,
   ) {}
 
-  async create(dto: CreateChatDto): Promise<ChatEntity> {
-    const userIds = [...new Set(dto.userIds)];
+  async create(
+    createchatsDto: CreateChatDto,
+    chatCreator: UserEntity,
+  ): Promise<ChatEntity> {
+    // Add the user to the userIds
+    if (!createchatsDto.userIds.includes(chatCreator.id)) {
+      createchatsDto.userIds.push(chatCreator.id);
+    }
+    // Check if all userIds are valid
+    const userIds = [...new Set(createchatsDto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
     const chat = this.chatRepository.create({ users: chatUsers });
+    // Add an optional initial message to the chat
+    if (createchatsDto.message) {
+      chat.messages = [
+        this.messageRepository.create({
+          content: createchatsDto.message,
+          sender: chatCreator,
+        }),
+      ];
+    }
     return this.chatRepository.save(chat);
   }
 

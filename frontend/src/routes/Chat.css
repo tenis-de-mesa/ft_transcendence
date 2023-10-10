@@ -20,11 +20,16 @@
   }
 
   .card {
-    overflow-y: scroll;
-    scrollbar-width: none;
+    overflow: hidden;
   }
 
-  .card::-webkit-scrollbar {
+  & .messages {
+    overflow-y: scroll;
+    scrollbar-width: none;
+    height: 100%;
+  }
+
+  & .messages::-webkit-scrollbar {
     display: none;
   }
 }

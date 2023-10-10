@@ -43,7 +43,7 @@ export class ChatEntity {
   @OneToMany(() => ChatMemberEntity, (member) => member.chat)
   chatMembers: ChatMemberEntity[];
 
-  @OneToMany(() => MessageEntity, (message) => message.chat)
+  @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
 
   constructor(chat?: ChatEntity) {

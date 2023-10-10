@@ -20,7 +20,7 @@ export default function Root() {
   };
 
   return (
-    <div className={`container ${sidebarOpen ? "" : "closed"}`}>
+    <div className={`main-content ${sidebarOpen ? "" : "closed"}`}>
       <button className="sidebar-toggle" onClick={toggleSidebar}>
         ≡
       </button>

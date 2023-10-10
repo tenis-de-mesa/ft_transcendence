@@ -5,7 +5,7 @@
   backdrop-filter: blur(2px);
 }
 
-.container {
+.main-content {
   height: 100vh;
   margin-left: 8em; /* Same as the width of the sidebar */
   transition: margin-left 0.5s;
@@ -13,7 +13,7 @@
   align-items: baseline;
 }
 
-.container.closed {
+.main-content.closed {
   margin-left: 0;
 }
 
