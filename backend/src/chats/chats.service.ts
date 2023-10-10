@@ -25,7 +25,7 @@ export class ChatsService {
     createchatsDto: CreateChatDto,
     chatCreator: UserEntity,
   ): Promise<ChatEntity> {
-    // Add the current user to the userIds
+    // Add the user to the userIds
     if (!createchatsDto.userIds.includes(chatCreator.id)) {
       createchatsDto.userIds.push(chatCreator.id);
     }
@@ -36,7 +36,7 @@ export class ChatsService {
       throw new NotFoundException('One or more users not found');
     }
     const chat = this.chatRepository.create({ users: chatUsers });
-    // Add an aptional initial message to the chat
+    // Add an optional initial message to the chat
     if (createchatsDto.message) {
       chat.messages = [
         this.messageRepository.create({
