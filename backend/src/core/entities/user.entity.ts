@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Entity,
   Column,
@@ -6,12 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ApiHideProperty } from '@nestjs/swagger';
 import {
   SessionEntity,
   FriendRequestEntity,
   ChatEntity,
   MessageEntity,
+  ChatMemberEntity,
 } from '.';
 
 export enum AuthProvider {
@@ -108,6 +109,9 @@ export class UserEntity {
     },
   })
   chats: ChatEntity[];
+
+  @OneToMany(() => ChatMemberEntity, (member) => member.user)
+  chatMembers: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];

@@ -3,3 +3,4 @@ export * from './session.entity';
 export * from './friend_request.entity';
 export * from './chat.entity';
 export * from './message.entity';
+export * from './chatMember.entity';

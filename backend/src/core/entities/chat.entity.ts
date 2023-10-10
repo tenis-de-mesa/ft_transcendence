@@ -5,11 +5,17 @@ import {
   ManyToMany,
   Column,
 } from 'typeorm';
-import { UserEntity, MessageEntity } from '.';
+import { UserEntity, MessageEntity, ChatMemberEntity } from '.';
 
-enum ChatType {
+export enum ChatAccess {
+  PUBLIC = 'public',
   PRIVATE = 'private',
+  PROTECTED = 'protected',
+}
+
+export enum ChatType {
   CHANNEL = 'channel',
+  DIRECT = 'direct',
 }
 
 @Entity({ name: 'chats' })
@@ -20,12 +26,22 @@ export class ChatEntity {
   @Column({
     type: 'enum',
     enum: ChatType,
-    default: ChatType.PRIVATE,
+    default: ChatType.DIRECT, // TODO: Remove default value
   })
   type: ChatType;
 
+  @Column({
+    type: 'enum',
+    enum: ChatAccess,
+    default: ChatAccess.PRIVATE,
+  })
+  access: ChatAccess;
+
   @ManyToMany(() => UserEntity, (user) => user.chats)
   users: UserEntity[];
+
+  @OneToMany(() => ChatMemberEntity, (member) => member.chat)
+  chatMembers: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.chat)
   messages: MessageEntity[];
