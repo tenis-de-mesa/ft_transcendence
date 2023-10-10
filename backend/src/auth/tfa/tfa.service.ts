@@ -3,7 +3,7 @@ import * as argon from 'argon2';
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-import { User } from '../../core/entities';
+import { UserEntity } from '../../core/entities';
 import { UsersService } from '../../users/users.service';
 import { EnvironmentConfigService } from '../../config/env.service';
 
@@ -24,7 +24,7 @@ export class TfaService {
     private readonly config: EnvironmentConfigService,
   ) {}
 
-  async tfaGenerateSecret(user: User): Promise<TfaGenerateResponse> {
+  async tfaGenerateSecret(user: UserEntity): Promise<TfaGenerateResponse> {
     const secret = authenticator.generateSecret();
 
     const otpAuthUrl = authenticator.keyuri(
@@ -46,7 +46,7 @@ export class TfaService {
     };
   }
 
-  async tfaEnable(user: User): Promise<string[]> {
+  async tfaEnable(user: UserEntity): Promise<string[]> {
     const recoveryCodes = await this.tfaGenerateRecoveryCodes();
 
     await this.usersService.updateUser(user.id, {
@@ -57,7 +57,7 @@ export class TfaService {
     return recoveryCodes.plain;
   }
 
-  async tfaDisable(user: User): Promise<void> {
+  async tfaDisable(user: UserEntity): Promise<void> {
     await this.usersService.updateUser(user.id, {
       tfaEnabled: false,
       tfaSecret: null,
@@ -65,14 +65,17 @@ export class TfaService {
     });
   }
 
-  tfaIsCodeValid(user: User, tfaCode: string): boolean {
+  tfaIsCodeValid(user: UserEntity, tfaCode: string): boolean {
     return authenticator.verify({
       token: tfaCode,
       secret: this.tfaDecrypt(user.tfaSecret, this.config.getTfaSecret()),
     });
   }
 
-  async tfaIsRecoveryCodeValid(user: User, tfaCode: string): Promise<boolean> {
+  async tfaIsRecoveryCodeValid(
+    user: UserEntity,
+    tfaCode: string,
+  ): Promise<boolean> {
     for (const code of user.tfaRecoveryCodes) {
       if (await argon.verify(code, tfaCode)) {
         return true;
@@ -82,7 +85,10 @@ export class TfaService {
     return false;
   }
 
-  async tfaKillSessions(user: User, exceptIds: string[] = []): Promise<void> {
+  async tfaKillSessions(
+    user: UserEntity,
+    exceptIds: string[] = [],
+  ): Promise<void> {
     await this.usersService.killAllSessionsByUserId(user.id, exceptIds);
   }
 

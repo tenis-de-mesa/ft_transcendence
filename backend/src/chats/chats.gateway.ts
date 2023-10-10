@@ -10,7 +10,7 @@ import { SessionsService } from '../users/sessions/sessions.service';
 import { GetSessionId } from '../core/decorators/get-sessionid.decorator';
 
 interface NewChatMessage {
-  chatId: string;
+  chatId: number;
   message: string;
 }
 
@@ -37,15 +37,16 @@ export class ChatsGateway {
     @MessageBody() data: NewChatMessage,
   ) {
     const session = await this.sessionService.getSessionById(sessionId);
-    if (!session) return;
 
-    const userId = session.userId;
+    if (!session) {
+      return;
+    }
 
-    const newMessage = await this.chatService.addMessage(
-      userId,
-      parseInt(data.chatId),
-      data.message,
-    );
+    const newMessage = await this.chatService.addMessage({
+      userId: session.userId,
+      chatId: data.chatId,
+      content: data.message,
+    });
 
     // Send the new message back to all clients
     this.server.emit('newMessage', newMessage);
