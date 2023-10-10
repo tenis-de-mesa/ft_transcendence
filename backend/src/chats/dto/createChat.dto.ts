@@ -1,6 +1,7 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,6 +10,7 @@ import {
 export class CreateChatDto {
   @IsArray()
   @ArrayMinSize(1)
+  @IsNotEmpty()
   @IsNumber({}, { each: true })
   userIds: number[];
 

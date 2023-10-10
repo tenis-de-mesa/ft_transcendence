@@ -8,11 +8,10 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
-import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { AuthenticatedGuard } from '../auth/guards';
-import { GetUser } from '../core/decorators';
-import { Chat, User } from '../core/entities';
-import { ChatWithName } from './dto/ChatWithName.dto';
+import { User } from '../core/decorators';
+import { ChatEntity, UserEntity } from '../core/entities';
+import { CreateChatDto, ChatWithName } from './dto';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('chats')
@@ -20,7 +19,7 @@ export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}
 
   @Get()
-  async findAll(@GetUser() user: User): Promise<ChatWithName[]> {
+  async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
     const chats = await this.chatsService.findAll(user);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
@@ -28,8 +27,8 @@ export class ChatsController {
   @Post()
   create(
     @Body() createchatsDto: CreateChatDto,
-    @GetUser() user: User,
-  ): Promise<Chat> {
+    @User() user: UserEntity,
+  ): Promise<ChatEntity> {
     return this.chatsService.create(createchatsDto, user);
   }
 

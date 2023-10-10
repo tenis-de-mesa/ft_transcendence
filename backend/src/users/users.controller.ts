@@ -14,9 +14,9 @@ import {
 
 import { AuthenticatedGuard } from '../auth/guards';
 import { UsersService } from './users.service';
-import { GetUser } from '../core/decorators';
+import { User } from '../core/decorators';
 import { UpdateUserDto } from './dto';
-import { User } from '../core/entities';
+import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
@@ -29,7 +29,7 @@ export class UsersController {
   }
 
   @Post('/')
-  create(@Body() body: UpdateUserDto, @GetUser() user: User) {
+  create(@Body() body: UpdateUserDto, @User() user: UserEntity) {
     if (Object.keys(body).length == 0) {
       return;
     }
@@ -38,7 +38,7 @@ export class UsersController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('me')
-  async getMe(@GetUser() user: User) {
+  async getMe(@User() user: UserEntity) {
     return user;
   }
 
@@ -77,7 +77,7 @@ export class UsersController {
     }),
   )
   async uploadFile(
-    @GetUser() user: User,
+    @User() user: UserEntity,
     @UploadedFile() file: Express.Multer.File,
   ) {
     await this.usersService.updateAvatar(user, file);

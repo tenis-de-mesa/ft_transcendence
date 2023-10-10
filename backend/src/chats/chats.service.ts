@@ -3,26 +3,28 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateChatDto } from './dto/CreateChatDto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { User, Chat, Message } from '../core/entities';
-import { ChatWithName } from './dto/ChatWithName.dto';
+import { UserEntity, ChatEntity, MessageEntity } from '../core/entities';
+import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
 
 @Injectable()
 export class ChatsService {
   constructor(
-    @InjectRepository(User)
-    readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    readonly userRepository: Repository<UserEntity>,
 
-    @InjectRepository(Chat)
-    private readonly chatRepository: Repository<Chat>,
+    @InjectRepository(ChatEntity)
+    private readonly chatRepository: Repository<ChatEntity>,
 
-    @InjectRepository(Message)
-    private readonly messageRepository: Repository<Message>,
+    @InjectRepository(MessageEntity)
+    private readonly messageRepository: Repository<MessageEntity>,
   ) {}
 
-  async create(createchatsDto: CreateChatDto, user: User): Promise<Chat> {
+  async create(
+    createchatsDto: CreateChatDto,
+    user: UserEntity,
+  ): Promise<ChatEntity> {
     // Add the current user's ID to the user IDs array if it is not already present
     if (!createchatsDto.userIds.includes(user.id)) {
       createchatsDto.userIds.push(user.id);
@@ -47,7 +49,7 @@ export class ChatsService {
     return this.chatRepository.save(chat);
   }
 
-  async findAll(user: User): Promise<Chat[]> {
+  async findAll(user: UserEntity): Promise<ChatEntity[]> {
     const chatsWithoutUsersRelation = await this.chatRepository.find({
       relations: {
         users: true,
@@ -69,14 +71,20 @@ export class ChatsService {
     });
   }
 
-  mapChatsToChatsWithName(chats: Chat[], currentUser: User): ChatWithName[] {
+  mapChatsToChatsWithName(
+    chats: ChatEntity[],
+    currentUser: UserEntity,
+  ): ChatWithName[] {
     return chats.map((chat) => ({
       ...chat,
       name: this.generateChatName(chat.users, currentUser),
     }));
   }
 
-  private generateChatName(users: User[], currentUser: User): string {
+  private generateChatName(
+    users: UserEntity[],
+    currentUser: UserEntity,
+  ): string {
     const otherUsers = users.filter((user) => user.id !== currentUser.id);
     // When a user creates a chat with himself
     if (otherUsers.length === 0) {
@@ -86,7 +94,7 @@ export class ChatsService {
     return names.join(', ');
   }
 
-  async findOne(id: number): Promise<Chat> {
+  async findOne(id: number): Promise<ChatEntity> {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
@@ -98,26 +106,26 @@ export class ChatsService {
     return chat;
   }
 
-  async addMessage(
-    userId: number,
-    chatId: number,
-    message: string,
-  ): Promise<Message> {
-    const chat = await this.chatRepository.findOneBy({ id: chatId });
+  async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
+    const findChatPromise = this.chatRepository.findOneBy({ id: dto.chatId });
+    const findUserPromise = this.userRepository.findOneBy({ id: dto.userId });
+
+    const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
+
     if (!chat) {
-      throw new NotFoundException('Chat not found');
+      throw new NotFoundException(`Chat not found`);
     }
-    if (!message) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!dto.content) {
       throw new BadRequestException('Message cannot be empty');
     }
 
-    const user = await this.userRepository.findOneBy({ id: userId });
-
-    const newMessage = await this.messageRepository.create({
-      content: message,
+    return this.messageRepository.save({
       chat,
       user,
+      content: dto.content,
     });
-    return this.messageRepository.save(newMessage);
   }
 }
