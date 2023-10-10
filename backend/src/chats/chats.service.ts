@@ -23,11 +23,11 @@ export class ChatsService {
 
   async create(
     createchatsDto: CreateChatDto,
-    user: UserEntity,
+    chatCreator: UserEntity,
   ): Promise<ChatEntity> {
     // Add the current user to the userIds
-    if (!createchatsDto.userIds.includes(user.id)) {
-      createchatsDto.userIds.push(user.id);
+    if (!createchatsDto.userIds.includes(chatCreator.id)) {
+      createchatsDto.userIds.push(chatCreator.id);
     }
     // Check if all userIds are valid
     const userIds = [...new Set(createchatsDto.userIds)];
@@ -41,7 +41,7 @@ export class ChatsService {
       chat.messages = [
         this.messageRepository.create({
           content: createchatsDto.message,
-          user: user,
+          user: chatCreator,
         }),
       ];
     }
