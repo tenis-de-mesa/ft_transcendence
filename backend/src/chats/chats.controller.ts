@@ -29,7 +29,7 @@ export class ChatsController {
     @Body() createchatsDto: CreateChatDto,
     @User() user: UserEntity,
   ): Promise<ChatEntity> {
-    return this.chatsService.create(createchatsDto, user);
+    return await this.chatsService.create(createchatsDto, user);
   }
 
   @Get(':id')
