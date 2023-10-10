@@ -5,7 +5,7 @@ import {
   ManyToMany,
   Column,
 } from 'typeorm';
-import { User, Message } from '.';
+import { UserEntity, MessageEntity } from '.';
 
 enum ChatType {
   PRIVATE = 'private',
@@ -13,7 +13,7 @@ enum ChatType {
 }
 
 @Entity({ name: 'chats' })
-export class Chat {
+export class ChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,13 +24,13 @@ export class Chat {
   })
   type: ChatType;
 
-  @ManyToMany(() => User, (user) => user.chats)
-  users: User[];
+  @ManyToMany(() => UserEntity, (user) => user.chats)
+  users: UserEntity[];
 
-  @OneToMany(() => Message, (message) => message.chat)
-  messages: Message[];
+  @OneToMany(() => MessageEntity, (message) => message.chat)
+  messages: MessageEntity[];
 
-  constructor(chat?: Chat) {
+  constructor(chat?: ChatEntity) {
     this.id = chat?.id;
     this.users = chat?.users;
     this.messages = chat?.messages;

@@ -7,7 +7,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ApiHideProperty } from '@nestjs/swagger';
-import { Session, FriendRequest, Message, Chat } from '.';
+import {
+  SessionEntity,
+  FriendRequestEntity,
+  ChatEntity,
+  MessageEntity,
+} from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -20,7 +25,7 @@ export enum UserStatus {
 }
 
 @Entity({ name: 'users' })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -65,31 +70,34 @@ export class User {
   })
   status: UserStatus;
 
-  @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
+  @OneToMany(() => SessionEntity, (session) => session.user)
+  sessions: SessionEntity[];
 
   @ApiHideProperty()
-  @ManyToMany(() => User)
+  @ManyToMany(() => UserEntity)
   @JoinTable({
     name: 'friends',
     joinColumn: {
-      name: 'user_id',
+      name: 'userId',
     },
     inverseJoinColumn: {
-      name: 'friend_id',
+      name: 'friendId',
     },
   })
-  friends: User[];
+  friends: UserEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
-  friend_requests_received: FriendRequest[];
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friendRequest) => friendRequest.receiver,
+  )
+  friendRequestsReceived: FriendRequestEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
-  friend_requests_sent: FriendRequest[];
+  @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.sender)
+  friendRequestsSent: FriendRequestEntity[];
 
-  @ManyToMany(() => Chat, (chat) => chat.users, { cascade: true })
+  @ManyToMany(() => ChatEntity, (chat) => chat.users, { cascade: true })
   @JoinTable({
     name: 'members',
     joinColumn: {
@@ -99,12 +107,12 @@ export class User {
       name: 'chatId',
     },
   })
-  chats: Chat[];
+  chats: ChatEntity[];
 
-  @OneToMany(() => Message, (message) => message.sender)
-  messages: Message[];
+  @OneToMany(() => MessageEntity, (message) => message.sender)
+  messages: MessageEntity[];
 
-  constructor(user?: User) {
+  constructor(user?: UserEntity) {
     this.id = user?.id;
     this.login = user?.login;
     this.nickname = user?.nickname;

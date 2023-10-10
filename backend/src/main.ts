@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 import { TypeormStore } from 'connect-typeorm';
 import { AppModule } from './app.module';
 import { AxiosExceptionFilter } from './core/filters';
-import { AuthProvider, Session } from './core/entities';
+import { AuthProvider, SessionEntity } from './core/entities';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -19,7 +19,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  const sessionRepository = app.get(DataSource).getRepository(Session);
+  const sessionRepository = app.get(DataSource).getRepository(SessionEntity);
 
   app.use(
     session({
