@@ -1,14 +1,12 @@
-import { ActionFunctionArgs } from "react-router-dom";
+import { ActionFunctionArgs, redirect } from "react-router-dom";
 
 export async function createChat({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const userId = formData.get("user") as string;
+  const userIds: number[] = formData.getAll("users[]").map((id) => Number(id));
+  const message = formData.get("message");
   const url = "http://localhost:3001/chats";
-  const body = {
-    userIds: [userId],
-  };
-
-  return fetch(url, {
+  const body = message ? { message, userIds: userIds } : { userIds: userIds };
+  const result = await fetch(url, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -16,4 +14,6 @@ export async function createChat({ request }: ActionFunctionArgs) {
     },
     body: JSON.stringify(body),
   });
+  const chat = await result.json();
+  return redirect(`/chats/${chat.id}`);
 }

@@ -22,13 +22,28 @@ export class ChatsService {
     private readonly messageRepository: Repository<Message>,
   ) {}
 
-  async create(createchatsDto: CreateChatDto): Promise<Chat> {
+  async create(createchatsDto: CreateChatDto, user: User): Promise<Chat> {
+    // Add the current user's ID to the user IDs array if it is not already present
+    if (!createchatsDto.userIds.includes(user.id)) {
+      createchatsDto.userIds.push(user.id);
+    }
+    // Get the chat users from the user IDs
     const userIds = [...new Set(createchatsDto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
+    // Check if all users were found
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
     const chat = this.chatRepository.create({ users: chatUsers });
+    // Add the first message to the chat if provided
+    if (createchatsDto.message) {
+      chat.messages = [
+        this.messageRepository.create({
+          content: createchatsDto.message,
+          user: user,
+        }),
+      ];
+    }
     return this.chatRepository.save(chat);
   }
 
