@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { UserEntity, ChatEntity, MessageEntity } from '../core/entities';
-import { CreateChatDto, ChatWithName } from './dto';
+import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
 
 @Injectable()
 export class ChatsService {
@@ -88,26 +88,26 @@ export class ChatsService {
     return chat;
   }
 
-  async addMessage(
-    userId: number,
-    chatId: number,
-    message: string,
-  ): Promise<MessageEntity> {
-    const chat = await this.chatRepository.findOneBy({ id: chatId });
+  async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
+    const findChatPromise = this.chatRepository.findOneBy({ id: dto.chatId });
+    const findUserPromise = this.userRepository.findOneBy({ id: dto.userId });
+
+    const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
+
     if (!chat) {
-      throw new NotFoundException('Chat not found');
+      throw new NotFoundException(`Chat not found`);
     }
-    if (!message) {
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!dto.content) {
       throw new BadRequestException('Message cannot be empty');
     }
 
-    const user = await this.userRepository.findOneBy({ id: userId });
-
-    const newMessage = await this.messageRepository.create({
-      content: message,
+    return this.messageRepository.save({
       chat,
       user,
+      content: dto.content,
     });
-    return this.messageRepository.save(newMessage);
   }
 }

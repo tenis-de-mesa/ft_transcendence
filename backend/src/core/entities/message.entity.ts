@@ -12,7 +12,10 @@ export class MessageEntity {
   @ManyToOne(() => ChatEntity, (chat) => chat.messages)
   chat: ChatEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, { nullable: false })
+  @ManyToOne(() => UserEntity, (user) => user.id, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   user: UserEntity;
 
   constructor(message?: MessageEntity) {

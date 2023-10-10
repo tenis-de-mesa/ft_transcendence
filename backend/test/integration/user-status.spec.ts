@@ -59,7 +59,9 @@ describe('User Status', () => {
 
     const mockStatusGateway = jest
       .spyOn(sessionsService, 'getSessionByClientSocket')
-      .mockResolvedValueOnce(new SessionEntity({ userId: id } as SessionEntity));
+      .mockResolvedValueOnce(
+        new SessionEntity({ userId: id } as SessionEntity),
+      );
 
     const mockSessionUpdate = jest
       .spyOn(sessionsService, 'updateSession')
