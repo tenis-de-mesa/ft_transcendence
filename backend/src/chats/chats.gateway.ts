@@ -2,11 +2,12 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  ConnectedSocket,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { ChatsService } from './chats.service';
+import { SessionsService } from '../users/sessions/sessions.service';
+import { GetSessionId } from '../core/decorators/get-sessionid.decorator';
 
 interface NewChatMessage {
   chatId: string;
@@ -24,18 +25,28 @@ export class ChatsGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatService: ChatsService) {}
+  constructor(
+    private readonly chatService: ChatsService,
+    private readonly sessionService: SessionsService,
+  ) {}
 
   // When the cliend sends a message to the server
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
-    @ConnectedSocket() client: Socket,
+    @GetSessionId() sessionId: string,
     @MessageBody() data: NewChatMessage,
   ) {
+    const session = await this.sessionService.getSessionById(sessionId);
+    if (!session) return;
+
+    const userId = session.userId;
+
     const newMessage = await this.chatService.addMessage(
+      userId,
       parseInt(data.chatId),
       data.message,
     );
+
     // Send the new message back to all clients
     this.server.emit('newMessage', newMessage);
   }
