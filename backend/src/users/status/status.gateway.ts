@@ -7,8 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
-import { SessionEntity, UserStatus } from '../../core/entities';
-import * as cookie from 'cookie';
+import { UserStatus } from '../../core/entities';
 
 @WebSocketGateway({
   cors: {
@@ -29,26 +28,37 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
     const session = await this.sessionService.getSessionByClientSocket(client);
+    if (!session) {
+      return;
+    }
 
-    if (!session) return;
-
-    const userId = session.userId;
-    await this.sessionService.updateSession(session.id, {
+    const updateSessionPromise = this.sessionService.updateSession(session.id, {
       socketId: client.id,
     });
-    await this.userService.updateUser(userId, { status: UserStatus.ONLINE });
-    await this.emitUserStatus(userId, UserStatus.ONLINE);
+    const updateUserPromise = this.userService.updateUser(session.userId, {
+      status: UserStatus.ONLINE,
+    });
+    await Promise.all([updateSessionPromise, updateUserPromise]);
+
+    this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
   // Called when a client disconnects from the server
   async handleDisconnect(client: Socket) {
     const session = await this.sessionService.getSessionBySocketId(client.id);
-    if (!session) return;
+    if (!session) {
+      return;
+    }
 
-    const userId = session.userId;
-    this.sessionService.updateSession(session.id, { socketId: null });
-    this.userService.updateUser(userId, { status: UserStatus.OFFLINE });
-    this.emitUserStatus(userId, UserStatus.OFFLINE);
+    const updateSessionPromise = this.sessionService.updateSession(session.id, {
+      socketId: null,
+    });
+    const updateUserPromise = this.userService.updateUser(session.userId, {
+      status: UserStatus.OFFLINE,
+    });
+    await Promise.all([updateSessionPromise, updateUserPromise]);
+
+    this.emitUserStatus(session.userId, UserStatus.OFFLINE);
   }
 
   // Emit user status to all clients connected via websocket
