@@ -25,7 +25,7 @@ export class ChatsController {
   }
 
   @Post()
-  create(
+  async create(
     @Body() createchatsDto: CreateChatDto,
     @User() user: UserEntity,
   ): Promise<ChatEntity> {
