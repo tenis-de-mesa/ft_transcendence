@@ -28,7 +28,8 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
-    const session = await this.getSession(client);
+    const session = await this.sessionService.getSessionByClientSocket(client);
+
     if (!session) return;
 
     const userId = session.userId;
@@ -53,24 +54,5 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Emit user status to all clients connected via websocket
   emitUserStatus(userId: number, status: string) {
     this.server.emit('userStatus', { id: userId, status });
-  }
-
-  async getSession(client: Socket): Promise<SessionEntity> {
-    const sessionId = this.getSessionId(client);
-    return await this.sessionService.getSessionById(sessionId);
-  }
-
-  getSessionId(client: Socket): string {
-    const cookies = cookie.parse(client.handshake.headers.cookie || '');
-    const sessionCookie = cookies['connect.sid'];
-    return this.extractSessionId(sessionCookie);
-  }
-
-  extractSessionId(sessionId: string): string {
-    if (!sessionId) return '';
-
-    const prefixIndex = sessionId.indexOf(':');
-    const dotIndex = sessionId.indexOf('.');
-    return sessionId.substring(prefixIndex + 1, dotIndex);
   }
 }

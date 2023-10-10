@@ -43,6 +43,19 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get(':id')
+  async getUser(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.getUserById(id);
+    return {
+      nickname: user.nickname,
+      id: user.id,
+      avatarUrl: user.avatarUrl,
+      login: user.login,
+      status: user.status,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);

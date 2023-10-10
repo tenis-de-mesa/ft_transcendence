@@ -77,18 +77,22 @@ export class ChatsService {
   }
 
   async findOne(id: number): Promise<ChatEntity> {
+    // TODO: filter all data user from only userid
+
     const chat = await this.chatRepository.findOne({
-      relations: {
-        users: true,
-        messages: true,
-      },
+      relations: ['users', 'messages', 'messages.user'],
       where: { id: id },
     });
+
     if (!chat) throw new NotFoundException('Chat not found');
     return chat;
   }
 
-  async addMessage(chatId: number, message: string): Promise<MessageEntity> {
+  async addMessage(
+    userId: number,
+    chatId: number,
+    message: string,
+  ): Promise<MessageEntity> {
     const chat = await this.chatRepository.findOneBy({ id: chatId });
     if (!chat) {
       throw new NotFoundException('Chat not found');
@@ -96,9 +100,13 @@ export class ChatsService {
     if (!message) {
       throw new BadRequestException('Message cannot be empty');
     }
+
+    const user = await this.userRepository.findOneBy({ id: userId });
+
     const newMessage = await this.messageRepository.create({
       content: message,
       chat,
+      user,
     });
     return this.messageRepository.save(newMessage);
   }
