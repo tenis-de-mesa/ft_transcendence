@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
 import { useEffect, useState } from "react";
 import { User, UserStatus } from "../types/types";
@@ -19,7 +19,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        }),
+        })
       );
     });
   }, []);
@@ -33,10 +33,7 @@ export default function Users() {
             <span style={{ color: user.status === "online" ? "green" : "red" }}>
               {user.status}
             </span>
-            <Form method="post" action="/chats">
-              <input type="hidden" name="user" value={user.id} />
-              <button type="submit">Chat</button>
-            </Form>
+            <Link to={`/chats/new/${user.id}`}> Chat 💬</Link>
           </li>
         ))}
       </ul>

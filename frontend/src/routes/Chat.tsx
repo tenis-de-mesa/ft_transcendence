@@ -72,7 +72,7 @@ export default function Chat() {
           </Card>
         </div>
       )}
-      <ul>
+      <div className="messages">
         {chat.messages.map((message) => {
           const showAvatar = lastUser?.id != message.user?.id;
 
@@ -98,12 +98,11 @@ export default function Chat() {
                   </button>
                 </div>
               )}
-
               <div className="pl-16">{message.content}</div>
             </div>
           );
         })}
-      </ul>
+      </div>
       <Form
         className="messageInput"
         method="POST"

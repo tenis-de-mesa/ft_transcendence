@@ -135,7 +135,7 @@ describe('ChatsService', () => {
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
 
       // Act
-      const result = await chatsService.create(createChatDto);
+      const result = await chatsService.create(createChatDto, TEST_USER);
 
       // Assert
       expect(result).toEqual(mockChat);
@@ -147,9 +147,9 @@ describe('ChatsService', () => {
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([]);
 
       // Act & Assert
-      await expect(chatsService.create(createChatDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        chatsService.create(createChatDto, TEST_USER),
+      ).rejects.toThrow(NotFoundException);
     });
 
     // Additional failure scenarios like chatRepository.save failure can be added

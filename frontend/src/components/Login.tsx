@@ -3,7 +3,7 @@ import "./Login.css";
 
 export default function Login() {
   return (
-    <div className="container closed">
+    <div className="main-content closed">
       <div className="login">
         <center>
           <h2>PONG</h2>
