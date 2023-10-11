@@ -5,7 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { UserEntity, ChatEntity, MessageEntity } from '../core/entities';
+import {
+  UserEntity,
+  ChatEntity,
+  MessageEntity,
+  ChatMemberEntity,
+  ChatMemberRole,
+  ChatType,
+} from '../core/entities';
 import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
 
 @Injectable()
@@ -19,33 +26,45 @@ export class ChatsService {
 
     @InjectRepository(MessageEntity)
     private readonly messageRepository: Repository<MessageEntity>,
+
+    @InjectRepository(ChatMemberEntity)
+    private chatMemberRepository: Repository<ChatMemberEntity>,
   ) {}
 
-  async create(
-    createchatsDto: CreateChatDto,
-    chatCreator: UserEntity,
-  ): Promise<ChatEntity> {
-    // Add the user to the userIds
-    if (!createchatsDto.userIds.includes(chatCreator.id)) {
-      createchatsDto.userIds.push(chatCreator.id);
+  async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
+    // Add creator user to the userIds
+    if (!dto.userIds.includes(creator.id)) {
+      dto.userIds.push(creator.id);
     }
+
     // Check if all userIds are valid
-    const userIds = [...new Set(createchatsDto.userIds)];
+    const userIds = [...new Set(dto.userIds)];
     const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
+
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
-    const chat = this.chatRepository.create({ users: chatUsers });
-    // Add an optional initial message to the chat
-    if (createchatsDto.message) {
-      chat.messages = [
-        this.messageRepository.create({
-          content: createchatsDto.message,
-          sender: chatCreator,
-        }),
-      ];
+
+    if (dto.type === ChatType.DIRECT && chatUsers.length > 2) {
+      throw new BadRequestException('Direct chats must have at most 2 users');
     }
-    return this.chatRepository.save(chat);
+
+    const chat = await this.chatRepository.save({
+      users: chatUsers,
+      type: dto.type,
+      access: dto.access,
+    });
+
+    // Add an optional initial message to the chat
+    if (dto.message) {
+      await this.addMessage({
+        senderId: creator.id,
+        chatId: chat.id,
+        content: dto.message,
+      });
+    }
+
+    return chat;
   }
 
   async findAll(user: UserEntity): Promise<ChatEntity[]> {

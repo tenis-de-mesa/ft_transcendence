@@ -26,10 +26,10 @@ export class ChatsController {
 
   @Post()
   async create(
-    @Body() createchatsDto: CreateChatDto,
+    @Body() dto: CreateChatDto,
     @User() user: UserEntity,
   ): Promise<ChatEntity> {
-    return await this.chatsService.create(createchatsDto, user);
+    return await this.chatsService.create(dto, user);
   }
 
   @Get(':id')
