@@ -46,4 +46,13 @@ export class ChatMemberEntity {
   })
   @JoinColumn({ name: 'chatId', referencedColumnName: 'id' })
   chat: ChatEntity;
+
+  constructor(member?: Partial<ChatMemberEntity>) {
+    this.user = member?.user;
+    this.userId = member?.userId;
+    this.chat = member?.chat;
+    this.chatId = member?.chatId;
+    this.role = member?.role;
+    this.status = member?.status;
+  }
 }

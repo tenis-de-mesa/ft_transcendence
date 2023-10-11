@@ -5,6 +5,8 @@ import {
   ChatAccess,
   ChatEntity,
   ChatMemberEntity,
+  ChatMemberRole,
+  ChatMemberStatus,
   ChatType,
   MessageEntity,
   UserEntity,
@@ -145,7 +147,7 @@ describe('ChatsService', () => {
   });
 
   describe('create', () => {
-    it('should successfully create a chat with 1 user (self)', async () => {
+    it('should successfully create a direct chat with 1 user (self)', async () => {
       // Arrange
       const createChatDto = {
         userIds: [TEST_USER_ID_1],
@@ -167,7 +169,7 @@ describe('ChatsService', () => {
       expect(result).toEqual(mockChat);
     });
 
-    it('should successfully create a chat with 2 users', async () => {
+    it('should successfully create a direct chat with 2 users', async () => {
       // Arrange
       const createChatDto = {
         userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
@@ -191,7 +193,24 @@ describe('ChatsService', () => {
       expect(result).toEqual(mockChat);
     });
 
-    it("should fail if user the chat user doesn't exist", async () => {
+    it('should fail direct chat creation if more than 2 users are provided', async () => {
+      // Arrange
+      const createChatDto = {
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2, 3],
+        type: ChatType.DIRECT,
+        access: ChatAccess.PRIVATE,
+      };
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+
+      // Act & Assert
+      await expect(
+        chatsService.create(createChatDto, TEST_USER_1),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("should fail direct chat creation if user doesn't exist", async () => {
       // Arrange
       const createChatDto = {
         userIds: [999],
@@ -204,6 +223,92 @@ describe('ChatsService', () => {
       await expect(
         chatsService.create(createChatDto, TEST_USER_1),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should successfully create a channel with 1 user (self)', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1],
+      } as ChatEntity);
+
+      const mockChatMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: mockChat.id,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1]);
+      jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockChatMember);
+
+      // Act
+      const result = await chatsService.create(dto, TEST_USER_1);
+
+      // Assert
+      expect(result).toEqual(mockChat);
+    });
+
+    it('should successfully create a channel with 2 users', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1, TEST_USER_2],
+      } as ChatEntity);
+
+      const mockChatMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: mockChat.id,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+      jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockChatMember);
+
+      // Act
+      const result = await chatsService.create(dto, TEST_USER_1);
+
+      // Assert
+      expect(result).toEqual(mockChat);
+    });
+
+    it('should fail channel creation if user is not found', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([]);
+
+      // Act & Assert
+      await expect(chatsService.create(dto, TEST_USER_1)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     // Additional failure scenarios like chatRepository.save failure can be added

@@ -33,27 +33,37 @@ export class ChatsService {
 
   async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
     // Add creator user to the userIds
-    if (!dto.userIds.includes(creator.id)) {
-      dto.userIds.push(creator.id);
+    const userIds = [...new Set(dto.userIds)];
+    if (!userIds.includes(creator.id)) {
+      userIds.push(creator.id);
     }
 
-    // Check if all userIds are valid
-    const userIds = [...new Set(dto.userIds)];
-    const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
+    // Check if direct chat has at most 2 users
+    if (dto.type === ChatType.DIRECT && userIds.length > 2) {
+      throw new BadRequestException('Direct chats must have at most 2 users');
+    }
 
+    // Check if all users in userIds exist
+    const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
     if (chatUsers.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
 
-    if (dto.type === ChatType.DIRECT && chatUsers.length > 2) {
-      throw new BadRequestException('Direct chats must have at most 2 users');
-    }
-
+    // Effectively create the chat
     const chat = await this.chatRepository.save({
       users: chatUsers,
       type: dto.type,
       access: dto.access,
     });
+
+    // if channel, set creator as owner of the chat
+    if (dto.type === ChatType.CHANNEL) {
+      await this.chatMemberRepository.save({
+        userId: creator.id,
+        chatId: chat.id,
+        role: ChatMemberRole.OWNER,
+      });
+    }
 
     // Add an optional initial message to the chat
     if (dto.message) {
