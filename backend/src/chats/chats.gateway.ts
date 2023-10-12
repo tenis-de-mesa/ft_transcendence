@@ -30,7 +30,7 @@ export class ChatsGateway {
     private readonly sessionService: SessionsService,
   ) {}
 
-  // When the cliend sends a message to the server
+  // When the client sends a message to the server
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
     @GetSessionId() sessionId: string,
@@ -43,9 +43,9 @@ export class ChatsGateway {
     }
 
     const newMessage = await this.chatService.addMessage({
-      userId: session.userId,
-      chatId: data.chatId,
       content: data.message,
+      senderId: session.userId,
+      chatId: data.chatId,
     });
 
     // Send the new message back to all clients

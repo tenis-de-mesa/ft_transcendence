@@ -9,6 +9,7 @@ import {
   ChatEntity,
   MessageEntity,
   SessionEntity,
+  ChatMemberEntity,
 } from '../core/entities';
 
 @Module({
@@ -18,6 +19,7 @@ import {
       UserEntity,
       MessageEntity,
       SessionEntity,
+      ChatMemberEntity,
     ]),
   ],
   controllers: [ChatsController],

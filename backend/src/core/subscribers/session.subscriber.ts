@@ -23,6 +23,6 @@ export class SessionSubscriber
     const json = JSON.parse(event.entity.json);
     const userId = json.passport.user;
     const manager = event.manager;
-    manager.merge(SessionEntity, event.entity, { userId: userId });
+    manager.merge(SessionEntity, event.entity, { userId });
   }
 }

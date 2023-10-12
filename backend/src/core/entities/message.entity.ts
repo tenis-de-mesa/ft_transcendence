@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ChatEntity, UserEntity } from '.';
 
-@Entity()
+@Entity({ name: 'messages' })
 export class MessageEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,7 +16,7 @@ export class MessageEntity {
     nullable: false,
     onDelete: 'CASCADE',
   })
-  user: UserEntity;
+  sender: UserEntity;
 
   constructor(message?: MessageEntity) {
     this.id = message?.id;

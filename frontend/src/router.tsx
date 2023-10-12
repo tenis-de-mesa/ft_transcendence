@@ -9,7 +9,7 @@ import {
   logout,
 } from "./loaders";
 
-import { createChat } from "./actions";
+import { createChannel, createChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
@@ -39,9 +39,19 @@ const router = createBrowserRouter([
         loader: loadUsersList,
       },
       {
+        path: "channels",
+        action: createChannel,
+      },
+      {
         path: "chats",
         element: <Chats />,
-        loader: loadChatList,
+        loader: async () => {
+          const [chats, users] = await Promise.all([
+            loadChatList(),
+            loadUsersList(),
+          ]);
+          return await Promise.all([chats.json(), users.json()]);
+        },
         action: createChat,
         children: [
           {

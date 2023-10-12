@@ -19,7 +19,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        })
+        }),
       );
     });
   }, []);
