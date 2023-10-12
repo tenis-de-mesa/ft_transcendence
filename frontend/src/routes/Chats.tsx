@@ -28,7 +28,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Close dialog, clear search and selected users on submit
@@ -38,19 +38,18 @@ export default function Chats() {
     setSelectedUsers([]);
   };
 
-  // Close new channel dialog when clicking outside of it
-  const handleOutsideClick = (e) => {
-    if (
-      isOpen &&
-      !e.target.closest(".dialog") &&
-      !e.target.closest(".new-channel-button")
-    ) {
-      setIsOpen(false);
-    }
-  };
-
   // Add event listener to close new channel dialog when clicking outside of it
   useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        isOpen &&
+        !e.target.closest(".dialog") &&
+        !e.target.closest(".new-channel-button")
+      ) {
+        setIsOpen(false);
+      }
+    };
+
     if (isOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
     } else {
