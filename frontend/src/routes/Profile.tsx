@@ -8,7 +8,7 @@ import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
 import "./Profile.css";
-import Avatar from "../components/Avatar";
+import { Avatar } from "../components/Avatar";
 
 export default function Profile() {
   const { id } = useParams();
@@ -24,7 +24,7 @@ export default function Profile() {
     }
   };
 
-  return userId == userMe.id ? (
+  return !userId ? (
     <div className="profile">
       <div className="flip-card">
         <div className="wrapper">
@@ -36,7 +36,7 @@ export default function Profile() {
           </div>
           <div className="card front">
             <center>
-              <Avatar login={userMe.login} avatarUrl={userMe.avatarUrl} />
+              <Avatar seed={userMe.login} src={userMe.avatarUrl} />
               <h1>{userMe.nickname}</h1>
               <button onClick={flipCard} className="edit-button">
                 Editar
@@ -60,7 +60,7 @@ export default function Profile() {
         <div className="wrapper">
           <div className="card front">
             <center>
-              <Avatar login={userOther.login} avatarUrl={userOther.avatarUrl} />
+              <Avatar seed={userOther.login} src={userOther.avatarUrl} />
               <h1>{userOther.nickname}</h1>
             </center>
             <hr />

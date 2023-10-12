@@ -2,7 +2,7 @@ import { socket } from "../socket";
 import { Form, Link, useLoaderData } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useState } from "react";
-import Avatar from "../components/Avatar";
+import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
@@ -42,11 +42,11 @@ export default function Chat() {
         <p>Messages:</p>
       </center>
       {isOpen && (
-        <div className="dark fixed w-1/2">
+        <div className="fixed w-1/2 dark">
           <Card>
             <Card.Title>
               <div className="flex items-center justify-between">
-                <Avatar login={user?.login} avatarUrl={user?.avatarUrl} />
+                <Avatar seed={user?.login} src={user?.avatarUrl} />
                 <Typography variant="h6">
                   <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
                 </Typography>
@@ -83,8 +83,8 @@ export default function Chat() {
               {showAvatar && (
                 <div className="flex gap-4">
                   <Avatar
-                    login={message.user?.login}
-                    avatarUrl={message.user?.avatarUrl}
+                    seed={message.user?.login}
+                    src={message.user?.avatarUrl}
                   />
                   <button
                     onClick={() => {
