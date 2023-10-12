@@ -13,6 +13,7 @@ export enum EnvironmentEnum {
   Production = 'production',
   Test = 'test',
   CI = 'ci',
+  AWS = 'aws',
 }
 
 class EnvironmentVariables {
