@@ -1,21 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatsService } from './chats.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Chat, Message, User } from '../core/entities';
+import {
+  ChatAccess,
+  ChatEntity,
+  ChatMemberEntity,
+  ChatMemberRole,
+  ChatMemberStatus,
+  ChatType,
+  MessageEntity,
+  UserEntity,
+} from '../core/entities';
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ChatsService', () => {
   let module: TestingModule;
   let chatsService: ChatsService;
-  let userRepository: Repository<User>;
-  let chatRepository: Repository<Chat>;
-  let messageRepository: Repository<Message>;
+  let userRepository: Repository<UserEntity>;
+  let chatRepository: Repository<ChatEntity>;
+  let messageRepository: Repository<MessageEntity>;
+  let chatMemberRepository: Repository<ChatMemberEntity>;
 
-  const TEST_USER_ID = 1;
+  const TEST_USER_ID_1 = 1;
+  const TEST_USER_ID_2 = 2;
   const TEST_CHAT_ID = 1;
-  const TEST_USER = new User({ id: TEST_USER_ID } as User);
-  const TEST_CHAT = new Chat({ id: TEST_CHAT_ID } as Chat);
+  const TEST_USER_1 = new UserEntity({ id: TEST_USER_ID_1 } as UserEntity);
+  const TEST_USER_2 = new UserEntity({ id: TEST_USER_ID_2 } as UserEntity);
+  const TEST_CHAT = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
   const TEST_MESSAGE_CONTENT = 'Hello World';
 
   beforeEach(async () => {
@@ -23,22 +35,27 @@ describe('ChatsService', () => {
       providers: [
         ChatsService,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(UserEntity),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Chat),
+          provide: getRepositoryToken(ChatEntity),
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Message),
+          provide: getRepositoryToken(MessageEntity),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(ChatMemberEntity),
           useClass: Repository,
         },
       ],
     }).compile();
-    userRepository = module.get(getRepositoryToken(User));
-    chatRepository = module.get(getRepositoryToken(Chat));
-    messageRepository = module.get(getRepositoryToken(Message));
+    userRepository = module.get(getRepositoryToken(UserEntity));
+    chatRepository = module.get(getRepositoryToken(ChatEntity));
+    messageRepository = module.get(getRepositoryToken(MessageEntity));
+    chatMemberRepository = module.get(getRepositoryToken(ChatMemberEntity));
     chatsService = module.get(ChatsService);
   });
 
@@ -47,6 +64,7 @@ describe('ChatsService', () => {
     expect(userRepository).toBeDefined();
     expect(chatRepository).toBeDefined();
     expect(messageRepository).toBeDefined();
+    expect(chatMemberRepository).toBeDefined();
     expect(chatsService).toBeDefined();
   });
 
@@ -54,22 +72,24 @@ describe('ChatsService', () => {
     // -- Success scenarios --
     it('should add a new message to the chat', async () => {
       // Arrange
-      const mockMessage = new Message({
+      const mockMessage = new MessageEntity({
         chat: TEST_CHAT,
         content: TEST_MESSAGE_CONTENT,
-      } as Message);
+      } as MessageEntity);
 
-      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(TEST_USER);
+      jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValueOnce(TEST_USER_1);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
       jest.spyOn(messageRepository, 'create').mockReturnValueOnce(mockMessage);
       jest.spyOn(messageRepository, 'save').mockResolvedValueOnce(mockMessage);
 
       // Act
-      const result = await chatsService.addMessage(
-        TEST_USER_ID,
-        TEST_CHAT_ID,
-        TEST_MESSAGE_CONTENT,
-      );
+      const result = await chatsService.addMessage({
+        senderId: TEST_USER_ID_1,
+        chatId: TEST_CHAT_ID,
+        content: TEST_MESSAGE_CONTENT,
+      });
 
       // Assert
       expect(result).toEqual(mockMessage);
@@ -78,52 +98,215 @@ describe('ChatsService', () => {
     // -- Failure scenarios --
     it('should fail if the chat does not exist', async () => {
       // Arrange
+      jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValueOnce(TEST_USER_1);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(null);
 
       // Act & Assert
       await expect(
-        chatsService.addMessage(
-          TEST_USER_ID,
-          TEST_CHAT_ID,
-          TEST_MESSAGE_CONTENT,
-        ),
+        chatsService.addMessage({
+          senderId: TEST_USER_ID_1,
+          chatId: TEST_CHAT_ID,
+          content: TEST_MESSAGE_CONTENT,
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should fail if the user does not exist', async () => {
+      // Arrange
+      jest.spyOn(userRepository, 'findOneBy').mockResolvedValueOnce(null);
+      jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
+
+      // Act & Assert
+      await expect(
+        chatsService.addMessage({
+          senderId: TEST_USER_ID_1,
+          chatId: TEST_CHAT_ID,
+          content: TEST_MESSAGE_CONTENT,
+        }),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should fail if the message content is empty', async () => {
       // Arrange
+      jest
+        .spyOn(userRepository, 'findOneBy')
+        .mockResolvedValueOnce(TEST_USER_1);
       jest.spyOn(chatRepository, 'findOneBy').mockResolvedValueOnce(TEST_CHAT);
 
       // Act & Assert
       await expect(
-        chatsService.addMessage(TEST_USER_ID, TEST_CHAT_ID, ''),
+        chatsService.addMessage({
+          senderId: TEST_USER_ID_1,
+          chatId: TEST_CHAT_ID,
+          content: '',
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });
 
   describe('create', () => {
-    it('should successfully create a chat', async () => {
+    it('should successfully create a direct chat with 1 user (self)', async () => {
       // Arrange
-      const createChatDto = { userIds: [TEST_USER_ID] };
-      const mockChat = new Chat({ id: 1, users: [TEST_USER] } as Chat);
-      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER]);
+      const createChatDto = {
+        userIds: [TEST_USER_ID_1],
+        type: ChatType.DIRECT,
+        access: ChatAccess.PRIVATE,
+      };
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1],
+      } as ChatEntity);
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1]);
       jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
 
       // Act
-      const result = await chatsService.create(createChatDto);
+      const result = await chatsService.create(createChatDto, TEST_USER_1);
 
       // Assert
       expect(result).toEqual(mockChat);
     });
 
-    it("should fail if user the chat user doesn't exist", async () => {
+    it('should successfully create a direct chat with 2 users', async () => {
       // Arrange
-      const createChatDto = { userIds: [999] }; // Non-existing user
+      const createChatDto = {
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
+        type: ChatType.DIRECT,
+        access: ChatAccess.PRIVATE,
+      };
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1],
+      } as ChatEntity);
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+      jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+
+      // Act
+      const result = await chatsService.create(createChatDto, TEST_USER_1);
+
+      // Assert
+      expect(result).toEqual(mockChat);
+    });
+
+    it('should fail direct chat creation if more than 2 users are provided', async () => {
+      // Arrange
+      const createChatDto = {
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2, 3],
+        type: ChatType.DIRECT,
+        access: ChatAccess.PRIVATE,
+      };
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+
+      // Act & Assert
+      await expect(
+        chatsService.create(createChatDto, TEST_USER_1),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it("should fail direct chat creation if user doesn't exist", async () => {
+      // Arrange
+      const createChatDto = {
+        userIds: [999],
+        type: ChatType.DIRECT,
+        access: ChatAccess.PRIVATE,
+      }; // Non-existing user
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([]);
 
       // Act & Assert
-      await expect(chatsService.create(createChatDto)).rejects.toThrow(
+      await expect(
+        chatsService.create(createChatDto, TEST_USER_1),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should successfully create a channel with 1 user (self)', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1],
+      } as ChatEntity);
+
+      const mockChatMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: mockChat.id,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1]);
+      jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockChatMember);
+
+      // Act
+      const result = await chatsService.create(dto, TEST_USER_1);
+
+      // Assert
+      expect(result).toEqual(mockChat);
+    });
+
+    it('should successfully create a channel with 2 users', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      const mockChat = new ChatEntity({
+        id: 2,
+        users: [TEST_USER_1, TEST_USER_2],
+      } as ChatEntity);
+
+      const mockChatMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: mockChat.id,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+      jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockChatMember);
+
+      // Act
+      const result = await chatsService.create(dto, TEST_USER_1);
+
+      // Assert
+      expect(result).toEqual(mockChat);
+    });
+
+    it('should fail channel creation if user is not found', async () => {
+      // Arrange
+      const dto = {
+        userIds: [TEST_USER_ID_1],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PUBLIC,
+      };
+
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([]);
+
+      // Act & Assert
+      await expect(chatsService.create(dto, TEST_USER_1)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -138,7 +321,7 @@ describe('ChatsService', () => {
       jest.spyOn(chatRepository, 'find').mockResolvedValue(mockChats);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER);
+      const result = await chatsService.findAll(TEST_USER_1);
 
       // Assert
       expect(result).toEqual(mockChats);
@@ -149,7 +332,7 @@ describe('ChatsService', () => {
       jest.spyOn(chatRepository, 'find').mockResolvedValue([]);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER);
+      const result = await chatsService.findAll(TEST_USER_1);
 
       // Assert
       expect(result).toEqual([]);
@@ -159,7 +342,7 @@ describe('ChatsService', () => {
   describe('findOne', () => {
     it('should return a chat by its ID', async () => {
       // Arrange
-      const mockChat = new Chat({ id: TEST_CHAT_ID } as Chat);
+      const mockChat = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
       jest.spyOn(chatRepository, 'findOne').mockResolvedValueOnce(mockChat);
 
       // Act

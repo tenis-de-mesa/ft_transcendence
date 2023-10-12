@@ -1,19 +1,52 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
-import { User } from './user.entity';
-import { Message } from './message.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  Column,
+} from 'typeorm';
+import { UserEntity, MessageEntity, ChatMemberEntity } from '.';
 
-@Entity()
-export class Chat {
+export enum ChatAccess {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  PROTECTED = 'protected',
+}
+
+export enum ChatType {
+  CHANNEL = 'channel',
+  DIRECT = 'direct',
+}
+
+@Entity({ name: 'chats' })
+export class ChatEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => User, (user) => user.chats)
-  users: User[];
+  @Column({
+    type: 'enum',
+    enum: ChatType,
+    default: ChatType.DIRECT, // TODO: Remove default value
+  })
+  type: ChatType;
 
-  @OneToMany(() => Message, (message) => message.chat)
-  messages: Message[];
+  @Column({
+    type: 'enum',
+    enum: ChatAccess,
+    default: ChatAccess.PRIVATE,
+  })
+  access: ChatAccess;
 
-  constructor(chat?: Chat) {
+  @ManyToMany(() => UserEntity, (user) => user.chats)
+  users: UserEntity[];
+
+  @OneToMany(() => ChatMemberEntity, (member) => member.chat)
+  chatMembers: ChatMemberEntity[];
+
+  @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
+  messages: MessageEntity[];
+
+  constructor(chat?: ChatEntity) {
     this.id = chat?.id;
     this.users = chat?.users;
     this.messages = chat?.messages;

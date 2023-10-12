@@ -9,7 +9,7 @@ import {
   logout,
 } from "./loaders";
 
-import { createChat } from "./actions";
+import { createChannel, createChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
@@ -18,6 +18,7 @@ import Profile from "./routes/Profile.tsx";
 import Chats from "./routes/Chats.tsx";
 import Chat from "./routes/Chat.tsx";
 import Home from "./routes/Home.tsx";
+import ChatNew from "./routes/ChatNew.tsx";
 import { sendChatMessage } from "./actions/sendChatMessage.ts";
 import { loadUserById } from "./loaders/loadUserById.ts";
 import Leaderboard from "./routes/Leaderboard.tsx";
@@ -41,11 +42,26 @@ const router = createBrowserRouter([
         loader: loadUsersList,
       },
       {
+        path: "channels",
+        action: createChannel,
+      },
+      {
         path: "chats",
         element: <Chats />,
-        loader: loadChatList,
+        loader: async () => {
+          const [chats, users] = await Promise.all([
+            loadChatList(),
+            loadUsersList(),
+          ]);
+          return await Promise.all([chats.json(), users.json()]);
+        },
         action: createChat,
         children: [
+          {
+            path: "new/:id",
+            element: <ChatNew />,
+            loader: loadUserById,
+          },
           {
             path: ":id",
             element: <Chat />,

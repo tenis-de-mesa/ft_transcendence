@@ -1,21 +1,24 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Chat, User } from '.';
+import { ChatEntity, UserEntity } from '.';
 
-@Entity()
-export class Message {
+@Entity({ name: 'messages' })
+export class MessageEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   content: string;
 
-  @ManyToOne(() => Chat, (chat) => chat.messages)
-  chat: Chat;
+  @ManyToOne(() => ChatEntity, (chat) => chat.messages)
+  chat: ChatEntity;
 
-  @ManyToOne(() => User, (user) => user.id, { nullable: false })
-  user: User;
+  @ManyToOne(() => UserEntity, (user) => user.id, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  sender: UserEntity;
 
-  constructor(message?: Message) {
+  constructor(message?: MessageEntity) {
     this.id = message?.id;
     this.content = message?.content;
     this.chat = message?.chat;

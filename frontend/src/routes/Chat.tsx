@@ -72,11 +72,11 @@ export default function Chat() {
           </Card>
         </div>
       )}
-      <ul>
+      <div className="messages">
         {chat.messages.map((message) => {
-          const showAvatar = lastUser?.id != message.user?.id;
+          const showAvatar = lastUser?.id != message.sender?.id;
 
-          lastUser = message.user;
+          lastUser = message.sender;
 
           return (
             <div key={message.id}>
@@ -89,21 +89,20 @@ export default function Chat() {
                   <button
                     onClick={() => {
                       setIsOpen(!isOpen);
-                      setUser(message.user);
+                      setUser(message.sender);
                     }}
                   >
                     <Typography variant="h6">
-                      {message.user?.nickname}:
+                      {message.sender?.nickname}:
                     </Typography>
                   </button>
                 </div>
               )}
-
               <div className="pl-16">{message.content}</div>
             </div>
           );
         })}
-      </ul>
+      </div>
       <Form
         className="messageInput"
         method="POST"
