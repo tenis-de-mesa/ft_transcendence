@@ -191,6 +191,16 @@
   .navItem {
     @apply flex items-center w-full h-10 py-2 transition-all duration-100 ease-out rounded-lg cursor-pointer select-none text-md whitespace-nowrap hover:bg-primary-50 dark:hover:bg-gray-100 dark:hover:bg-opacity-10;
   }
+
+  /* Utils */
+  .center {
+    @apply flex flex-row items-center justify-center min-h-screen;
+  }
+
+  .stroke {
+    @apply mx-auto mt-1 bg-transparent border-0 bg-gradient-to-r from-transparent via-gray-500 dark:via-gray-100 to-transparent;
+  }
+
 }
 
 @layer utilities {
