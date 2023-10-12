@@ -13,6 +13,7 @@ import classNames from "classnames";
 import { LuLogOut } from "react-icons/lu";
 import { Navitem } from "./Navitem";
 import { User } from "../../types/types";
+import { Avatar } from "../Avatar";
 
 export interface ISidebarProps {
   options: INavitem[];
@@ -166,9 +167,10 @@ export const Sidebar: FC<ISidebarProps> = ({
         >
           {isOpen ? (
             <div className="w-full duration-100 ease-in transform">
-              <img
+              <Avatar  
+                size="sm"
                 src={images.demoAvatar}
-                className="w-0 h-0 rounded-full transition duration-150 ease-in fixed bottom-4 opacity-0"
+                className="fixed w-0 h-0 transition duration-150 ease-out opacity-0 bottom-1"
               />
               <div className="flex items-center justify-between py-1">
                 <Typography
@@ -195,9 +197,10 @@ export const Sidebar: FC<ISidebarProps> = ({
             </div>
           ) : (
             <div>
-              <img
+              <Avatar  
+                size="sm"
                 src={images.demoAvatar}
-                className="w-10 h-10 rounded-full cursor-pointer select-none fixed bottom-4 transition ease-in delay-300 opacity-100"
+                className="fixed transition ease-in delay-300 opacity-100 cursor-pointer select-none bottom-4"
               />
               <div className="flex items-center justify-between">
                 <Typography

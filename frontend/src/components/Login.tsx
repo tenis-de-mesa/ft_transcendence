@@ -1,19 +1,36 @@
 import { Link } from "react-router-dom";
-import "./Login.css";
+import { Card } from "./Card";
+import { Typography } from "./Typography";
+import { Button } from "./Button";
+import { images } from "../data/images";
+import { FaUserSecret } from "react-icons/fa"
 
 export default function Login() {
   return (
-    <div className="container closed">
-      <div className="login">
-        <center>
-          <h2>PONG</h2>
-        </center>
-        <div className="card">
-          <Link to={"/login/intra"}>Login using intra</Link>
-          <hr />
-          <Link to={"/login/guest"}>Login as guest</Link>
-        </div>
-      </div>
+    <div>
+      <Card className="bg-gray-100 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800">
+        <Card.Title>
+          <Typography variant="h6">Transcendence</Typography>
+        </Card.Title>
+        <Card.Body className="flex flex-col gap-3">
+          <>
+            <Button variant="info" LeadingIcon={<img src={images.logoLight} width={20} />} className="gap-1" >
+              <Link to={"/login/intra"}>
+                <Typography variant="md">
+                  Login with 42
+                </Typography>
+              </Link>
+            </Button>
+            <Button variant="info" LeadingIcon={<FaUserSecret size={20} />} className="gap-1">
+              <Link to={"/login/guest"}>
+                <Typography variant="md">
+                  Play anonymously
+                </Typography>
+              </Link>
+            </Button>
+          </>
+        </Card.Body>
+      </Card>
     </div>
-  );
+  )
 }
