@@ -1,21 +1,47 @@
-import "./Avatar.css";
+import classNames from "classnames";
+import { FC } from "react";
 
-interface AvatarProps {
-  login?: string;
-  avatarUrl?: string;
+export interface AvatarProps {
+  src?: string;
+  seed?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
 }
 
-export default function Avatar({ login, avatarUrl }: AvatarProps) {
-  // If the user has a custom avatar, use that
-  if (avatarUrl) {
-    return <img className="avatar" src={avatarUrl} alt="avatar" />;
-  }
-  // Otherwise, generate an avatar using the user's login
+export const Avatar: FC<AvatarProps> = ({
+  src,
+  seed = "Default",
+  size = "md",
+  className
+}) => {
   return (
-    <img
-      className="avatar"
-      src={`https://api.dicebear.com/7.x/croodles/svg?seed=${login}`}
-      alt="avatar"
-    />
-  );
-}
+    <>
+      {src ? 
+        <img className={classNames(
+            "rounded-full object-cover bg-gray-100", {
+              "w-10 h-10": size == "sm",
+              "w-24 h-24": size == "md",
+              "w-36 h-36": size == "lg",
+              "w-52 h-52": size == "xl",
+            },
+            className
+          )} 
+          src={src} 
+          alt="avatar" 
+        /> :
+        <img className={classNames(
+            "rounded-full object-cover bg-gray-100", {
+              "w-10 h-10": size == "sm",
+              "w-24 h-24": size == "md",
+              "w-36 h-36": size == "lg",
+              "w-52 h-52": size == "xl",
+            },
+            className
+          )} 
+          src={`https://api.dicebear.com/7.x/croodles/svg?seed=${seed}`} 
+          alt="avatar" 
+        />
+      }
+    </>
+  )
+};
