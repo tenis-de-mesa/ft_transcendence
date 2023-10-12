@@ -16,7 +16,7 @@ export class MessageEntity {
   content: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @ManyToOne(() => ChatEntity, (chat) => chat.messages)
   chat: ChatEntity;

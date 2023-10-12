@@ -130,7 +130,7 @@ export class ChatsService {
       where: { id: id },
       order: {
         messages: {
-          created_at: 'ASC',
+          createdAt: 'ASC',
         },
       },
     });
