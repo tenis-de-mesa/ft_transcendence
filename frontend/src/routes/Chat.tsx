@@ -93,7 +93,7 @@ export default function Chat() {
                     }}
                   >
                     <Typography variant="h6">
-                      {message.sender?.nickname}:
+                      {message.sender?.nickname ?? 'deleted user'}:
                     </Typography>
                   </button>
                 </div>
