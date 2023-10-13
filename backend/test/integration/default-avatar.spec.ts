@@ -73,7 +73,7 @@ describe('Default Avatar', () => {
     expect(s3ClientMock).toBeCalled();
     expect(imageKey).toEqual(user.id + file.originalname);
     expect(user.avatarUrl).toEqual(
-      `https://transcendence-images.s3.amazonaws.com/${imageKey}`,
+      `https://transcendence.s3.amazonaws.com/${imageKey}`,
     );
   });
 });
