@@ -5,7 +5,7 @@ import { Hr } from "./Hr";
 const CardWrapper = ({ children, className = "" }) => (
   <div className={classNames(
     "block text-center rounded-xl",
-    "bg-white dark:bg-gray-700",
+    "bg-white dark:bg-gray-800",
     "shadow-xl",
     className
   )}>
@@ -13,21 +13,7 @@ const CardWrapper = ({ children, className = "" }) => (
   </div>
 )
 
-interface CardBodyProps {
-  children: string | React.ReactElement;
-  className?: string;
-}
-
-const CardBody = ({ 
-  children,
-  className,
-}: CardBodyProps) => (
-  <div className={classNames("p-6", className)}>
-    {children}
-  </div>
-);
-
-interface CardOptional {
+interface CardProps {
   children: string | React.ReactElement;
   position?: "left" | "center" | "right";
   className?: string;
@@ -37,9 +23,10 @@ const CardTitle = ({
   children, 
   position = "center",
   className,
-}: CardOptional) => (
+}: CardProps) => (
   <div className={classNames(
     `text-${position}`,
+    "px-6 py-3",
     className
   )}>
     {children}
@@ -47,16 +34,31 @@ const CardTitle = ({
   </div>
 );
 
+const CardBody = ({ 
+  children,
+  position = "center",
+  className,
+}: CardProps) => (
+  <div className={classNames(
+    `text-${position}`,
+    "px-6 py-3",
+    className
+  )}>
+    {children}
+  </div>
+);
+
 const CardFooter = ({ 
   children, 
   position = "center", 
   className, 
-}: CardOptional) => (
+}: CardProps) => (
   <div className={classNames(
     `text-${position}`, 
-    "px-6 py-3 border-t-2 border-primary-50 dark:border-white",
+    "px-6 py-3",
     className
   )}>
+    <Hr />
     {children}
   </div>
 );
