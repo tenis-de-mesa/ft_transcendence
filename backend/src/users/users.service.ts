@@ -95,14 +95,14 @@ export class UsersService {
   ): Promise<UpdateResult> {
     const imageKey = user.id + file.originalname;
     const command = new PutObjectCommand({
-      Bucket: 'transcendence-images',
+      Bucket: 'transcendence',
       Key: imageKey,
       Body: file.buffer,
       ContentType: file.mimetype,
     });
     await this.s3Client.send(command);
     return await this.userRepository.update(user.id, {
-      avatarUrl: `https://transcendence-images.s3.amazonaws.com/${imageKey}`,
+      avatarUrl: `https://transcendence.s3.amazonaws.com/${imageKey}`,
     });
   }
 
