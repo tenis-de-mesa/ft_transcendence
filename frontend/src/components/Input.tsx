@@ -1,11 +1,10 @@
-import React, { FC } from "react";
+import React, { FC, InputHTMLAttributes } from "react";
 import classNames from "classnames";
 import { Typography } from "./Typography";
 
-export interface InputProps {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   type: "text" | "email" | "password";
   value: string;
-  handleChange: (value: string) => void;
   label?: string;
   leadingText?: string;
   placeholder: string;
@@ -19,7 +18,6 @@ export interface InputProps {
 export const Input: FC<InputProps> = ({
   type,
   value,
-  handleChange,
   label,
   leadingText,
   placeholder,
@@ -28,6 +26,7 @@ export const Input: FC<InputProps> = ({
   LeadingIcon,
   TrailingIcon,
   disabled,
+  ...props
 }) => {
   return (
     <>
@@ -79,13 +78,9 @@ export const Input: FC<InputProps> = ({
         ) : null}
 
         <input
+          {...props}
           type={type}
           value={value}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (!disabled) {
-              handleChange(event.target.value);
-            }
-          }}
           placeholder={placeholder}
           aria-label="input"
           className={classNames(

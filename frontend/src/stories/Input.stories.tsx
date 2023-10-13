@@ -17,19 +17,15 @@ interface Props extends InputProps {
 }
 
 const StoryInput = (args: Props) => {
-  const [text1, setText1] = React.useState<string>(args.value);
-
-  const handleChange = (value: string) => {
-    setText1(value);
-  };
+  const [text, setText] = React.useState<string>(args.value);
 
   return (
     <StoryLayout {...args} className="flex space-x-8">
       <div>
         <Input
           type="text"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Username"
           placeholder="Frosa-ma"
           disabled={args.disabled}
@@ -37,8 +33,8 @@ const StoryInput = (args: Props) => {
         <div className="mb-11" />
         <Input
           type="password"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Password"
           placeholder=""
           disabled={args.disabled}
@@ -47,8 +43,8 @@ const StoryInput = (args: Props) => {
       <div>
         <Input
           type="email"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Email"
           placeholder="veronica@example.com"
           helperText="This is a hint text to help the user."
@@ -59,8 +55,8 @@ const StoryInput = (args: Props) => {
         <div className="mb-4" />
         <Input
           type="email"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Email"
           placeholder="veronica@example.com"
           error="This is an error message."
@@ -72,8 +68,8 @@ const StoryInput = (args: Props) => {
       <div>
         <Input
           type="text"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Website"
           placeholder="example.com"
           leadingText="https://"
@@ -84,8 +80,8 @@ const StoryInput = (args: Props) => {
         <div className="mb-4" />
         <Input
           type="text"
-          value={text1}
-          handleChange={handleChange}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           label="Website"
           placeholder="example.com"
           leadingText="https://"
@@ -110,7 +106,6 @@ Default.parameters = {
     exclude: [
       "value",
       "type",
-      "handleChange",
       "label",
       "leadingText",
       "placeholder",
