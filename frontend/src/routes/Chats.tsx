@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Chat, User } from "../types/types";
-import "./Chat.css";
 
 import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
 import { Button } from "../components/Button";
@@ -64,13 +63,13 @@ export default function Chats() {
   }, [isOpen]);
 
   return (
-    <div className="flex flex-row h-full gap-4">
+    <div className="flex flex-row justify-between h-full gap-3">
       <div className="w-1/4">
         <Card className="h-full">
           <Card.Title>
             <Typography variant="h6">Chats</Typography>
           </Card.Title>
-          <Card.Body>
+          <Card.Body className="pt-0">
             <>
               <Button
                 className="flex items-center justify-center w-full"
@@ -163,7 +162,9 @@ export default function Chats() {
           </Card.Body>
         </Card>
       </div>
-      <Outlet />
+      <div className="w-3/4 h-full">
+        <Outlet />
+      </div>
     </div>
   );
 }

@@ -26,12 +26,19 @@ export default function Root() {
   }
 
   return (
-    <div className={isDark ? "dark" : ""}>
-      <div className="flex gap-5 bg-white dark:bg-gray-700">
-        <Sidebar darkMode={isDark} options={navitems} user={user} />
-        <main className="flex-1 max-h-screen py-4 mx-auto">
+    <div className={classNames(
+      "w-screen h-screen",
+      "overflow-hidden", {
+        "dark": isDark
+      }
+    )}>
+      <div className="flex w-full h-full bg-white dark:bg-gray-700">
+        <div className="">
+          <Sidebar darkMode={isDark} options={navitems} user={user} />
+        </div>
+        <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
           <Outlet context={user} />
-        </main>
+        </div>
       </div>
     </div>
   );
