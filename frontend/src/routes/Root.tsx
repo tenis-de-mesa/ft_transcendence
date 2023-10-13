@@ -29,7 +29,7 @@ export default function Root() {
     <div className={isDark ? "dark" : ""}>
       <div className="flex gap-5 bg-white dark:bg-gray-700">
         <Sidebar darkMode={isDark} options={navitems} user={user} />
-        <main className="container flex-1 py-4 mx-auto">
+        <main className="flex-1 max-h-screen py-4 mx-auto">
           <Outlet context={user} />
         </main>
       </div>
