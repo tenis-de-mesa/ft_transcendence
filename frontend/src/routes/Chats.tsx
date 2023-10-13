@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Chat, User } from "../types/types";
 import "./Chat.css";
 
-import { Form, Outlet, useLoaderData } from "react-router-dom";
+import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
 import { RootUser } from "./Root";
+import { Hr } from "../components/Hr";
+import { Input } from "../components/Input";
 
 export default function Chats() {
   const currentUser = RootUser();
@@ -62,100 +64,104 @@ export default function Chats() {
   }, [isOpen]);
 
   return (
-    <div className="chat">
-      <div className="card">
-        <center>
-          <h3>Chats</h3>
-        </center>
-        <Button
-          className="new-channel-button w-full my-2"
-          LeadingIcon={<FiPlus />}
-          variant="info"
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
-        >
-          New channel
-        </Button>
-        {isOpen && (
-          <div className="dark fixed dialog">
-            <Card>
-              <Card.Title>
-                <div className="flex items-center justify-between gap-5">
-                  <Typography variant="md">
-                    Select friends to chat with
-                  </Typography>
-                  <Button
-                    IconOnly={<FiX />}
-                    size="md"
-                    variant="info"
-                    onClick={() => setIsOpen(false)}
-                  />
+    <div className="flex flex-row h-full gap-4">
+      <div className="w-1/4">
+        <Card className="h-full">
+          <Card.Title>
+            <Typography variant="h6">Chats</Typography>
+          </Card.Title>
+          <Card.Body>
+            <>
+              <Button
+                className="flex items-center justify-center w-full"
+                LeadingIcon={<FiPlus />}
+                variant="info"
+                onClick={() => {
+                  setIsOpen(!isOpen);
+                }}
+              >
+                New channel
+              </Button>
+
+              {isOpen && (
+                <div className="absolute z-10 dialog">
+                  <Card className="dark:bg-gray-900">
+                    <Card.Title>
+                      <div className="flex items-center justify-between gap-5">
+                        <Typography variant="md">
+                          Select friends to chat with
+                        </Typography>
+                        <Button
+                          IconOnly={<FiX />}
+                          size="sm"
+                          variant="info"
+                          onClick={() => setIsOpen(false)}
+                        />
+                      </div>
+                    </Card.Title>
+                    <Card.Body>
+                      <div>
+                        <Input
+                          type="text"
+                          placeholder="Search users"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+
+                        <div className="my-3 overflow-y-auto">
+                          <ul className="flex flex-col items-start">
+                            {filteredUsers.map((user) => {
+                              if (user.id === currentUser.id) return null;
+                              return (
+                                <li key={user.id}>
+                                  <input
+                                    className="mr-1"
+                                    type="checkbox"
+                                    checked={selectedUsers.includes(user.id)}
+                                    onChange={() => toggleUserSelection(user.id)}
+                                  />
+                                  <Typography variant="sm" as="label">
+                                    {user.nickname}
+                                  </Typography>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+
+                        <Form
+                          method="POST"
+                          action="/channels"
+                          onSubmit={handleNewChannelSubmit}
+                        >
+                          {selectedUsers.map((userId, index) => (
+                            <input type="hidden" name="users[]" value={userId} key={index} />
+                          ))}
+                          <input type="hidden" name="users[]" value={currentUser.id} />
+                          <Button className="w-full" type="submit" variant="info">
+                            Create Channel
+                          </Button>
+                        </Form>
+                      </div>
+                    </Card.Body>
+                  </Card>
                 </div>
-              </Card.Title>
-              <Card.Body>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Search users"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{
-                      color: "black",
-                      paddingInline: ".25em",
-                      width: "100%",
-                      marginBottom: ".25em",
-                    }}
-                  />
-                  <div className="h-[5.25em] overflow-y-auto">
-                    <ul className="flex flex-col items-start">
-                      {filteredUsers.map((user) => {
-                        if (user.id === currentUser.id) return null;
-                        return (
-                          <li key={user.id}>
-                            <label>
-                              <input
-                                className="mr-1"
-                                type="checkbox"
-                                checked={selectedUsers.includes(user.id)}
-                                onChange={() => toggleUserSelection(user.id)}
-                              />
-                              {user.nickname}
-                            </label>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
+              )}
+
+              <Hr className="my-3" />
+
+              {chats.map((chat) => (
+                <div key={chat.id} className="mt-2 text-left">
+                  <Link to={`/chats/${chat.id}`}>
+                    <Typography variant="sm">
+                      [{chat.id}] - {chat.name}
+                    </Typography>
+                  </Link>
                 </div>
-              </Card.Body>
-              <Card.Footer>
-                <Form
-                  method="POST"
-                  action="/channels"
-                  onSubmit={handleNewChannelSubmit}
-                >
-                  {selectedUsers.map((userId) => (
-                    <input type="hidden" name="users[]" value={userId} />
-                  ))}
-                  <input type="hidden" name="users[]" value={currentUser.id} />
-                  <Button className="w-full" type="submit" variant="info">
-                    Create Channel
-                  </Button>
-                </Form>
-              </Card.Footer>
-            </Card>
-          </div>
-        )}
-        <hr />
-        {chats.map((chat) => (
-          <div key={chat.id}>
-            <a href={`/chats/${chat.id}`}>
-              [{chat.id}] - {chat.name}
-            </a>
-            <hr />
-          </div>
-        ))}
+              ))}
+            </>
+          </Card.Body>
+        </Card>
       </div>
       <Outlet />
     </div>
