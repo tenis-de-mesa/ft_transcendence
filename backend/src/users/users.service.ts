@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import {
+  UserEntity,
+  SessionEntity,
+  AuthProvider,
+  MessageEntity,
+} from '../core/entities';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +17,8 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(SessionEntity)
     private readonly sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(MessageEntity)
+    private readonly messageRepository: Repository<MessageEntity>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
@@ -42,6 +49,8 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<void> {
+    await this.messageRepository.update({ sender: { id } }, { sender: null });
+
     await Promise.all([
       this.killAllSessionsByUserId(id),
       this.userRepository.delete(id),

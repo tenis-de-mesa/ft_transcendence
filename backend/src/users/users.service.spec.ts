@@ -1,6 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import {
+  UserEntity,
+  SessionEntity,
+  AuthProvider,
+  MessageEntity,
+} from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
@@ -47,6 +52,12 @@ describe('UsersService', () => {
           provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(MessageEntity),
+          useValue: {
+            update: jest.fn(),
           },
         },
       ],
