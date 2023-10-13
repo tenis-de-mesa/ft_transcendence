@@ -87,14 +87,14 @@ export const Sidebar: FC<ISidebarProps> = ({
   }, [pathname, isTab, closeMobileMenu]);
 
   return (
-    <div>
+    <div className="h-full">
       <div
         onClick={() => setIsOpen(false)}
         className={classNames(
           "md:hidden fixed inset-0 max-h-screen z-[998] bg-gray-900/50",
           {
-            block: isOpen,
-            hidden: !isOpen,
+            "block": isOpen,
+            "hidden": !isOpen,
           },
         )}
       ></div>
@@ -107,7 +107,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           "flex flex-col justify-between",
           "bg-white dark:bg-gray-800 text-gray-900",
           "shadow-xl",
-          "z-[999] w-[16rem] max-w-[16rem] h-screen overflow-hidden md:relative fixed",
+          "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 overflow-hidden md:relative fixed",
           "border-r border-gray-100 dark:border-opacity-10",
           className,
         )}
@@ -227,6 +227,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           )}
         </div>
       </motion.div>
+
       <div className="m-3 md:hidden" onClick={() => setIsOpen(true)}>
         <IoMdMenu size={25} className="text-gray-900 dark:text-white" />
       </div>
