@@ -17,7 +17,10 @@ import { SecretsManager } from '../lib/aws/SecretsManager';
       validate,
     }),
   ],
-  providers: [EnvironmentConfigService, SecretsManager],
+  providers:
+    process.env.NODE_ENV == EnvironmentEnum.AWS
+      ? [EnvironmentConfigService, SecretsManager]
+      : [EnvironmentConfigService],
   exports: [EnvironmentConfigService],
 })
 export class AppConfigModule {}
