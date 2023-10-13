@@ -28,7 +28,7 @@ export class SessionEntity implements ISession {
   @Column({ nullable: true })
   userId: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.sessions)
+  @ManyToOne(() => UserEntity, (user) => user.sessions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
 

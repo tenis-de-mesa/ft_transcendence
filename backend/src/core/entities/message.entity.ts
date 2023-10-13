@@ -22,8 +22,8 @@ export class MessageEntity {
   chat: ChatEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id, {
-    nullable: false,
-    onDelete: 'CASCADE',
+    nullable: true,
+    onDelete: 'SET NULL',
   })
   sender: UserEntity;
 
