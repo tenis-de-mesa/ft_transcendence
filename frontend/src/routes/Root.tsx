@@ -1,29 +1,16 @@
 import { Outlet, useLoaderData, useOutletContext } from "react-router-dom";
-import { User } from "../types/types";
 
-import Login from "../components/Login";
-
+import classNames from "classnames";
 import { Sidebar } from "../components/nav/Sidebar";
 import { navitems } from "../data";
-import classNames from "classnames";
+
+import { User } from "../types/types";
+import Login from "./Login";
 
 const isDark = true;
 
 export default function Root() {
   const user: User = useLoaderData() as User;
-
-  if (!user) {
-    return (
-      <div className={isDark ? "dark " : ""}>
-        <div className={classNames(
-          "center",
-          "bg-white dark:bg-gray-700",
-        )}>
-          <Login />
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className={classNames(
@@ -32,16 +19,25 @@ export default function Root() {
         "dark": isDark
       }
     )}>
-      <div className="flex w-full h-full bg-white dark:bg-gray-700">
-        <div className="">
-          <Sidebar darkMode={isDark} options={navitems} user={user} />
+      {!user ? (
+        <div className={classNames(
+          "center",
+          "bg-white dark:bg-gray-700",
+        )}>
+          <Login />
         </div>
-        <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
-          <Outlet context={user} />
+      ) : (
+        <div className="flex w-full h-full bg-white dark:bg-gray-700">
+          <div className="">
+            <Sidebar darkMode={isDark} options={navitems} user={user} />
+          </div>
+          <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
+            <Outlet context={user} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  );
+  )
 }
 
 export function RootUser(): User {
