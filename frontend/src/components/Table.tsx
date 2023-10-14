@@ -1,15 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import {
   ColumnDef,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
   getSortedRowModel,
   SortingState,
-  Table,
+  Table
 } from '@tanstack/react-table'
 
 import { Data } from '../data'
@@ -17,58 +16,7 @@ import { FiArrowLeft, FiArrowRight } from 'react-icons/fi'
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa'
 import classNames from 'classnames'
 
-const columnHelper = createColumnHelper<Data>()
-
-interface DataTableProps {
-  dataset: Data[];
-}
-
-export const DataTable = ({ dataset }: DataTableProps) => {
-  const columns = useMemo<ColumnDef<Data>[]>(() => [
-    columnHelper.accessor("id", {
-      cell: info => <span className="font-bold dark:text-gray-50">{info.getValue()}</span>
-    }),
-    columnHelper.accessor("nickname", {
-      header: () => <span>Nickname</span>,
-      cell: info => <i>{info.getValue()}</i>,
-    }),
-    columnHelper.accessor("email", {
-      header: () => "Email",
-      cell: info => info.renderValue(),
-    }),
-    columnHelper.accessor("total_games", {
-      header: () => <span>Total games</span>,
-    }),
-    columnHelper.accessor("wins", {
-      header: "Wins",
-    }),
-    columnHelper.accessor("online", {
-      header: "Status",
-      cell: info => {
-        const isOnline = info.getValue();
-        return (isOnline ? 
-          <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-success-500 mr-2"></div>
-            <span className='text-success-500'>Online</span> 
-          </div>
-          :
-          <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
-            <span className='text-error-500'>Offline</span> 
-          </div>
-        )
-      },
-    }),
-  ], []);
-
-  const [data] = useState(() => [...dataset])
-
-  return (
-    <Table columns={columns} data={data} />
-  )
-}
-
-interface TableProps {
+export interface TableProps {
   columns: ColumnDef<Data>[];
   data: Data[];
 }
@@ -191,3 +139,5 @@ const Pagination = ({ table }: { table: Table<Data> }) => {
     </div>
   )
 }
+
+export default Table;
