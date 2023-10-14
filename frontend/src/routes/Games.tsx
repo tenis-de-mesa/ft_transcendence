@@ -1,5 +1,11 @@
+import { Typography } from "../components/Typography";
+
 const Games = () => {
-  return <h1>Games</h1>;
+  return (
+    <Typography variant="h5">
+      Games
+    </Typography>
+  )
 };
 
 export default Games;

@@ -1,5 +1,11 @@
+import { Typography } from "../components/Typography";
+
 const Settings = () => {
-  return <h1>Settings</h1>;
+  return (
+    <Typography variant="h5">
+      Settings
+    </Typography>
+  )
 };
 
 export default Settings;
