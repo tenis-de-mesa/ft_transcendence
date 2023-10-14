@@ -56,9 +56,9 @@ export default function Chat() {
               <Card className="dark:bg-gray-900">
                 <Card.Title>
                   <div className="flex items-center justify-between">
-                    <Avatar 
+                    <Avatar
                       size="sm"
-                      seed={user?.login} 
+                      seed={user?.login}
                       src={user?.avatarUrl}
                     />
                     <Typography variant="h6">
@@ -87,7 +87,10 @@ export default function Chat() {
             </div>
           )}
 
-          <div ref={refMessages} className="h-full mb-4 overflow-scroll break-words no-scrollbar">
+          <div
+            ref={refMessages}
+            className="h-full mb-4 overflow-scroll break-words no-scrollbar"
+          >
             {chat.messages.map((message) => {
               const showAvatar = lastUser?.id != message.sender?.id;
               lastUser = message.sender;
@@ -122,11 +125,8 @@ export default function Chat() {
           </div>
 
           <div className="">
-            <Form
-              method="POST"
-              onSubmit={handleSubmitNewMessage}
-            >
-              <Input 
+            <Form method="POST" onSubmit={handleSubmitNewMessage}>
+              <Input
                 type="text"
                 value={newMessage}
                 name="message"

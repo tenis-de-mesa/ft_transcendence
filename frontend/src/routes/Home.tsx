@@ -6,9 +6,7 @@ export default function Home() {
 
   return (
     <div className="flex justify-center h-full">
-      <Typography variant="h3">
-        Welcome {user.nickname}
-      </Typography>
+      <Typography variant="h3">Welcome {user.nickname}</Typography>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { images } from "../data/images";
-import { FaUserSecret } from "react-icons/fa"
+import { FaUserSecret } from "react-icons/fa";
 
 export default function Login() {
   return (
@@ -14,23 +14,27 @@ export default function Login() {
         </Card.Title>
         <Card.Body className="flex flex-col gap-2 pt-0 pb-6">
           <>
-            <Button variant="info" LeadingIcon={<img src={images.logoLight} width={20} />} className="gap-1" >
+            <Button
+              variant="info"
+              LeadingIcon={<img src={images.logoLight} width={20} />}
+              className="gap-1"
+            >
               <Link to={"/login/intra"}>
-                <Typography variant="md">
-                  Login with 42
-                </Typography>
+                <Typography variant="md">Login with 42</Typography>
               </Link>
             </Button>
-            <Button variant="info" LeadingIcon={<FaUserSecret size={20} />} className="gap-1">
+            <Button
+              variant="info"
+              LeadingIcon={<FaUserSecret size={20} />}
+              className="gap-1"
+            >
               <Link to={"/login/guest"}>
-                <Typography variant="md">
-                  Play anonymously
-                </Typography>
+                <Typography variant="md">Play anonymously</Typography>
               </Link>
             </Button>
           </>
         </Card.Body>
       </Card>
     </div>
-  )
+  );
 }

@@ -17,17 +17,24 @@ export default function ChatNew() {
           New chat with <strong>{chatUser.nickname}</strong>
         </Typography>
       </Card.Title>
-      <Card.Body position="left" className="flex flex-col justify-between h-[calc(100%-4rem)]">
+      <Card.Body
+        position="left"
+        className="flex flex-col justify-between h-[calc(100%-4rem)]"
+      >
         <>
           <div></div>
           <div>
             <Form method="POST" action="/chats">
               <input type="hidden" name="users[]" value={chatUser.id} />
-              <Input type="text" name="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Enter your message" />
+              <Input
+                type="text"
+                name="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Enter your message"
+              />
               <button type="submit" hidden>
-                <Typography variant="sm">
-                  Create Chat
-                </Typography>
+                <Typography variant="sm">Create Chat</Typography>
               </button>
             </Form>
           </div>

@@ -26,20 +26,22 @@ const StoryCard = (args: Props) => (
   <StoryLayout {...args} className="w-1/2 m-auto space-y-8">
     <Card {...args}>
       <Card.Title {...args}>
-        <Typography variant="h6">
-          Title
-        </Typography>
+        <Typography variant="h6">Title</Typography>
       </Card.Title>
       <Card.Body {...args}>
         <Typography variant="sm">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam quidem eaque est? Est laborum vel eius iusto blanditiis pariatur. Quam dolorem laborum placeat voluptatibus illum dolores error eius inventore corrupti.
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, maiores dolor iure nobis minima libero omnis mollitia fuga perspiciatis, est eius! Perspiciatis natus possimus repellendus voluptates est inventore saepe quam, officia odio praesentium. Quibusdam, inventore sed nulla doloremque tenetur beatae.
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam quidem
+          eaque est? Est laborum vel eius iusto blanditiis pariatur. Quam
+          dolorem laborum placeat voluptatibus illum dolores error eius
+          inventore corrupti. Lorem ipsum dolor sit amet consectetur adipisicing
+          elit. Numquam, maiores dolor iure nobis minima libero omnis mollitia
+          fuga perspiciatis, est eius! Perspiciatis natus possimus repellendus
+          voluptates est inventore saepe quam, officia odio praesentium.
+          Quibusdam, inventore sed nulla doloremque tenetur beatae.
         </Typography>
       </Card.Body>
       <Card.Footer {...args}>
-        <Typography variant="lg">
-          Footer
-        </Typography>
+        <Typography variant="lg">Footer</Typography>
       </Card.Footer>
     </Card>
   </StoryLayout>

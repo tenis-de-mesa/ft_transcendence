@@ -3,10 +3,7 @@ import { socket } from "../socket";
 import { useEffect, useMemo, useState } from "react";
 import { User, UserStatus } from "../types/types";
 
-import {
-  ColumnDef,
-  createColumnHelper
-} from '@tanstack/react-table'
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
@@ -36,51 +33,55 @@ export default function Users() {
     });
   }, []);
 
-  const columns = useMemo<ColumnDef<User>[]>(() => [
-    columnHelper.accessor("nickname", {
-      header: "Nickname",
-      cell: info => <i>{info.getValue()}</i>
-    }),
-    columnHelper.accessor("status", {
-      header: "Status",
-      cell: info => {
-        const isOnline = info.getValue();
-        return (isOnline == "online" ? 
-          <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-success-500 mr-2"></div>
-            <span className='text-success-500'>Online</span> 
-          </div>
-          :
-          <div className="flex items-center">
-            <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
-            <span className='text-error-500'>Offline</span> 
-          </div>
-        )
-      },
-    }),
-    columnHelper.accessor("id", {
-      header: "Action",
-      cell: info => {
-        return (
-          <div key={info.getValue()}>
-            <Button variant="info" size="sm">
-              <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
-            </Button>
-          </div>
-        )
-      }
-    }),
-  ], []);
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      columnHelper.accessor("nickname", {
+        header: "Nickname",
+        cell: (info) => <i>{info.getValue()}</i>,
+      }),
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: (info) => {
+          const isOnline = info.getValue();
+          return isOnline == "online" ? (
+            <div className="flex items-center">
+              <div className="h-2.5 w-2.5 rounded-full bg-success-500 mr-2"></div>
+              <span className="text-success-500">Online</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
+              <span className="text-error-500">Offline</span>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("id", {
+        header: "Action",
+        cell: (info) => {
+          return (
+            <div key={info.getValue()}>
+              <Button variant="info" size="sm">
+                <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
+              </Button>
+            </div>
+          );
+        },
+      }),
+    ],
+    [],
+  );
 
   return (
     <>
-      <Typography variant="h5">
-        Users
-      </Typography>
+      <Typography variant="h5">Users</Typography>
 
       <div className="h-[92%]">
-        <Table columns={columns as unknown as ColumnDef<Data>[]} data={users as unknown as Data[]} />
+        <Table
+          columns={columns as unknown as ColumnDef<Data>[]}
+          data={users as unknown as Data[]}
+        />
       </div>
     </>
-  )
+  );
 }

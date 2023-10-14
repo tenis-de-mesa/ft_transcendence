@@ -29,7 +29,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Close dialog, clear search and selected users on submit
@@ -117,7 +117,9 @@ export default function Chats() {
                                     className="mr-1"
                                     type="checkbox"
                                     checked={selectedUsers.includes(user.id)}
-                                    onChange={() => toggleUserSelection(user.id)}
+                                    onChange={() =>
+                                      toggleUserSelection(user.id)
+                                    }
                                   />
                                   <Typography variant="sm" as="label">
                                     {user.nickname}
@@ -134,10 +136,23 @@ export default function Chats() {
                           onSubmit={handleNewChannelSubmit}
                         >
                           {selectedUsers.map((userId, index) => (
-                            <input type="hidden" name="users[]" value={userId} key={index} />
+                            <input
+                              type="hidden"
+                              name="users[]"
+                              value={userId}
+                              key={index}
+                            />
                           ))}
-                          <input type="hidden" name="users[]" value={currentUser.id} />
-                          <Button className="w-full" type="submit" variant="info">
+                          <input
+                            type="hidden"
+                            name="users[]"
+                            value={currentUser.id}
+                          />
+                          <Button
+                            className="w-full"
+                            type="submit"
+                            variant="info"
+                          >
                             Create Channel
                           </Button>
                         </Form>

@@ -5,7 +5,7 @@ export type Data = {
   total_games: number;
   wins: number;
   online: boolean;
-}
+};
 
 export const tableData: Data[] = [
   {

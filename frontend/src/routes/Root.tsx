@@ -13,17 +13,13 @@ export default function Root() {
   const user: User = useLoaderData() as User;
 
   return (
-    <div className={classNames(
-      "w-screen h-screen",
-      "overflow-hidden", {
-        "dark": isDark
-      }
-    )}>
+    <div
+      className={classNames("w-screen h-screen", "overflow-hidden", {
+        dark: isDark,
+      })}
+    >
       {!user ? (
-        <div className={classNames(
-          "center",
-          "bg-white dark:bg-gray-700",
-        )}>
+        <div className={classNames("center", "bg-white dark:bg-gray-700")}>
           <Login />
         </div>
       ) : (
@@ -37,7 +33,7 @@ export default function Root() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function RootUser(): User {

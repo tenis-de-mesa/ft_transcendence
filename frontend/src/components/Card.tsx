@@ -3,15 +3,17 @@ import classNames from "classnames";
 import { Hr } from "./Hr";
 
 const CardWrapper = ({ children, className = "" }) => (
-  <div className={classNames(
-    "block text-center rounded-xl",
-    "bg-white dark:bg-gray-800",
-    "shadow-xl",
-    className
-  )}>
+  <div
+    className={classNames(
+      "block text-center rounded-xl",
+      "bg-white dark:bg-gray-800",
+      "shadow-xl",
+      className,
+    )}
+  >
     {children}
   </div>
-)
+);
 
 interface CardProps {
   children: string | React.ReactElement;
@@ -19,45 +21,25 @@ interface CardProps {
   className?: string;
 }
 
-const CardTitle = ({ 
-  children, 
-  position = "center",
-  className,
-}: CardProps) => (
-  <div className={classNames(
-    `text-${position}`,
-    "px-6 py-3",
-    className
-  )}>
+const CardTitle = ({ children, position = "center", className }: CardProps) => (
+  <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
     {children}
     <Hr />
   </div>
 );
 
-const CardBody = ({ 
-  children,
-  position = "center",
-  className,
-}: CardProps) => (
-  <div className={classNames(
-    `text-${position}`,
-    "px-6 py-3",
-    className
-  )}>
+const CardBody = ({ children, position = "center", className }: CardProps) => (
+  <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
     {children}
   </div>
 );
 
-const CardFooter = ({ 
-  children, 
-  position = "center", 
-  className, 
+const CardFooter = ({
+  children,
+  position = "center",
+  className,
 }: CardProps) => (
-  <div className={classNames(
-    `text-${position}`, 
-    "px-6 py-3",
-    className
-  )}>
+  <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
     <Hr />
     {children}
   </div>

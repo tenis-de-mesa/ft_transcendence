@@ -25,7 +25,7 @@ const StorySidebar = (args: Props) => {
     login: "frosa-ma",
     nickname: "frosa-ma",
     status: "",
-    avatarUrl: ""
+    avatarUrl: "",
   };
 
   return (

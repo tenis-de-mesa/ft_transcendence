@@ -93,8 +93,8 @@ export const Sidebar: FC<ISidebarProps> = ({
         className={classNames(
           "md:hidden fixed inset-0 max-h-screen z-[998] bg-gray-900/50",
           {
-            "block": isOpen,
-            "hidden": !isOpen,
+            block: isOpen,
+            hidden: !isOpen,
           },
         )}
       ></div>
@@ -167,7 +167,7 @@ export const Sidebar: FC<ISidebarProps> = ({
         >
           {isOpen ? (
             <div className="w-full duration-100 ease-in transform">
-              <Avatar  
+              <Avatar
                 size="sm"
                 src={images.demoAvatar}
                 className="fixed w-0 h-0 transition duration-150 ease-out opacity-0 bottom-1"
@@ -197,7 +197,7 @@ export const Sidebar: FC<ISidebarProps> = ({
             </div>
           ) : (
             <div>
-              <Avatar  
+              <Avatar
                 size="sm"
                 src={images.demoAvatar}
                 className="fixed transition ease-in delay-300 opacity-100 cursor-pointer select-none bottom-4"
