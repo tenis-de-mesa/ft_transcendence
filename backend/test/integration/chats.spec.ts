@@ -4,7 +4,13 @@ import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { ChatsModule } from '../../src/chats/chats.module';
 import { UsersService } from '../../src/users/users.service';
 import { ChatsService } from '../../src/chats/chats.service';
-import { AuthProvider, ChatAccess, ChatType } from '../../src/core/entities';
+import {
+  AuthProvider,
+  ChatAccess,
+  ChatEntity,
+  ChatType,
+  UserEntity,
+} from '../../src/core/entities';
 import { UsersModule } from '../../src/users/users.module';
 
 describe('Chats', () => {
@@ -32,18 +38,20 @@ describe('Chats', () => {
     expect(chatsService).toBeDefined();
   });
 
-  describe('order messages', () => {
-    it('chat direct', async () => {
-      // Arrange
-      const user1 = await usersService.createUser({
+  describe('simulate chat 4 messages', () => {
+    let user1: UserEntity;
+    let user2: UserEntity;
+    let chat: ChatEntity;
+    beforeEach(async () => {
+      user1 = await usersService.createUser({
         login: 'user1',
         provider: AuthProvider.GUEST,
       });
-      const user2 = await usersService.createUser({
+      user2 = await usersService.createUser({
         login: 'user2',
         provider: AuthProvider.GUEST,
       });
-      const chat = await chatsService.create(
+      chat = await chatsService.create(
         {
           userIds: [user1.id, user2.id],
           access: ChatAccess.PUBLIC,
@@ -71,13 +79,39 @@ describe('Chats', () => {
         chatId: chat.id,
         senderId: user2.id,
       });
-      // Act
-      const { messages } = await chatsService.findOne(chat.id);
-      // Assert
-      expect(messages[0].content).toEqual('message 1');
-      expect(messages[1].content).toEqual('message 2');
-      expect(messages[2].content).toEqual('message 3');
-      expect(messages[3].content).toEqual('message 4');
+    });
+    describe('order messages', () => {
+      it('chat direct', async () => {
+        // Act
+        const { messages } = await chatsService.findOne(chat.id);
+        // Assert
+        expect(messages[0].content).toEqual('message 1');
+        expect(messages[1].content).toEqual('message 2');
+        expect(messages[2].content).toEqual('message 3');
+        expect(messages[3].content).toEqual('message 4');
+      });
+    });
+
+    describe('deleted user messages', () => {
+      it('check users', async () => {
+        // Act
+        const { messages } = await chatsService.findOne(chat.id);
+        // Assert
+        expect(messages[0].sender?.id).toEqual(user1.id);
+        expect(messages[1].sender?.id).toEqual(user2.id);
+        expect(messages[2].sender?.id).toEqual(user1.id);
+        expect(messages[3].sender?.id).toEqual(user2.id);
+      });
+      it('after deleteUser', async () => {
+        // Act
+        await usersService.deleteUser(user1.id);
+        const { messages } = await chatsService.findOne(chat.id);
+        // Assert
+        expect(messages[0].sender).toEqual(null);
+        expect(messages[1].sender?.id).toEqual(user2.id);
+        expect(messages[2].sender).toEqual(null);
+        expect(messages[3].sender?.id).toEqual(user2.id);
+      });
     });
   });
 });
