@@ -42,10 +42,7 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<void> {
-    await Promise.all([
-      this.killAllSessionsByUserId(id),
-      this.userRepository.delete(id),
-    ]);
+    await this.userRepository.delete(id);
   }
 
   async killAllSessionsByUserId(
