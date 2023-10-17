@@ -46,9 +46,12 @@ export class ChatEntity {
   @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
 
-  constructor(chat?: ChatEntity) {
+  constructor(chat?: Partial<ChatEntity>) {
     this.id = chat?.id;
+    this.type = chat?.type;
+    this.access = chat?.access;
     this.users = chat?.users;
+    this.chatMembers = chat?.chatMembers;
     this.messages = chat?.messages;
   }
 }

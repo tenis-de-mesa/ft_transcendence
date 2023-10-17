@@ -6,6 +6,7 @@ import {
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import {
   SessionEntity,
@@ -98,7 +99,7 @@ export class UserEntity {
   @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.sender)
   friendRequestsSent: FriendRequestEntity[];
 
-  @ManyToMany(() => ChatEntity, (chat) => chat.users, { cascade: true })
+  @ManyToMany(() => ChatEntity, (chat) => chat.users)
   @JoinTable({
     name: 'members',
     joinColumn: {
@@ -116,11 +117,27 @@ export class UserEntity {
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
 
-  constructor(user?: UserEntity) {
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  constructor(user?: Partial<UserEntity>) {
     this.id = user?.id;
+    this.intraId = user?.intraId;
     this.login = user?.login;
     this.nickname = user?.nickname;
-    this.intraId = user?.intraId;
+    this.avatarUrl = user?.avatarUrl;
     this.provider = user?.provider;
+    this.tfaEnabled = user?.tfaEnabled;
+    this.tfaSecret = user?.tfaSecret;
+    this.tfaRecoveryCodes = user?.tfaRecoveryCodes;
+    this.status = user?.status;
+    this.sessions = user?.sessions;
+    this.friends = user?.friends;
+    this.friendRequestsReceived = user?.friendRequestsReceived;
+    this.friendRequestsSent = user?.friendRequestsSent;
+    this.chats = user?.chats;
+    this.chatMembers = user?.chatMembers;
+    this.messages = user?.messages;
+    this.deletedAt = user?.deletedAt;
   }
 }

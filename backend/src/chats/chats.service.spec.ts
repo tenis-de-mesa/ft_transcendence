@@ -362,4 +362,223 @@ describe('ChatsService', () => {
       );
     });
   });
+
+  describe('mapChatsToChatsWithName', () => {
+    it('direct chat with self should have name "user.nickname (You)"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser],
+        type: ChatType.DIRECT,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(`${mockUser.nickname} (You)`);
+    });
+
+    it('direct chat with other user should have name "otherUser.nickname"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser, mockOtherUser],
+        type: ChatType.DIRECT,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(mockOtherUser.nickname);
+    });
+
+    it('direct chat with deleted user should have name "Deleted user"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+        deletedAt: new Date(),
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser, mockOtherUser],
+        type: ChatType.DIRECT,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual('Deleted user');
+    });
+
+    it('channel chat with self should have name "user.nickname (You)"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser],
+        type: ChatType.CHANNEL,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(`${mockUser.nickname} (You)`);
+    });
+
+    it('channel chat with other user should have name "user.nickname (You) and otherUser.nickname"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser, mockOtherUser],
+        type: ChatType.CHANNEL,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(
+        `${mockUser.nickname} (You) and ${mockOtherUser.nickname}`,
+      );
+    });
+
+    it('channel chat with many users should have name "user.nickname (You), otherUser.nickname and otherOtherUser.nickname"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+      } as UserEntity);
+
+      const mockOtherOtherUser = new UserEntity({
+        id: 3,
+        nickname: 'OtherOtherUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: TEST_CHAT_ID,
+        users: [mockUser, mockOtherUser, mockOtherOtherUser],
+        type: ChatType.CHANNEL,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(
+        `${mockUser.nickname} (You), ${mockOtherUser.nickname} and ${mockOtherOtherUser.nickname}`,
+      );
+    });
+
+    it('channel chat with deleted user should omit deleted users\' name "user.nickname (You)"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+        deletedAt: new Date(),
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [mockUser, mockOtherUser],
+        type: ChatType.CHANNEL,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(`${mockUser.nickname} (You)`);
+    });
+
+    it('channel chat with many users should omit deleted users\' name "user.nickname (You) and otherOtherUser.nickname"', () => {
+      // Arrange
+      const mockUser = new UserEntity({
+        id: 1,
+        nickname: 'TestUser',
+      } as UserEntity);
+
+      const mockOtherUser = new UserEntity({
+        id: 2,
+        nickname: 'OtherUser',
+        deletedAt: new Date(),
+      } as UserEntity);
+
+      const mockOtherOtherUser = new UserEntity({
+        id: 3,
+        nickname: 'OtherOtherUser',
+      } as UserEntity);
+
+      const mockChat = new ChatEntity({
+        id: TEST_CHAT_ID,
+        users: [mockUser, mockOtherUser, mockOtherOtherUser],
+        type: ChatType.CHANNEL,
+      } as ChatEntity);
+
+      // Act
+      const result = chatsService.mapChatsToChatsWithName([mockChat], mockUser);
+
+      // Assert
+      expect(result.length).toStrictEqual(1);
+      expect(result[0].name).toStrictEqual(
+        `${mockUser.nickname} (You) and ${mockOtherOtherUser.nickname}`,
+      );
+    });
+  });
 });

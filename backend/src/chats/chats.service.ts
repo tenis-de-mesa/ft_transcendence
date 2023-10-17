@@ -19,7 +19,7 @@ import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
 export class ChatsService {
   constructor(
     @InjectRepository(UserEntity)
-    readonly userRepository: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
 
     @InjectRepository(ChatEntity)
     private readonly chatRepository: Repository<ChatEntity>,
@@ -28,7 +28,7 @@ export class ChatsService {
     private readonly messageRepository: Repository<MessageEntity>,
 
     @InjectRepository(ChatMemberEntity)
-    private chatMemberRepository: Repository<ChatMemberEntity>,
+    private readonly chatMemberRepository: Repository<ChatMemberEntity>,
   ) {}
 
   async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
@@ -93,33 +93,11 @@ export class ChatsService {
       relations: {
         users: true,
       },
+      withDeleted: true,
       where: {
         id: In(chatIds),
       },
     });
-  }
-
-  mapChatsToChatsWithName(
-    chats: ChatEntity[],
-    currentUser: UserEntity,
-  ): ChatWithName[] {
-    return chats.map((chat) => ({
-      ...chat,
-      name: this.generateChatName(chat.users, currentUser),
-    }));
-  }
-
-  private generateChatName(
-    users: UserEntity[],
-    currentUser: UserEntity,
-  ): string {
-    const otherUsers = users.filter((user) => user.id !== currentUser.id);
-    // When a user creates a chat with himself
-    if (otherUsers.length === 0) {
-      return `${currentUser.nickname} (You)`;
-    }
-    const names = otherUsers.map((user) => user.nickname);
-    return names.join(', ');
   }
 
   async findOne(id: number): Promise<ChatEntity> {
@@ -160,5 +138,55 @@ export class ChatsService {
       sender: user,
       content: dto.content,
     });
+  }
+
+  mapChatsToChatsWithName(
+    chats: ChatEntity[],
+    currentUser: UserEntity,
+  ): ChatWithName[] {
+    return chats.map((chat) => ({
+      ...chat,
+      name: this.generateChatName(chat, currentUser),
+    }));
+  }
+
+  private generateChatName(
+    { users, type }: ChatEntity,
+    currentUser: UserEntity,
+  ): string {
+    const otherUsers = users.filter((user) => user.id !== currentUser.id);
+
+    // When a user creates a chat with himself
+    if (otherUsers.length === 0) {
+      return `${currentUser.nickname} (You)`;
+    }
+
+    // Direct chats only have two users, so no need to map nicknames
+    if (type === ChatType.DIRECT) {
+      return otherUsers[0].deletedAt ? 'Deleted user' : otherUsers[0].nickname;
+    }
+
+    let nicknames: string[] = [`${currentUser.nickname} (You)`];
+
+    otherUsers.forEach((user) => {
+      if (!user.deletedAt) {
+        nicknames.push(user.nickname);
+      }
+    });
+
+    return this.joinChatNicknames(nicknames);
+  }
+
+  private joinChatNicknames(nicknames: string[]): string {
+    if (nicknames.length === 0) {
+      return '';
+    } else if (nicknames.length === 1) {
+      return nicknames[0];
+    } else if (nicknames.length === 2) {
+      return nicknames.join(' and ');
+    } else {
+      const last = nicknames.pop();
+      return `${nicknames.join(', ')} and ${last}`;
+    }
   }
 }

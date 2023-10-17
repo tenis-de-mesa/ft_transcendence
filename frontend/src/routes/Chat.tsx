@@ -92,15 +92,18 @@ export default function Chat() {
             className="h-full mb-4 overflow-scroll break-words no-scrollbar"
           >
             {chat.messages.map((message) => {
-              const showAvatar = lastUser?.id != message.sender?.id;
+              const showAvatar =
+                lastUser?.id != message.sender?.id || !message.sender;
+
               lastUser = message.sender;
+
               return (
                 <div key={message.id}>
                   {showAvatar && (
                     <div className="flex gap-4 mt-5">
                       <Avatar
-                        seed={message.sender.login}
-                        src={message.sender.avatarUrl}
+                        seed={message.sender?.login}
+                        src={message.sender?.avatarUrl}
                         size="sm"
                       />
                       <div
@@ -111,7 +114,7 @@ export default function Chat() {
                         className="cursor-pointer"
                       >
                         <Typography variant="h6">
-                          {message.sender?.nickname}
+                          {message.sender?.nickname || "Deleted user"}
                         </Typography>
                       </div>
                     </div>
