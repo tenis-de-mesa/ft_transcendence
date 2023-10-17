@@ -43,8 +43,8 @@ export const navitems: INavitem[] = [
   },
   {
     order: 5,
-    path: "chat",
-    label: "Chat",
+    path: "chats",
+    label: "Chats",
     icon: <LuMessagesSquare />,
   },
   {

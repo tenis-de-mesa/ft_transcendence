@@ -1,7 +1,16 @@
 import { Link, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { User, UserStatus } from "../types/types";
+
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+
+import { Typography } from "../components/Typography";
+import { Button } from "../components/Button";
+import Table from "../components/Table";
+import { Data } from "../data";
+
+const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
   const initialUsers: User[] = useLoaderData() as User[];
@@ -24,19 +33,55 @@ export default function Users() {
     });
   }, []);
 
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      columnHelper.accessor("nickname", {
+        header: "Nickname",
+        cell: (info) => <i>{info.getValue()}</i>,
+      }),
+      columnHelper.accessor("status", {
+        header: "Status",
+        cell: (info) => {
+          const isOnline = info.getValue();
+          return isOnline == "online" ? (
+            <div className="flex items-center">
+              <div className="h-2.5 w-2.5 rounded-full bg-success-500 mr-2"></div>
+              <span className="text-success-500">Online</span>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
+              <span className="text-error-500">Offline</span>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("id", {
+        header: "Action",
+        cell: (info) => {
+          return (
+            <div key={info.getValue()}>
+              <Button variant="info" size="sm">
+                <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
+              </Button>
+            </div>
+          );
+        },
+      }),
+    ],
+    [],
+  );
+
   return (
-    <div>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <span>{user.login} </span>
-            <span style={{ color: user.status === "online" ? "green" : "red" }}>
-              {user.status}
-            </span>
-            <Link to={`/chats/new/${user.id}`}> Chat 💬</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Typography variant="h5">Users</Typography>
+
+      <div className="h-[92%]">
+        <Table
+          columns={columns as unknown as ColumnDef<Data>[]}
+          data={users as unknown as Data[]}
+        />
+      </div>
+    </>
   );
 }

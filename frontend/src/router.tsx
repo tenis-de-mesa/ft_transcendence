@@ -21,6 +21,9 @@ import Home from "./routes/Home.tsx";
 import ChatNew from "./routes/ChatNew.tsx";
 import { sendChatMessage } from "./actions/sendChatMessage.ts";
 import { loadUserById } from "./loaders/loadUserById.ts";
+import Leaderboard from "./routes/Leaderboard.tsx";
+import Games from "./routes/Games.tsx";
+import Settings from "./routes/Settings.tsx";
 
 const router = createBrowserRouter([
   {
@@ -68,9 +71,21 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "profile/:id",
+        path: "profile/:id?",
         element: <Profile />,
         loader: loadUserById,
+      },
+      {
+        path: "leaderboard",
+        element: <Leaderboard />,
+      },
+      {
+        path: "games",
+        element: <Games />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },

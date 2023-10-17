@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import { User } from "../types/types";
-import Avatar from "./Avatar";
+import { Avatar } from "./Avatar";
 
 interface UserFormProps {
   user: User;
@@ -49,7 +49,7 @@ export default function UserForm({ user }: UserFormProps) {
   return (
     <>
       <center>
-        <Avatar login={user.login} avatarUrl={avatarUrl} />
+        <Avatar seed={user.login} src={avatarUrl} />
       </center>
       <center>
         <label>
