@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Chat, User } from "../types/types";
 
-import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
+import { Form, Outlet, useLoaderData } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -166,11 +166,11 @@ export default function Chats() {
 
               {chats.map((chat) => (
                 <div key={chat.id} className="mt-2 text-left">
-                  <Link to={`/chats/${chat.id}`}>
+                  <a href={`/chats/${chat.id}`}>
                     <Typography variant="sm">
                       [{chat.id}] - {chat.name}
                     </Typography>
-                  </Link>
+                  </a>
                 </div>
               ))}
             </>

@@ -13,26 +13,26 @@ export default function Login() {
           <Typography variant="h6">Transcendence</Typography>
         </Card.Title>
         <Card.Body className="flex flex-col gap-2 pt-0 pb-6">
-          <>
-            <Button
-              variant="info"
-              LeadingIcon={<img src={images.logoLight} width={20} />}
-              className="gap-1"
-            >
-              <Link to={"/login/intra"}>
+          <div className="flex flex-col gap-1">
+            <Link to={"/login/intra"}>
+              <Button
+                variant="info"
+                LeadingIcon={<img src={images.logoLight} width={20} />}
+                className="w-full"
+              >
                 <Typography variant="md">Login with 42</Typography>
-              </Link>
-            </Button>
-            <Button
-              variant="info"
-              LeadingIcon={<FaUserSecret size={20} />}
-              className="gap-1"
-            >
-              <Link to={"/login/guest"}>
+              </Button>
+            </Link>
+            <Link to={"/login/guest"}>
+              <Button
+                variant="info"
+                LeadingIcon={<FaUserSecret size={20} />}
+                className="w-full"
+              >
                 <Typography variant="md">Play anonymously</Typography>
-              </Link>
-            </Button>
-          </>
+              </Button>
+            </Link>
+          </div>
         </Card.Body>
       </Card>
     </div>
