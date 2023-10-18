@@ -27,4 +27,8 @@ export class CreateChatDto {
   @IsOptional()
   @IsString()
   message?: string;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
 }

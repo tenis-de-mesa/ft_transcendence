@@ -1,3 +1,4 @@
+import * as argon2 from 'argon2';
 import {
   BadRequestException,
   Injectable,
@@ -12,6 +13,7 @@ import {
   ChatMemberEntity,
   ChatMemberRole,
   ChatType,
+  ChatAccess,
 } from '../core/entities';
 import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
 
@@ -38,41 +40,61 @@ export class ChatsService {
       userIds.push(creator.id);
     }
 
-    // Check if direct chat has at most 2 users
-    if (dto.type === ChatType.DIRECT && userIds.length > 2) {
-      throw new BadRequestException('Direct chats must have at most 2 users');
-    }
-
     // Check if all users in userIds exist
-    const chatUsers = await this.userRepository.findBy({ id: In(userIds) });
-    if (chatUsers.length !== userIds.length) {
+    const users = await this.userRepository.findBy({ id: In(userIds) });
+    if (users.length !== userIds.length) {
       throw new NotFoundException('One or more users not found');
     }
 
-    // Effectively create the chat
+    switch (dto.type) {
+      case ChatType.DIRECT:
+        return await this.createDirectChat(dto, users, creator);
+
+      case ChatType.CHANNEL:
+        return await this.createChannelChat(dto, users, creator);
+
+      default:
+        throw new BadRequestException('Invalid chat type');
+    }
+  }
+
+  private async createDirectChat(
+    dto: CreateChatDto,
+    users: UserEntity[],
+    creator: UserEntity,
+  ): Promise<ChatEntity> {
+    if (users.length > 2) {
+      throw new BadRequestException('Direct chats can have at most 2 users');
+    }
+
+    return await this.chatRepository.save({
+      users,
+      type: ChatType.DIRECT,
+      access: ChatAccess.PRIVATE,
+      messages: dto.message
+        ? [{ sender: creator, content: dto.message }]
+        : undefined,
+    });
+  }
+
+  private async createChannelChat(
+    dto: CreateChatDto,
+    users: UserEntity[],
+    creator: UserEntity,
+  ): Promise<ChatEntity> {
     const chat = await this.chatRepository.save({
-      users: chatUsers,
-      type: dto.type,
-      access: dto.access,
+      users,
+      type: ChatType.CHANNEL,
+      access: dto.password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
+      password: dto.password ? await argon2.hash(dto.password) : undefined,
+      // chatMembers: [{ userId: creator.id, role: ChatMemberRole.OWNER }],
     });
 
-    // if channel, set creator as owner of the chat
-    if (dto.type === ChatType.CHANNEL) {
-      await this.chatMemberRepository.save({
-        userId: creator.id,
-        chatId: chat.id,
-        role: ChatMemberRole.OWNER,
-      });
-    }
-
-    // Add an optional initial message to the chat
-    if (dto.message) {
-      await this.addMessage({
-        senderId: creator.id,
-        chatId: chat.id,
-        content: dto.message,
-      });
-    }
+    await this.chatMemberRepository.save({
+      userId: creator.id,
+      chatId: chat.id,
+      role: ChatMemberRole.OWNER,
+    });
 
     return chat;
   }

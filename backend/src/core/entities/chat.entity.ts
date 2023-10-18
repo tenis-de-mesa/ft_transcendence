@@ -37,6 +37,9 @@ export class ChatEntity {
   })
   access: ChatAccess;
 
+  @Column({ nullable: true })
+  password: string;
+
   @ManyToMany(() => UserEntity, (user) => user.chats)
   users: UserEntity[];
 
@@ -46,9 +49,13 @@ export class ChatEntity {
   @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
 
-  constructor(chat?: ChatEntity) {
+  constructor(chat?: Partial<ChatEntity>) {
     this.id = chat?.id;
+    this.type = chat?.type;
+    this.access = chat?.access;
+    this.password = chat?.password;
     this.users = chat?.users;
+    this.chatMembers = chat?.chatMembers;
     this.messages = chat?.messages;
   }
 }

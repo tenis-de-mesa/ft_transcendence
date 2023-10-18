@@ -1,3 +1,4 @@
+import * as argon from 'argon2';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatsService } from './chats.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -195,14 +196,16 @@ describe('ChatsService', () => {
 
     it('should fail direct chat creation if more than 2 users are provided', async () => {
       // Arrange
+      const mockThirdUser = new UserEntity({ id: 3 } as UserEntity);
+
       const createChatDto = {
-        userIds: [TEST_USER_ID_1, TEST_USER_ID_2, 3],
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2, mockThirdUser.id],
         type: ChatType.DIRECT,
         access: ChatAccess.PRIVATE,
       };
       jest
         .spyOn(userRepository, 'findBy')
-        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2, mockThirdUser]);
 
       // Act & Assert
       await expect(
@@ -309,6 +312,47 @@ describe('ChatsService', () => {
       await expect(chatsService.create(dto, TEST_USER_1)).rejects.toThrow(
         NotFoundException,
       );
+    });
+
+    it('should create channel with password if password is provided', async () => {
+      // Arrange
+      const password = 'secret';
+
+      const dto = {
+        password,
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PROTECTED,
+        userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
+      };
+
+      const mockChat = new ChatEntity({
+        id: 1,
+        users: [TEST_USER_1, TEST_USER_2],
+        type: ChatType.CHANNEL,
+        access: ChatAccess.PROTECTED,
+        password: await argon.hash(password),
+      } as ChatEntity);
+
+      const mockChatMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: mockChat.id,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+      jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest.spyOn(chatMemberRepository, 'save').mockResolvedValueOnce(mockChatMember);
+
+      // Act
+      const result = await chatsService.create(dto, TEST_USER_1);
+
+      console.log({chat:result});
+
+      // Assert
+      expect(result.type).toStrictEqual(ChatType.CHANNEL);
+      expect(result.access).toStrictEqual(ChatAccess.PROTECTED);
+      expect(await argon.verify(result.password, password)).toBeTruthy();
     });
 
     // Additional failure scenarios like chatRepository.save failure can be added
