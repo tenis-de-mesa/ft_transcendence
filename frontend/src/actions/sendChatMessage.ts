@@ -8,7 +8,8 @@ export async function sendChatMessage({ request, params }: ActionFunctionArgs) {
   const chatId = params.id;
 
   if (!chatId || !message) {
-    return console.error("Missing Chat ID or message");
+    console.error("Missing Chat ID or message");
+    return null;
   }
 
   const body: NewChatMessage = {
