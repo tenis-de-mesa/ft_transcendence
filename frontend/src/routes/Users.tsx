@@ -28,7 +28,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        })
+        }),
       );
     });
   }, []);
@@ -78,7 +78,7 @@ export default function Users() {
         },
       }),
     ],
-    []
+    [],
   );
 
   return (
