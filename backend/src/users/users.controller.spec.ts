@@ -7,24 +7,6 @@ import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 import { ChatsService } from '../chats/chats.service';
 
-const usersEntityList: UserEntity[] = [
-  new UserEntity({
-    id: 1,
-    login: 'login-1',
-    nickname: 'login-1',
-  } as UserEntity),
-  new UserEntity({
-    id: 2,
-    login: 'login-2',
-    nickname: 'login-2',
-  } as UserEntity),
-  new UserEntity({
-    id: 3,
-    login: 'login-3',
-    nickname: 'login-3',
-  } as UserEntity),
-];
-
 describe('UsersController', () => {
   let app: TestingModule;
   let usersController: UsersController;
