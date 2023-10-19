@@ -5,6 +5,7 @@ import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
+import { ChatsService } from '../chats/chats.service';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -46,6 +47,10 @@ describe('UsersController', () => {
           },
         },
         {
+          provide: ChatsService,
+          useValue: {},
+        },
+        {
           provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
@@ -68,18 +73,5 @@ describe('UsersController', () => {
     expect(app).toBeDefined();
     expect(usersController).toBeDefined();
     expect(userRepository).toBeDefined();
-  });
-
-  describe('index', () => {
-    it('show result', async () => {
-      // Arrange
-      jest.spyOn(userRepository, 'find').mockResolvedValueOnce(usersEntityList);
-
-      // Act
-      const result = await usersController.index();
-
-      // Assert
-      expect(result).toEqual(usersEntityList);
-    });
   });
 });

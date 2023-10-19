@@ -29,7 +29,7 @@ export class UsersController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('/')
-  async index(@User() currentUser: UserEntity) {
+  async findAll(@User() currentUser: UserEntity) {
     const users = await this.usersService.findAll();
 
     const addDirectChatId = async (user: UserEntity) => {

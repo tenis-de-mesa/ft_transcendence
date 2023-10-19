@@ -362,4 +362,30 @@ describe('ChatsService', () => {
       );
     });
   });
+
+  describe('findDirectChatId', () => {
+    it('should find a direct chat between two users', async () => {
+      // Arrange
+      const currentUser = TEST_USER_1;
+      const otherUser = TEST_USER_2;
+      jest.spyOn(chatRepository, 'createQueryBuilder').mockReturnValueOnce({
+        innerJoin: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        having: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValueOnce(TEST_CHAT),
+      } as any);
+
+      // Act
+      const result = await chatsService.findDirectChatId(
+        currentUser,
+        otherUser,
+      );
+
+      // Assert
+      expect(result).toEqual(TEST_CHAT_ID);
+    });
+  });
 });
