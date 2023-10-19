@@ -28,7 +28,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        }),
+        })
       );
     });
   }, []);
@@ -59,17 +59,26 @@ export default function Users() {
       columnHelper.accessor("id", {
         header: "Action",
         cell: (info) => {
+          const user = info.row.original;
           return (
             <div key={info.getValue()}>
-              <Button variant="info" size="sm">
-                <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
-              </Button>
+              {user.directChatId ? (
+                <Button variant="info" size="sm">
+                  <Link to={`/chats/${user.directChatId}`}>
+                    Ir para o chat 💬
+                  </Link>
+                </Button>
+              ) : (
+                <Button variant="info" size="sm">
+                  <Link to={`/chats/new/${user.id}`}>Novo chat 💬</Link>
+                </Button>
+              )}
             </div>
           );
         },
       }),
     ],
-    [],
+    []
   );
 
   return (
