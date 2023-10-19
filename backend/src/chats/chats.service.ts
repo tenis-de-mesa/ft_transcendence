@@ -99,6 +99,42 @@ export class ChatsService {
     });
   }
 
+  async findDirectChatId(
+    currentUser: UserEntity,
+    otherUser: UserEntity,
+  ): Promise<number | null> {
+    if (currentUser.id == otherUser.id) {
+      const selfChat = await this.findSelfChat(currentUser);
+      return selfChat ? selfChat.id : null;
+    }
+
+    const userIds = [currentUser.id, otherUser.id];
+
+    const directChat = await this.chatRepository
+      .createQueryBuilder('chat')
+      .innerJoin('chat.chatMembers', 'chatMember')
+      .select('chat.id')
+      .where('chat.type = :type', { type: ChatType.DIRECT })
+      .andWhere('chatMember.userId IN (:...userIds)', { userIds })
+      .groupBy('chat.id')
+      .having('COUNT(DISTINCT chatMember.userId) = 2')
+      .getOne();
+
+    return directChat ? directChat.id : null;
+  }
+
+  async findSelfChat(user: UserEntity): Promise<ChatEntity | null> {
+    return await this.chatRepository
+      .createQueryBuilder('chat')
+      .innerJoin('chat.chatMembers', 'chatMember')
+      .select('chat.id')
+      .where('chat.type = :type', { type: ChatType.DIRECT })
+      .andWhere('chatMember.userId = :id', { id: user.id })
+      .groupBy('chat.id')
+      .having('COUNT(chatMember.userId) = 1')
+      .getOne();
+  }
+
   mapChatsToChatsWithName(
     chats: ChatEntity[],
     currentUser: UserEntity,
