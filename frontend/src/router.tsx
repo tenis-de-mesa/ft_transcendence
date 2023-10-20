@@ -59,7 +59,7 @@ const router = createBrowserRouter([
         action: createChat,
         children: [
           {
-            path: "with/:id",
+            path: "with/:userId",
             loader: redirectToChat,
           },
           {

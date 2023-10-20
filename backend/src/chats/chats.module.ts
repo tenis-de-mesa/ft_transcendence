@@ -24,6 +24,5 @@ import {
   ],
   controllers: [ChatsController],
   providers: [ChatsService, ChatsGateway, SessionsService],
-  exports: [ChatsService],
 })
 export class ChatsModule {}
