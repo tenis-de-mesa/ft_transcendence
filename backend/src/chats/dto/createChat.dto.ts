@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ChatAccess, ChatType } from '../../core/entities';
+import { ChatType } from '../../core/entities';
 
 export class CreateChatDto {
   @IsArray()
@@ -19,10 +19,6 @@ export class CreateChatDto {
   @IsNotEmpty()
   @IsEnum(ChatType)
   type: ChatType;
-
-  @IsNotEmpty()
-  @IsEnum(ChatAccess)
-  access: ChatAccess;
 
   @IsOptional()
   @IsString()

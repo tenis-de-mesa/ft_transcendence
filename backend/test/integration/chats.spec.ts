@@ -6,7 +6,6 @@ import { UsersService } from '../../src/users/users.service';
 import { ChatsService } from '../../src/chats/chats.service';
 import {
   AuthProvider,
-  ChatAccess,
   ChatEntity,
   ChatType,
   UserEntity,
@@ -54,7 +53,6 @@ describe('Chats', () => {
       chat = await chatsService.create(
         {
           userIds: [user1.id, user2.id],
-          access: ChatAccess.PUBLIC,
           type: ChatType.DIRECT,
         },
         user1,
