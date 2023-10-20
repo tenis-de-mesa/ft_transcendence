@@ -2,37 +2,16 @@ import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import { User } from "../types/types";
 import { Avatar } from "./Avatar";
+import { Input } from "./Input";
+import { Button } from "./Button";
 
 interface UserFormProps {
   user: User;
 }
 
 export default function UserForm({ user }: UserFormProps) {
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
   const [nickname, setNickname] = useState(user.nickname);
   const navigate = useNavigate();
-  const handleUpdateAvatar = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", file);
-    const response = await fetch("http://localhost:3001/users/avatar", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
-    if (!response.ok) {
-      console.error("Failed to upload image");
-      return;
-    }
-    const data = await response.json();
-    setAvatarUrl(data.avatarUrl);
-  };
 
   const update = async (nickname: string) => {
     await fetch("http://localhost:3001/users/", {
@@ -47,38 +26,31 @@ export default function UserForm({ user }: UserFormProps) {
     navigate(".", { replace: true });
   };
   return (
-    <>
+    <Form>
+      <Input
+        disabled
+        label="Login"
+        value={user.login}
+        placeholder=""
+        type="text"
+      />
+      <Input
+        label="Nickname"
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        placeholder=""
+        type="text"
+      />
       <center>
-        <Avatar seed={user.login} src={avatarUrl} />
+        <Button
+          variant="primary"
+          size="sm"
+          className="inline m-2"
+          onClick={() => update(nickname)}
+        >
+          Atualizar
+        </Button>
       </center>
-      <center>
-        <label>
-          Alterar imagem
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleUpdateAvatar}
-            id="file-input"
-            style={{ display: "none" }}
-          />
-        </label>
-      </center>
-      <hr />
-      <Form>
-        <h3>{user.login}</h3>
-        <div>
-          <label>
-            Nickname:
-            <input
-              type="text"
-              name="name"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-            />
-          </label>
-        </div>
-        <button onClick={() => update(nickname)}>Atualizar</button>
-      </Form>
-    </>
+    </Form>
   );
 }

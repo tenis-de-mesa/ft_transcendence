@@ -6,13 +6,14 @@ import "./Profile.css";
 import { Avatar } from "../components/Avatar";
 import { RootUser } from "./Root";
 import { Card } from "../components/Card";
+import { Button } from "../components/Button";
+import { Typography } from "../components/Typography";
+import UserUpdateAvatar from "../components/UserUpdateAvatar";
 
 export default function Profile() {
-  const { id } = useParams();
-
-  const userId = Number(id);
   const currentUser = RootUser();
   const userOther = useLoaderData() as User; // loadUserById
+  const isViewingOwnProfile = currentUser.id === userOther.id;
 
   const flipCard = () => {
     const alternate = document.querySelector(".flip-card .wrapper");
@@ -21,50 +22,60 @@ export default function Profile() {
     }
   };
 
-  return !userId ? (
-    <div className="profile">
-      <div className="flip-card">
-        <div className="wrapper">
+  return (
+    <div className="profile h-full">
+      <div className="flip-card grid">
+        <div className="wrapper self-center">
           <Card className="card back">
-            <UserForm user={currentUser} />
-            <button onClick={flipCard} className="back-button">
+            <Button
+              variant="info"
+              onClick={flipCard}
+              className="absolute top-0 left-0 p-2"
+            >
               Voltar
-            </button>
+            </Button>
+            <Card.Title>
+              <UserUpdateAvatar user={userOther} />
+            </Card.Title>
+            <Card.Body position="left">
+              <UserForm user={userOther} />
+            </Card.Body>
           </Card>
           <Card className="card front">
-            <center>
-              <Avatar seed={currentUser.login} src={currentUser.avatarUrl} />
-              <h1>{currentUser.nickname}</h1>
-              <button onClick={flipCard} className="edit-button">
-                Editar
-              </button>
-            </center>
-            <hr />
-            <p>
-              <strong>Login:</strong> {currentUser.login}
-            </p>
-            <p>
-              <strong>Nickname:</strong> {currentUser.nickname}
-            </p>
-            <Link to={"/logout"}>Sair</Link>
+            <Card.Title>
+              <>
+                <Avatar
+                  seed={userOther.login}
+                  src={userOther.avatarUrl}
+                  className="inline"
+                />
+                <Typography customWeight="regular" variant="h4">
+                  {userOther.nickname}
+                </Typography>
+                {isViewingOwnProfile && (
+                  <Button
+                    variant="info"
+                    onClick={flipCard}
+                    className="absolute top-0 right-0 p-2"
+                  >
+                    Editar
+                  </Button>
+                )}
+              </>
+            </Card.Title>
+            <Card.Body>
+              <Typography customWeight="regular" variant="md">
+                <span className="flex justify-between">
+                  <strong>Login:</strong>
+                  {userOther.login}
+                </span>
+                <span className="flex justify-between">
+                  <strong>Nickname:</strong>
+                  {currentUser.nickname}
+                </span>
+              </Typography>
+            </Card.Body>
           </Card>
-        </div>
-      </div>
-    </div>
-  ) : (
-    <div className="profile">
-      <div className="flip-card">
-        <div className="wrapper">
-          <div className="card front">
-            <center>
-              <Avatar seed={userOther.login} src={userOther.avatarUrl} />
-              <h1>{userOther.nickname}</h1>
-            </center>
-            <hr />
-            <p>
-              <strong>Nickname:</strong> {userOther.nickname}
-            </p>
-          </div>
         </div>
       </div>
     </div>

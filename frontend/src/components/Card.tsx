@@ -8,7 +8,7 @@ const CardWrapper = ({ children, className = "" }) => (
       "block text-center rounded-xl",
       "bg-white dark:bg-gray-800",
       "shadow-xl",
-      className,
+      className
     )}
   >
     {children}
