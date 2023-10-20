@@ -6,6 +6,24 @@ import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 
+const usersEntityList: UserEntity[] = [
+  new UserEntity({
+    id: 1,
+    login: 'login-1',
+    nickname: 'login-1',
+  } as UserEntity),
+  new UserEntity({
+    id: 2,
+    login: 'login-2',
+    nickname: 'login-2',
+  } as UserEntity),
+  new UserEntity({
+    id: 3,
+    login: 'login-3',
+    nickname: 'login-3',
+  } as UserEntity),
+];
+
 describe('UsersController', () => {
   let app: TestingModule;
   let usersController: UsersController;
@@ -50,5 +68,18 @@ describe('UsersController', () => {
     expect(app).toBeDefined();
     expect(usersController).toBeDefined();
     expect(userRepository).toBeDefined();
+  });
+
+  describe('index', () => {
+    it('show result', async () => {
+      // Arrange
+      jest.spyOn(userRepository, 'find').mockResolvedValueOnce(usersEntityList);
+
+      // Act
+      const result = await usersController.index();
+
+      // Assert
+      expect(result).toEqual(usersEntityList);
+    });
   });
 });
