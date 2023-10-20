@@ -18,31 +18,14 @@ import { User } from '../core/decorators';
 import { UpdateUserDto } from './dto';
 import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ChatsService } from '../chats/chats.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly chatsService: ChatsService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthenticatedGuard)
   @Get('/')
-  async findAll(@User() currentUser: UserEntity) {
-    const users = await this.usersService.findAll();
-
-    const addDirectChatId = async (user: UserEntity) => {
-      const directChatId = await this.chatsService.findDirectChatId(
-        currentUser,
-        user,
-      );
-      return { ...user, directChatId: directChatId };
-    };
-
-    const usersWithChatId = await Promise.all(users.map(addDirectChatId));
-
-    return usersWithChatId;
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
   @Post('/')

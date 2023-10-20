@@ -6,6 +6,7 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard } from '../auth/guards';
@@ -22,6 +23,14 @@ export class ChatsController {
   async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
     const chats = await this.chatsService.findAll(user);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
+  }
+
+  @Get('with/:userId')
+  async findWith(
+    @Param('userId', ParseIntPipe) userId: number,
+    @User() user: UserEntity,
+  ): Promise<ChatEntity> {
+    return await this.chatsService.findDirectChat(user, userId);
   }
 
   @Post()

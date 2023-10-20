@@ -5,7 +5,6 @@ import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
-import { ChatsService } from '../chats/chats.service';
 
 describe('UsersController', () => {
   let app: TestingModule;
@@ -27,10 +26,6 @@ describe('UsersController', () => {
             update: jest.fn(),
             findOne: jest.fn(),
           },
-        },
-        {
-          provide: ChatsService,
-          useValue: {},
         },
         {
           provide: getRepositoryToken(SessionEntity),

@@ -99,17 +99,25 @@ export class ChatsService {
     });
   }
 
-  async findDirectChatId(
+  async findDirectChat(
     currentUser: UserEntity,
-    otherUser: UserEntity,
-  ): Promise<number | null> {
+    otherUserId: number,
+  ): Promise<ChatEntity> {
+    const otherUser = await this.userRepository.findOneBy({
+      id: otherUserId,
+    });
+    if (!otherUser) {
+      throw new NotFoundException('User not found');
+    }
     if (currentUser.id == otherUser.id) {
       const selfChat = await this.findSelfChat(currentUser);
-      return selfChat ? selfChat.id : null;
+      if (!selfChat) {
+        throw new NotFoundException('Self chat not found');
+      }
+      return this.findOne(selfChat.id);
     }
 
     const userIds = [currentUser.id, otherUser.id];
-
     const directChat = await this.chatRepository
       .createQueryBuilder('chat')
       .innerJoin('chat.chatMembers', 'chatMember')
@@ -120,7 +128,11 @@ export class ChatsService {
       .having('COUNT(DISTINCT chatMember.userId) = 2')
       .getOne();
 
-    return directChat ? directChat.id : null;
+    if (!directChat) {
+      throw new NotFoundException('Direct chat not found');
+    }
+    // Return the chat with relations
+    return this.findOne(directChat.id);
   }
 
   async findSelfChat(user: UserEntity): Promise<ChatEntity | null> {
@@ -139,10 +151,17 @@ export class ChatsService {
     chats: ChatEntity[],
     currentUser: UserEntity,
   ): ChatWithName[] {
-    return chats.map((chat) => ({
+    return chats.map((chat) => this.mapChatToChatWithName(chat, currentUser));
+  }
+
+  mapChatToChatWithName(
+    chat: ChatEntity,
+    currentUser: UserEntity,
+  ): ChatWithName {
+    return {
       ...chat,
       name: this.generateChatName(chat.users, currentUser),
-    }));
+    };
   }
 
   private generateChatName(
@@ -160,7 +179,7 @@ export class ChatsService {
 
   async findOne(id: number): Promise<ChatEntity> {
     // TODO: filter all data user from only userid
-
+    if (!id) throw new BadRequestException('Chat id is required');
     const chat = await this.chatRepository.findOne({
       relations: ['users', 'messages', 'messages.sender'],
       where: { id: id },
