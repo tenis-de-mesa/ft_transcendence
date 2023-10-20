@@ -6,14 +6,17 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
+  Patch,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
-import { AuthenticatedGuard } from '../auth/guards';
-import { User } from '../core/decorators';
-import { ChatEntity, UserEntity } from '../core/entities';
-import { CreateChatDto, ChatWithName } from './dto';
+import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
+import { ChannelRoles, User } from '../core/decorators';
+import { ChatEntity, ChatMemberRole, UserEntity } from '../core/entities';
+import { CreateChatDto, ChatWithName, UpdateChatDto } from './dto';
 
-@UseGuards(AuthenticatedGuard)
+@UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
 export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}
@@ -32,8 +35,18 @@ export class ChatsController {
     return await this.chatsService.create(dto, user);
   }
 
+  @Patch(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateChatDto,
+  ): Promise<void> {
+    return await this.chatsService.update(id, dto);
+  }
+
   @Get(':id')
-  async show(@Param('id', ParseIntPipe) id: number) {
+  async show(@Param('id', ParseIntPipe) id: number): Promise<ChatEntity> {
     return await this.chatsService.findOne(id);
   }
 }

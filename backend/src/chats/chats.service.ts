@@ -15,7 +15,12 @@ import {
   ChatType,
   ChatAccess,
 } from '../core/entities';
-import { CreateChatDto, ChatWithName, CreateMessageDto } from './dto';
+import {
+  CreateChatDto,
+  ChatWithName,
+  CreateMessageDto,
+  UpdateChatDto,
+} from './dto';
 
 @Injectable()
 export class ChatsService {
@@ -89,7 +94,7 @@ export class ChatsService {
     });
 
     users.map(async (user) => {
-      if (user.id !== creator.id) {
+      if (user.id === creator.id) {
         return;
       }
       await this.chatMemberRepository.save({ user, chat });
@@ -100,6 +105,22 @@ export class ChatsService {
       user: creator,
       role: ChatMemberRole.OWNER,
     });
+
+    return chat;
+  }
+
+  async findOne(id: number): Promise<ChatEntity> {
+    // TODO: filter all data user from only userid
+
+    const chat = await this.chatRepository.findOne({
+      relations: { users: true, messages: { sender: true } },
+      where: { id },
+      order: { messages: { createdAt: 'ASC' } },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
 
     return chat;
   }
@@ -115,6 +136,17 @@ export class ChatsService {
       relations: { users: { user: true } },
       where: { id: In(chatIds) },
     });
+  }
+
+  async update(id: number, dto: UpdateChatDto): Promise<void> {
+    const chat = await this.findOne(id);
+
+    const { password } = dto;
+
+    chat.password = password ? await argon2.hash(password) : chat.password;
+    chat.access = password ? ChatAccess.PROTECTED : chat.access;
+
+    await this.chatRepository.save(chat);
   }
 
   mapChatsToChatsWithName(
@@ -140,22 +172,6 @@ export class ChatsService {
     }
     const names = otherUsers.map((user) => user.nickname);
     return names.join(', ');
-  }
-
-  async findOne(id: number): Promise<ChatEntity> {
-    // TODO: filter all data user from only userid
-
-    const chat = await this.chatRepository.findOne({
-      relations: { users: true, messages: { sender: true } },
-      where: { id },
-      order: { messages: { createdAt: 'ASC' } },
-    });
-
-    if (!chat) {
-      throw new NotFoundException('Chat not found');
-    }
-
-    return chat;
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
