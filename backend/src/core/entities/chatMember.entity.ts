@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserEntity, ChatEntity } from '.';
 
 export enum ChatMemberRole {
@@ -15,10 +22,13 @@ export enum ChatMemberStatus {
 
 @Entity({ name: 'members' })
 export class ChatMemberEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   userId: number;
 
-  @PrimaryColumn()
+  @Column()
   chatId: number;
 
   @Column({
@@ -35,13 +45,13 @@ export class ChatMemberEntity {
   })
   status: ChatMemberStatus;
 
-  @ManyToOne(() => UserEntity, (user) => user.chatMembers, {
+  @ManyToOne(() => UserEntity, (user) => user.chats, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: UserEntity;
 
-  @ManyToOne(() => ChatEntity, (chat) => chat.chatMembers, {
+  @ManyToOne(() => ChatEntity, (chat) => chat.users, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'chatId', referencedColumnName: 'id' })

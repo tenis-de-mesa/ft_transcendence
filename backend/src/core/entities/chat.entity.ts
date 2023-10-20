@@ -40,11 +40,8 @@ export class ChatEntity {
   @Column({ nullable: true })
   password: string;
 
-  @ManyToMany(() => UserEntity, (user) => user.chats)
-  users: UserEntity[];
-
   @OneToMany(() => ChatMemberEntity, (member) => member.chat)
-  chatMembers: ChatMemberEntity[];
+  users: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
@@ -55,7 +52,6 @@ export class ChatEntity {
     this.access = chat?.access;
     this.password = chat?.password;
     this.users = chat?.users;
-    this.chatMembers = chat?.chatMembers;
     this.messages = chat?.messages;
   }
 }

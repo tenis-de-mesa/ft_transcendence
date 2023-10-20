@@ -155,13 +155,25 @@ describe('ChatsService', () => {
         type: ChatType.DIRECT,
         access: ChatAccess.PRIVATE,
       };
+
+      const mockMember = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.MEMBER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
       const mockChat = new ChatEntity({
-        id: 2,
-        users: [TEST_USER_1],
+        id: TEST_CHAT_ID,
+        users: [mockMember],
       } as ChatEntity);
+
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1]);
       jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockMember);
 
       // Act
       const result = await chatsService.create(createChatDto, TEST_USER_1);
@@ -177,15 +189,35 @@ describe('ChatsService', () => {
         type: ChatType.DIRECT,
         access: ChatAccess.PRIVATE,
       };
+
+      const mockMember1 = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.MEMBER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      const mockMember2 = new ChatMemberEntity({
+        userId: TEST_USER_ID_2,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.MEMBER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
       const mockChat = new ChatEntity({
-        id: 2,
-        users: [TEST_USER_1],
+        id: TEST_CHAT_ID,
+        users: [mockMember1, mockMember2],
       } as ChatEntity);
+
       jest
         .spyOn(userRepository, 'findBy')
         .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
       jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockMember1)
+        .mockResolvedValueOnce(mockMember2);
 
       // Act
       const result = await chatsService.create(createChatDto, TEST_USER_1);
@@ -236,24 +268,24 @@ describe('ChatsService', () => {
         access: ChatAccess.PUBLIC,
       };
 
-      const mockChat = new ChatEntity({
-        id: 2,
-        users: [TEST_USER_1],
-      } as ChatEntity);
-
-      const mockChatMember = new ChatMemberEntity({
+      const mockMember = new ChatMemberEntity({
         userId: TEST_USER_ID_1,
-        chatId: mockChat.id,
+        chatId: TEST_CHAT_ID,
         role: ChatMemberRole.OWNER,
         status: ChatMemberStatus.ACTIVE,
       });
+
+      const mockChat = new ChatEntity({
+        id: TEST_CHAT_ID,
+        users: [mockMember],
+      } as ChatEntity);
 
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1]);
       jest.spyOn(chatRepository, 'create').mockReturnValue(mockChat);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
       jest
         .spyOn(chatMemberRepository, 'save')
-        .mockResolvedValueOnce(mockChatMember);
+        .mockResolvedValueOnce(mockMember);
 
       // Act
       const result = await chatsService.create(dto, TEST_USER_1);
@@ -270,17 +302,24 @@ describe('ChatsService', () => {
         access: ChatAccess.PUBLIC,
       };
 
-      const mockChat = new ChatEntity({
-        id: 2,
-        users: [TEST_USER_1, TEST_USER_2],
-      } as ChatEntity);
-
-      const mockChatMember = new ChatMemberEntity({
+      const mockMember1 = new ChatMemberEntity({
         userId: TEST_USER_ID_1,
-        chatId: mockChat.id,
+        chatId: TEST_CHAT_ID,
         role: ChatMemberRole.OWNER,
         status: ChatMemberStatus.ACTIVE,
       });
+
+      const mockMember2 = new ChatMemberEntity({
+        userId: TEST_USER_ID_2,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.MEMBER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      const mockChat = new ChatEntity({
+        id: TEST_CHAT_ID,
+        users: [mockMember1, mockMember2],
+      } as ChatEntity);
 
       jest
         .spyOn(userRepository, 'findBy')
@@ -289,7 +328,8 @@ describe('ChatsService', () => {
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
       jest
         .spyOn(chatMemberRepository, 'save')
-        .mockResolvedValueOnce(mockChatMember);
+        .mockResolvedValueOnce(mockMember1)
+        .mockResolvedValueOnce(mockMember2);
 
       // Act
       const result = await chatsService.create(dto, TEST_USER_1);
@@ -325,29 +365,39 @@ describe('ChatsService', () => {
         userIds: [TEST_USER_ID_1, TEST_USER_ID_2],
       };
 
+      const mockMember1 = new ChatMemberEntity({
+        userId: TEST_USER_ID_1,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.OWNER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
+      const mockMember2 = new ChatMemberEntity({
+        userId: TEST_USER_ID_2,
+        chatId: TEST_CHAT_ID,
+        role: ChatMemberRole.MEMBER,
+        status: ChatMemberStatus.ACTIVE,
+      });
+
       const mockChat = new ChatEntity({
         id: 1,
-        users: [TEST_USER_1, TEST_USER_2],
+        users: [mockMember1, mockMember2],
         type: ChatType.CHANNEL,
         access: ChatAccess.PROTECTED,
         password: await argon.hash(password),
       } as ChatEntity);
 
-      const mockChatMember = new ChatMemberEntity({
-        userId: TEST_USER_ID_1,
-        chatId: mockChat.id,
-        role: ChatMemberRole.OWNER,
-        status: ChatMemberStatus.ACTIVE,
-      });
-
-      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
+      jest
+        .spyOn(userRepository, 'findBy')
+        .mockResolvedValueOnce([TEST_USER_1, TEST_USER_2]);
       jest.spyOn(chatRepository, 'save').mockResolvedValueOnce(mockChat);
-      jest.spyOn(chatMemberRepository, 'save').mockResolvedValueOnce(mockChatMember);
+      jest
+        .spyOn(chatMemberRepository, 'save')
+        .mockResolvedValueOnce(mockMember1)
+        .mockResolvedValueOnce(mockMember2);
 
       // Act
       const result = await chatsService.create(dto, TEST_USER_1);
-
-      console.log({chat:result});
 
       // Assert
       expect(result.type).toStrictEqual(ChatType.CHANNEL);

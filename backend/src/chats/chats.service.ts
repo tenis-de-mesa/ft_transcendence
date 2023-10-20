@@ -35,10 +35,7 @@ export class ChatsService {
 
   async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
     // Add creator user to the userIds
-    const userIds = [...new Set(dto.userIds)];
-    if (!userIds.includes(creator.id)) {
-      userIds.push(creator.id);
-    }
+    const userIds = [...new Set([...dto.userIds, creator.id])];
 
     // Check if all users in userIds exist
     const users = await this.userRepository.findBy({ id: In(userIds) });
@@ -59,7 +56,7 @@ export class ChatsService {
   }
 
   private async createDirectChat(
-    dto: CreateChatDto,
+    { message }: CreateChatDto,
     users: UserEntity[],
     creator: UserEntity,
   ): Promise<ChatEntity> {
@@ -67,32 +64,40 @@ export class ChatsService {
       throw new BadRequestException('Direct chats can have at most 2 users');
     }
 
-    return await this.chatRepository.save({
-      users,
+    const chat = await this.chatRepository.save({
       type: ChatType.DIRECT,
       access: ChatAccess.PRIVATE,
-      messages: dto.message
-        ? [{ sender: creator, content: dto.message }]
-        : undefined,
+      messages: message ? [{ sender: creator, content: message }] : undefined,
     });
+
+    users.map(async (user) => {
+      await this.chatMemberRepository.save({ user, chat });
+    });
+
+    return chat;
   }
 
   private async createChannelChat(
-    dto: CreateChatDto,
+    { password }: CreateChatDto,
     users: UserEntity[],
     creator: UserEntity,
   ): Promise<ChatEntity> {
     const chat = await this.chatRepository.save({
-      users,
       type: ChatType.CHANNEL,
-      access: dto.password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
-      password: dto.password ? await argon2.hash(dto.password) : undefined,
-      // chatMembers: [{ userId: creator.id, role: ChatMemberRole.OWNER }],
+      access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
+      password: password ? await argon2.hash(password) : undefined,
+    });
+
+    users.map(async (user) => {
+      if (user.id !== creator.id) {
+        return;
+      }
+      await this.chatMemberRepository.save({ user, chat });
     });
 
     await this.chatMemberRepository.save({
-      userId: creator.id,
-      chatId: chat.id,
+      chat,
+      user: creator,
       role: ChatMemberRole.OWNER,
     });
 
@@ -101,23 +106,14 @@ export class ChatsService {
 
   async findAll(user: UserEntity): Promise<ChatEntity[]> {
     const chatsWithoutUsersRelation = await this.chatRepository.find({
-      relations: {
-        users: true,
-      },
-      where: {
-        users: {
-          id: user.id,
-        },
-      },
+      where: { users: { userId: user.id } },
     });
+
     const chatIds = chatsWithoutUsersRelation.map((chat) => chat.id);
+
     return await this.chatRepository.find({
-      relations: {
-        users: true,
-      },
-      where: {
-        id: In(chatIds),
-      },
+      relations: { users: { user: true } },
+      where: { id: In(chatIds) },
     });
   }
 
@@ -125,10 +121,12 @@ export class ChatsService {
     chats: ChatEntity[],
     currentUser: UserEntity,
   ): ChatWithName[] {
-    return chats.map((chat) => ({
-      ...chat,
-      name: this.generateChatName(chat.users, currentUser),
-    }));
+    return chats.map((chat) => {
+      const members = chat.users.map((member) => member.user);
+      const name = this.generateChatName(members, currentUser);
+
+      return { ...chat, name };
+    });
   }
 
   private generateChatName(
@@ -148,16 +146,15 @@ export class ChatsService {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
-      relations: ['users', 'messages', 'messages.sender'],
-      where: { id: id },
-      order: {
-        messages: {
-          createdAt: 'ASC',
-        },
-      },
+      relations: { users: true, messages: { sender: true } },
+      where: { id },
+      order: { messages: { createdAt: 'ASC' } },
     });
 
-    if (!chat) throw new NotFoundException('Chat not found');
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
     return chat;
   }
 
