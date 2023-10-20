@@ -380,6 +380,7 @@ describe('ChatsService', () => {
       jest
         .spyOn(userRepository, 'findOneBy')
         .mockResolvedValueOnce(TEST_USER_2);
+      jest.spyOn(chatsService, 'findOne').mockResolvedValueOnce(TEST_CHAT);
 
       // Act
       const result = await chatsService.findDirectChat(
