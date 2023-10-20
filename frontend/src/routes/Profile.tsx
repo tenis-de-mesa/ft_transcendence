@@ -1,21 +1,18 @@
-import {
-  Link,
-  useLoaderData,
-  useParams,
-  useRouteLoaderData,
-} from "react-router-dom";
+import { Link, useLoaderData, useParams } from "react-router-dom";
 import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
 import "./Profile.css";
 import { Avatar } from "../components/Avatar";
+import { RootUser } from "./Root";
+import { Card } from "../components/Card";
 
 export default function Profile() {
   const { id } = useParams();
 
   const userId = Number(id);
-  const userMe = useRouteLoaderData("root") as User;
-  const userOther = useLoaderData() as User;
+  const currentUser = RootUser();
+  const userOther = useLoaderData() as User; // loadUserById
 
   const flipCard = () => {
     const alternate = document.querySelector(".flip-card .wrapper");
@@ -28,29 +25,29 @@ export default function Profile() {
     <div className="profile">
       <div className="flip-card">
         <div className="wrapper">
-          <div className="card back">
-            <UserForm user={userMe} />
+          <Card className="card back">
+            <UserForm user={currentUser} />
             <button onClick={flipCard} className="back-button">
               Voltar
             </button>
-          </div>
-          <div className="card front">
+          </Card>
+          <Card className="card front">
             <center>
-              <Avatar seed={userMe.login} src={userMe.avatarUrl} />
-              <h1>{userMe.nickname}</h1>
+              <Avatar seed={currentUser.login} src={currentUser.avatarUrl} />
+              <h1>{currentUser.nickname}</h1>
               <button onClick={flipCard} className="edit-button">
                 Editar
               </button>
             </center>
             <hr />
             <p>
-              <strong>Login:</strong> {userMe.login}
+              <strong>Login:</strong> {currentUser.login}
             </p>
             <p>
-              <strong>Nickname:</strong> {userMe.nickname}
+              <strong>Nickname:</strong> {currentUser.nickname}
             </p>
             <Link to={"/logout"}>Sair</Link>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

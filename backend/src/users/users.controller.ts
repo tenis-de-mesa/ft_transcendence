@@ -61,10 +61,10 @@ export class UsersController {
     return this.usersService.deleteUser(id);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('/friends')
-  async getUserFriends(@Request() req: any) {
-    const currentUser = req.user;
-    return this.usersService.getUserFriends(currentUser);
+  async getUserFriends(@User() user: UserEntity) {
+    return this.usersService.getUserFriends(user);
   }
 
   @UseGuards(AuthenticatedGuard)
