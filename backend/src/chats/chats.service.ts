@@ -151,17 +151,10 @@ export class ChatsService {
     chats: ChatEntity[],
     currentUser: UserEntity,
   ): ChatWithName[] {
-    return chats.map((chat) => this.mapChatToChatWithName(chat, currentUser));
-  }
-
-  mapChatToChatWithName(
-    chat: ChatEntity,
-    currentUser: UserEntity,
-  ): ChatWithName {
-    return {
+    return chats.map((chat) => ({
       ...chat,
       name: this.generateChatName(chat.users, currentUser),
-    };
+    }));
   }
 
   private generateChatName(
@@ -179,7 +172,7 @@ export class ChatsService {
 
   async findOne(id: number): Promise<ChatEntity> {
     // TODO: filter all data user from only userid
-    if (!id) throw new BadRequestException('Chat id is required');
+
     const chat = await this.chatRepository.findOne({
       relations: ['users', 'messages', 'messages.sender'],
       where: { id: id },

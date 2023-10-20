@@ -6,7 +6,6 @@ import {
   Param,
   UseGuards,
   ParseIntPipe,
-  NotFoundException,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard } from '../auth/guards';

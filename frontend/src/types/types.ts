@@ -9,7 +9,6 @@ export type User = {
   status: string;
   nickname: string;
   avatarUrl: string;
-  directChatId: number;
 };
 
 export type Message = {
