@@ -1,5 +1,5 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -7,7 +7,11 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
+import { LuUserX } from "react-icons/lu";
 import { Input } from "../components/Input";
+import { blockUser } from "../actions/blockUser";
+
+// LuUserCheck2
 
 export default function Chat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +20,8 @@ export default function Chat() {
   const refMessages = useRef(null);
 
   let lastUser: User | null = null;
+
+  const userMe = useRouteLoaderData("root") as User;
 
   const [chat, setChat] = useState(useLoaderData() as Chat);
   const [newMessage, setNewMessage] = useState("");
@@ -64,6 +70,21 @@ export default function Chat() {
                     <Typography variant="h6">
                       <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
                     </Typography>
+
+                    {
+                      userMe.id != user?.id && (
+                        <Button
+                          IconOnly={<LuUserX />}
+                          size="md"
+                          variant="error"
+                          onClick={() => {
+                            setIsOpen(false);
+                            blockUser(user?.id)
+                          }}
+                        />
+                      )
+                    }
+
                     <Button
                       IconOnly={<AiFillCloseCircle />}
                       size="md"
