@@ -52,6 +52,9 @@ export class UsersService {
     userId: number,
     userBlockedId: number,
   ): Promise<BlockListEntity> {
+    if (userId === userBlockedId) {
+      return null;
+    }
     return await this.blockListRepository.save({ userId, userBlockedId });
   }
 
