@@ -4,6 +4,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,8 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(SessionEntity)
     private readonly sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(BlockListEntity)
+    private readonly blockListRepository: Repository<BlockListEntity>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
@@ -43,6 +46,13 @@ export class UsersService {
 
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async blockUserById(
+    userId: number,
+    userBlockedId: number,
+  ): Promise<BlockListEntity> {
+    return await this.blockListRepository.save({ userId, userBlockedId });
   }
 
   async killAllSessionsByUserId(

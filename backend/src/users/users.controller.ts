@@ -56,6 +56,15 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get('block/:id')
+  async blockUser(
+    @User() user: UserEntity,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.usersService.blockUserById(user.id, id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
