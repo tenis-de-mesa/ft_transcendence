@@ -65,6 +65,15 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get('unblock/:id')
+  async unblockUser(
+    @User() user: UserEntity,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.usersService.unblockUserById(user.id, id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);

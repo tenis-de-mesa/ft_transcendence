@@ -58,6 +58,10 @@ export class UsersService {
     return await this.blockListRepository.save({ userId, userBlockedId });
   }
 
+  async unblockUserById(userId: number, userBlockedId: number): Promise<void> {
+    await this.blockListRepository.delete({ userId, userBlockedId });
+  }
+
   async killAllSessionsByUserId(
     userId: number,
     exceptIds: string[] = [],
