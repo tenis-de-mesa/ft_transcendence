@@ -66,8 +66,8 @@ const Table = ({ columns, data }: TableProps) => {
                           asc: <FaSortUp size={10} />,
                           desc: <FaSortDown size={10} />,
                         }[header.column.getIsSorted() as string] ?? (
-                          <FaSort size={10} />
-                        )}
+                            <FaSort size={10} />
+                          )}
                       </div>
                     )}
                   </th>
@@ -100,7 +100,7 @@ const Table = ({ columns, data }: TableProps) => {
 
 const Pagination = ({ table }: { table: Table<Data> }) => {
   return (
-    <div className="flex items-center justify-between w-full h-10 gap-2 px-0.5 text-gray-700 bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
+    <div className="py-6 flex items-center justify-between w-full h-10 gap-2 px-0.5 text-gray-700 bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
       <div className="flex items-center gap-5 pl-5 text-sm select-none">
         <button
           className={classNames(
