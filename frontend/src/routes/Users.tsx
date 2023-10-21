@@ -50,8 +50,8 @@ export default function Users() {
             </div>
           ) : (
             <div className="flex items-center">
-              <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
-              <span className="text-error-500">Offline</span>
+              <div className="h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></div>
+              <span className="text-gray-500">Offline</span>
             </div>
           );
         },
