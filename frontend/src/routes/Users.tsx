@@ -76,7 +76,7 @@ export default function Users() {
     <>
       <Typography variant="h5">Users</Typography>
 
-      <div className="h-[92%]">
+      <div className="h-[92%] mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
           data={users as unknown as Data[]}
