@@ -7,7 +7,11 @@ export async function sendChatMessage({ request, params }: ActionFunctionArgs) {
   const message = formData.get("message") as string;
   const chatId = params.id;
 
-  if (!chatId || !message) {
+  if (!message) {
+    return null;
+  }
+
+  if (!chatId) {
     console.error("Missing Chat ID or message");
     return null;
   }
