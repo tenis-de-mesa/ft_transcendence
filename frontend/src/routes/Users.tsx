@@ -8,6 +8,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import Table from "../components/Table";
+import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
 
 const columnHelper = createColumnHelper<User>();
@@ -62,7 +63,7 @@ export default function Users() {
           return (
             <div key={info.getValue()}>
               <Button variant="info" size="sm">
-                <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
+                <Link to={`/chats/new/${info.getValue()}`}>Chat<BsFillChatDotsFill /></Link>
               </Button>
             </div>
           );
