@@ -1,4 +1,11 @@
-import { CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import {
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
+import { UserEntity } from './user.entity';
 
 @Entity({ name: 'blockList' })
 export class BlockListEntity {
@@ -10,6 +17,14 @@ export class BlockListEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => UserEntity, (user) => user.id)
+  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+  userBlocker: UserEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.id)
+  @JoinColumn({ name: 'userBlockedId', referencedColumnName: 'id' })
+  userBlocked: UserEntity;
 
   constructor(blockList?: BlockListEntity) {
     this.userId = blockList?.userId;
