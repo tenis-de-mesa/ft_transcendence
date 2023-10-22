@@ -7,11 +7,9 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { LuUserX } from "react-icons/lu";
+import { LuUserX, LuUserCheck2 } from "react-icons/lu";
 import { Input } from "../components/Input";
-import { blockUser } from "../actions/blockUser";
-
-// LuUserCheck2
+import { blockUser, unblockUser } from "../actions/blockUser";
 
 export default function Chat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,9 +25,20 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const chatId = chat.id;
 
+  const members = chat.users.map((user) => user.id)
+  const isBlocked: boolean = chat.type == "direct" && userMe.userBlocked.find((user) => members.includes(user.userId)) !== undefined;
+
+  console.log(isBlocked)
+
   const handleSubmitNewMessage = () => {
     setNewMessage("");
   };
+
+  const checkUserIsBlocked = (userBlockedId: number) => {
+    console.log(userBlockedId)
+    console.log(userMe)
+    return userMe.userBlocker.find((user) => user.userBlockedId == userBlockedId) !== undefined;
+  }
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -72,16 +81,28 @@ export default function Chat() {
                     </Typography>
 
                     {
-                      userMe.id != user?.id && (
-                        <Button
-                          IconOnly={<LuUserX />}
-                          size="md"
-                          variant="error"
-                          onClick={() => {
-                            setIsOpen(false);
-                            blockUser(user?.id)
-                          }}
-                        />
+                      userMe.id != user?.id && chat.type == "direct" && (
+                        !checkUserIsBlocked(user?.id) ? (
+                          <Button
+                            IconOnly={<LuUserX />}
+                            size="md"
+                            variant="error"
+                            onClick={() => {
+                              setIsOpen(false);
+                              blockUser(user?.id);
+                            }}
+                          />
+                        ) : (
+                          <Button
+                            IconOnly={<LuUserCheck2 />}
+                            size="md"
+                            variant="success"
+                            onClick={() => {
+                              setIsOpen(false);
+                              unblockUser(user?.id);
+                            }}
+                          />
+                        )
                       )
                     }
 
@@ -153,6 +174,7 @@ export default function Chat() {
                 name="message"
                 placeholder="Enter your message"
                 onChange={(e) => setNewMessage(e.target.value)}
+                {...(isBlocked && { disabled: true })}
               />
             </Form>
           </div>
