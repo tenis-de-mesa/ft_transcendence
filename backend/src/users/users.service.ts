@@ -62,6 +62,10 @@ export class UsersService {
     await this.blockListRepository.delete({ userId, userBlockedId });
   }
 
+  async getBlockedUsers(userId: number): Promise<BlockListEntity[]> {
+    return await this.blockListRepository.findBy({ userId });
+  }
+
   async killAllSessionsByUserId(
     userId: number,
     exceptIds: string[] = [],
