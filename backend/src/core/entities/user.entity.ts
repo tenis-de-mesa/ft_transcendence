@@ -118,10 +118,10 @@ export class UserEntity {
   messages: MessageEntity[];
 
   @OneToMany(() => BlockListEntity, (block) => block.userBlocker)
-  userBlocker: BlockListEntity;
+  userBlocker: BlockListEntity[];
 
   @OneToMany(() => BlockListEntity, (block) => block.userBlocked)
-  userBlocked: BlockListEntity;
+  userBlocked: BlockListEntity[];
 
   constructor(user?: UserEntity) {
     this.id = user?.id;

@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -140,10 +142,26 @@ export class ChatsService {
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
-    const findUserPromise = this.userRepository.findOneBy({ id: dto.senderId });
-    const findChatPromise = this.chatRepository.findOneBy({ id: dto.chatId });
+    const findUserPromise = this.userRepository.findOne({
+      relations: ['userBlocked'],
+      where: { id: dto.senderId },
+    });
+    const findChatPromise = this.chatRepository.findOne({
+      relations: ['chatMembers'],
+      where: { id: dto.chatId },
+    });
 
     const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
+
+    if (chat.type == ChatType.DIRECT) {
+      const blockedList = user.userBlocked.map((block) => block.userId);
+      const membersList = chat.chatMembers.map((member) => member.userId);
+      for (const member of membersList) {
+        if (blockedList.includes(member)) {
+          throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
+        }
+      }
+    }
 
     if (!chat) {
       throw new NotFoundException('Chat not found');

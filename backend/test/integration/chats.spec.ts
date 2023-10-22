@@ -114,4 +114,55 @@ describe('Chats', () => {
       });
     });
   });
+  describe('blocked user messages', () => {
+    it('check messages', async () => {
+      // Arrange
+      const user1 = await usersService.createUser({
+        login: 'user1',
+        provider: AuthProvider.GUEST,
+      });
+      const user2 = await usersService.createUser({
+        login: 'user2',
+        provider: AuthProvider.GUEST,
+      });
+      const chat = await chatsService.create(
+        {
+          userIds: [user1.id, user2.id],
+          access: ChatAccess.PUBLIC,
+          type: ChatType.DIRECT,
+        },
+        user1,
+      );
+      await chatsService.addMessage({
+        content: 'message 1',
+        chatId: chat.id,
+        senderId: user1.id,
+      });
+      await usersService.blockUserById(user1.id, user2.id);
+      try {
+        await chatsService.addMessage({
+          content: 'message 2',
+          chatId: chat.id,
+          senderId: user2.id,
+        });
+      } catch (e) {}
+      await chatsService.addMessage({
+        content: 'message 3',
+        chatId: chat.id,
+        senderId: user1.id,
+      });
+      await usersService.unblockUserById(user1.id, user2.id);
+      await chatsService.addMessage({
+        content: 'message 4',
+        chatId: chat.id,
+        senderId: user2.id,
+      });
+      // Act
+      const { messages } = await chatsService.findOne(chat.id);
+      // Assert
+      expect(messages[0].content).toEqual('message 1');
+      expect(messages[1].content).toEqual('message 3');
+      expect(messages[2].content).toEqual('message 4');
+    });
+  });
 });
