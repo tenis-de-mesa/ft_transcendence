@@ -153,7 +153,7 @@ export class ChatsService {
 
     const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
 
-    if (chat.type == ChatType.DIRECT) {
+    if (chat?.type == ChatType.DIRECT) {
       const blockedList = user.userBlocked.map((block) => block.userId);
       const membersList = chat.chatMembers.map((member) => member.userId);
       for (const member of membersList) {
