@@ -18,11 +18,15 @@ export class BlockListEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   userBlocker: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userBlockedId', referencedColumnName: 'id' })
   userBlocked: UserEntity;
 
