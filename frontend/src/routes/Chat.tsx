@@ -99,8 +99,8 @@ export default function Chat() {
                   {showAvatar && (
                     <div className="flex gap-4 mt-5">
                       <Avatar
-                        seed={message.sender.login}
-                        src={message.sender.avatarUrl}
+                        seed={message.sender?.login}
+                        src={message.sender?.avatarUrl}
                         size="sm"
                       />
                       <div
@@ -111,7 +111,7 @@ export default function Chat() {
                         className="cursor-pointer"
                       >
                         <Typography variant="h6">
-                          {message.sender?.nickname}
+                          {message.sender?.nickname ?? "Deleted user"}
                         </Typography>
                       </div>
                     </div>

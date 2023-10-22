@@ -3,12 +3,15 @@ import { ActionFunctionArgs, redirect } from "react-router-dom";
 export async function createChannel({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const userIds: number[] = formData.getAll("users[]").map((id) => Number(id));
+  const password: string = formData.get("password") as string;
   const url = "http://localhost:3001/chats";
   const body = {
     userIds,
     type: "channel",
-    access: "public",
+    password: password ?? undefined,
   };
+
+  console.log({body})
 
   const result = await fetch(url, {
     method: "POST",

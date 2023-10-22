@@ -17,6 +17,8 @@ export default function Chats() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [hasPassword, setHasPassword] = useState(false);
+  const [password, setPassword] = useState("");
 
   // Function to toggle user selection
   const toggleUserSelection = (userId: number) => {
@@ -29,7 +31,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Close dialog, clear search and selected users on submit
@@ -37,6 +39,8 @@ export default function Chats() {
     setIsOpen(false);
     setSearchTerm("");
     setSelectedUsers([]);
+    setHasPassword(false);
+    setPassword("");
   };
 
   // Add event listener to close new channel dialog when clicking outside of it
@@ -148,10 +152,44 @@ export default function Chats() {
                             name="users[]"
                             value={currentUser.id}
                           />
+
+                          <Hr className="my-3"></Hr>
+
+                          <input
+                            type="checkbox"
+                            name="hasPassword"
+                            id="hasPassword"
+                            className="mr-1 mb-3"
+                            onChange={() => setHasPassword(!hasPassword)}
+                          />
+                          <Typography variant="sm" as="label">
+                            Protect with password
+                          </Typography>
+
+                          {hasPassword && (
+                            <div className="mb-3">
+                              <Input
+                                type="password"
+                                placeholder="Insert password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                              ></Input>
+                            </div>
+                          )}
+
+                          {hasPassword && (
+                            <input
+                              type="hidden"
+                              name="password"
+                              value={password}
+                            />
+                          )}
+
                           <Button
                             className="w-full"
                             type="submit"
                             variant="info"
+                            disabled={hasPassword && password.length === 0}
                           >
                             Create Channel
                           </Button>
