@@ -62,7 +62,7 @@ export default function Users() {
         cell: (info) => {
           return (
             <div key={info.getValue()}>
-              <Link to={`/chats/new/${info.getValue()}`}>
+              <Link to={`/chats/with/${info.getValue()}`}>
                 <Button
                   variant="info"
                   size="sm"

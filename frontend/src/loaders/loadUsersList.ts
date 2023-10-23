@@ -1,3 +1,5 @@
 export async function loadUsersList() {
-  return fetch(`http://localhost:3001/users/`);
+  return fetch(`http://localhost:3001/users/`, {
+    credentials: "include",
+  });
 }
