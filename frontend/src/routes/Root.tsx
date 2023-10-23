@@ -7,7 +7,7 @@ import { navitems } from "../data";
 import { User } from "../types/types";
 import Login from "./Login";
 
-const isDark = true;
+export const isDark = true;
 
 export default function Root() {
   const user: User = useLoaderData() as User;
