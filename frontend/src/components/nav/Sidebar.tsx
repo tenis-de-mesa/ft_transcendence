@@ -14,6 +14,7 @@ import { LuLogOut } from "react-icons/lu";
 import { Navitem } from "./Navitem";
 import { User } from "../../types/types";
 import { Avatar } from "../Avatar";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 export interface ISidebarProps {
   options: INavitem[];
@@ -31,7 +32,7 @@ export const Sidebar: FC<ISidebarProps> = ({
   const isTab = useMediaQuery({ query: "(max-width: 786px)" });
   const isMob = useMediaQuery({ query: "(max-height: 420px)" });
 
-  const [isOpen, setIsOpen] = useState<boolean>(isTab ? false : true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeNavitem, setActiveNavitem] = useState<string>("");
 
   const { pathname } = useLocation();
@@ -70,14 +71,6 @@ export const Sidebar: FC<ISidebarProps> = ({
         },
       };
 
-  useEffect(() => {
-    if (isTab) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
-    }
-  }, [isTab]);
-
   const closeMobileMenu = useCallback((isTab: boolean) => {
     isTab && setIsOpen(false);
   }, []);
@@ -93,11 +86,12 @@ export const Sidebar: FC<ISidebarProps> = ({
         className={classNames(
           "md:hidden fixed inset-0 max-h-screen z-[998] bg-gray-900/50",
           {
-            block: isOpen,
-            hidden: !isOpen,
+            "block": isOpen,
+            "hidden": !isOpen,
           },
         )}
-      ></div>
+      >
+      </div>
 
       <motion.div
         variants={SidebarAnimation}
@@ -107,17 +101,14 @@ export const Sidebar: FC<ISidebarProps> = ({
           "flex flex-col justify-between",
           "bg-white dark:bg-gray-800 text-gray-900",
           "shadow-xl",
-          "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 overflow-hidden md:relative fixed",
+          "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 md:relative fixed",
           "border-r border-gray-100 dark:border-opacity-10",
           className,
         )}
-        onHoverStart={() => !isTab && setIsOpen(true)}
-        onHoverEnd={() => !isTab && setIsOpen(false)}
       >
         <div
           className={classNames(
-            "flex flex-row w-full py-3 mx-2 mb-8 transform ease-out duration-100",
-            {
+            "flex flex-row w-full py-3 mx-2 mt-7 transform ease-out duration-100", {
               "px-5": isOpen,
             },
           )}
@@ -130,8 +121,10 @@ export const Sidebar: FC<ISidebarProps> = ({
 
           <Typography
             variant="xl"
-            className={classNames("ml-2.5 whitespace-nowrap select-none", {
-              "opacity-0 transition ease-in-out delay-75": !isOpen,
+            className={classNames("ml-2.5 whitespace-nowrap select-none",
+            "transition ease-in-out", {
+              "opacity-100 delay-150": isOpen,
+              "opacity-0 delay-0": !isOpen,
             })}
             customWeight="medium"
           >
@@ -139,11 +132,24 @@ export const Sidebar: FC<ISidebarProps> = ({
           </Typography>
         </div>
 
+        {!isTab && (
+          <div className="relative h-10">
+            <div className={classNames(
+              "absolute top-0 flex items-center justify-center",
+              "w-8 h-8",
+              "bg-gray-800 rounded-full cursor-pointer -right-3",
+            )}
+              onClick={() => !isTab && setIsOpen(!isOpen)}
+            >
+              {isOpen ? <FaArrowLeft className="text-white" size={17} /> : <FaArrowRight className="text-white" size={17} /> }
+            </div>
+          </div>
+        )}
+
         <div className={classNames("h-full")}>
           <ul
             className={classNames(
-              "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar",
-              {
+              "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar", {
                 "h-[60%]": isMob,
               },
             )}
