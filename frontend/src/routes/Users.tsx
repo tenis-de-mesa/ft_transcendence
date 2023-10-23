@@ -62,9 +62,11 @@ export default function Users() {
         cell: (info) => {
           return (
             <div key={info.getValue()}>
-              <Button variant="info" size="sm">
-                <Link to={`/chats/new/${info.getValue()}`}>Chat<BsFillChatDotsFill /></Link>
-              </Button>
+              <Link to={`/chats/new/${info.getValue()}`}>
+                <Button variant="info" size="sm" TrailingIcon={<BsFillChatDotsFill />}>
+                  Chat
+                </Button>
+              </Link>
             </div>
           );
         },
