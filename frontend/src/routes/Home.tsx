@@ -5,8 +5,8 @@ export default function Home() {
   const user = RootUser();
 
   return (
-    <div className="flex justify-center h-full">
-      <Typography variant="h3">Welcome {user.nickname}</Typography>
+    <div className="flex justify-start h-full p-5">
+      <Typography variant="h5">Welcome, {user.nickname} !</Typography>
     </div>
   );
 }

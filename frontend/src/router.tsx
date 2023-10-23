@@ -25,11 +25,13 @@ import Leaderboard from "./routes/Leaderboard.tsx";
 import Games from "./routes/Games.tsx";
 import Settings from "./routes/Settings.tsx";
 import { redirectToChat } from "./loaders/redirectToChat.ts";
+import ErrorBoundary from "./routes/ErrorBoundary.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     id: "root",
+    errorElement: <ErrorBoundary />,
     element: <Root />,
     loader: loadRootUser,
     children: [
