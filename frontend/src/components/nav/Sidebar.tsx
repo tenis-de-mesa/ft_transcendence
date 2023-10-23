@@ -86,12 +86,11 @@ export const Sidebar: FC<ISidebarProps> = ({
         className={classNames(
           "md:hidden fixed inset-0 max-h-screen z-[998] bg-gray-900/50",
           {
-            "block": isOpen,
-            "hidden": !isOpen,
+            block: isOpen,
+            hidden: !isOpen,
           },
         )}
-      >
-      </div>
+      ></div>
 
       <motion.div
         variants={SidebarAnimation}
@@ -108,7 +107,8 @@ export const Sidebar: FC<ISidebarProps> = ({
       >
         <div
           className={classNames(
-            "flex flex-row w-full py-3 mx-2 mt-7 transform ease-out duration-100", {
+            "flex flex-row w-full py-3 mx-2 mt-7 transform ease-out duration-100",
+            {
               "px-5": isOpen,
             },
           )}
@@ -121,11 +121,14 @@ export const Sidebar: FC<ISidebarProps> = ({
 
           <Typography
             variant="xl"
-            className={classNames("ml-2.5 whitespace-nowrap select-none",
-            "transition ease-in-out", {
-              "opacity-100 delay-150": isOpen,
-              "opacity-0 delay-0": !isOpen,
-            })}
+            className={classNames(
+              "ml-2.5 whitespace-nowrap select-none",
+              "transition ease-in-out",
+              {
+                "opacity-100 delay-150": isOpen,
+                "opacity-0 delay-0": !isOpen,
+              },
+            )}
             customWeight="medium"
           >
             Transcendence
@@ -134,14 +137,19 @@ export const Sidebar: FC<ISidebarProps> = ({
 
         {!isTab && (
           <div className="relative h-10">
-            <div className={classNames(
-              "absolute top-0 flex items-center justify-center",
-              "w-8 h-8",
-              "bg-gray-800 rounded-full cursor-pointer -right-3",
-            )}
+            <div
+              className={classNames(
+                "absolute top-0 flex items-center justify-center",
+                "w-8 h-8",
+                "bg-gray-800 rounded-full cursor-pointer -right-3",
+              )}
               onClick={() => !isTab && setIsOpen(!isOpen)}
             >
-              {isOpen ? <FaArrowLeft className="text-white" size={17} /> : <FaArrowRight className="text-white" size={17} /> }
+              {isOpen ? (
+                <FaArrowLeft className="text-white" size={17} />
+              ) : (
+                <FaArrowRight className="text-white" size={17} />
+              )}
             </div>
           </div>
         )}
@@ -149,7 +157,8 @@ export const Sidebar: FC<ISidebarProps> = ({
         <div className={classNames("h-full")}>
           <ul
             className={classNames(
-              "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar", {
+              "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar",
+              {
                 "h-[60%]": isMob,
               },
             )}
