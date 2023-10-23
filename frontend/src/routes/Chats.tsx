@@ -7,8 +7,8 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
 import { RootUser } from "./Root";
-import { Hr } from "../components/Hr";
 import { Input } from "../components/Input";
+import classNames from "classnames";
 
 export default function Chats() {
   const currentUser = RootUser();
@@ -64,26 +64,27 @@ export default function Chats() {
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
+      <div
+        onClick={() => setIsOpen(false)}
+        className={classNames(
+          "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
+          {
+            block: isOpen,
+            hidden: !isOpen,
+          },
+        )}
+      >
+      </div>
+
       <div className="w-1/4">
         <Card className="h-full">
           <Card.Title>
             <Typography variant="h6">Chats</Typography>
           </Card.Title>
-          <Card.Body className="pt-0">
-            <>
-              <Button
-                className="flex items-center justify-center w-full"
-                LeadingIcon={<FiPlus />}
-                variant="info"
-                onClick={() => {
-                  setIsOpen(!isOpen);
-                }}
-              >
-                New channel
-              </Button>
-
+          <Card.Body className="h-full pt-0">
+            <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
               {isOpen && (
-                <div className="absolute z-10 dialog">
+                <div className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 dialog top-1/2 left-1/2">
                   <Card className="dark:bg-gray-900">
                     <Card.Title>
                       <div className="flex items-center justify-between gap-5">
@@ -149,7 +150,7 @@ export default function Chats() {
                             value={currentUser.id}
                           />
                           <Button
-                            className="w-full"
+                            className="justify-center w-full"
                             type="submit"
                             variant="info"
                           >
@@ -162,21 +163,35 @@ export default function Chats() {
                 </div>
               )}
 
-              <Hr className="my-3" />
+              <div>
+                {chats.map((chat) => (
+                  <div key={chat.id} className="mt-2 text-left">
+                    <a href={`/chats/${chat.id}`}>
+                      <Typography variant="sm">
+                        [{chat.id}] - {chat.name}
+                      </Typography>
+                    </a>
+                  </div>
+                ))}
+              </div>
 
-              {chats.map((chat) => (
-                <div key={chat.id} className="mt-2 text-left">
-                  <a href={`/chats/${chat.id}`}>
-                    <Typography variant="sm">
-                      [{chat.id}] - {chat.name}
-                    </Typography>
-                  </a>
-                </div>
-              ))}
-            </>
+              <div>
+                <Button
+                  className="flex items-center justify-center w-full"
+                  LeadingIcon={<FiPlus />}
+                  variant="info"
+                  onClick={() => {
+                    setIsOpen(!isOpen);
+                  }}
+                >
+                  New channel
+                </Button>
+              </div>
+            </div>
           </Card.Body>
         </Card>
       </div>
+
       <div className="w-3/4 h-full">
         <Outlet />
       </div>
