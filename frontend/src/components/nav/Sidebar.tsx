@@ -107,7 +107,7 @@ export const Sidebar: FC<ISidebarProps> = ({
       >
         <div
           className={classNames(
-            "flex flex-row w-full py-3 mx-2 mt-7 transform ease-out duration-100",
+            "flex ml-3 py-2 mt-5 mb-4 transform ease-out duration-100",
             {
               "px-5": isOpen,
             },
