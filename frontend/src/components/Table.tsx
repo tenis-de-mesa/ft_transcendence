@@ -100,8 +100,8 @@ const Table = ({ columns, data }: TableProps) => {
 
 const Pagination = ({ table }: { table: Table<Data> }) => {
   return (
-    <div className="py-6 flex items-center justify-between w-full h-10 gap-2 px-0.5 text-gray-700 bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
-      <div className="flex items-center gap-5 pl-5 text-sm select-none">
+    <div className="w-full py-3 text-gray-700 bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
+      <div className="flex justify-center gap-5 pl-5 text-sm select-none">
         <button
           className={classNames(
             "flex items-center text-gray-500 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none",
@@ -134,22 +134,6 @@ const Pagination = ({ table }: { table: Table<Data> }) => {
         >
           <FiArrowRight size={20} />
         </button>
-      </div>
-
-      <div className="flex items-center justify-end gap-2 text-sm select-none">
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={(e) => {
-            table.setPageSize(Number(e.target.value));
-          }}
-          className="p-1 mr-3 font-bold text-gray-700 bg-gray-200 border-0 border-b-2 border-gray-700 rounded-sm outline-none appearance-none dark:bg-gray-900 peer dark:border-gray-400 dark:text-gray-400"
-        >
-          {[10, 20, 30, 40, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Total page: {pageSize}
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );
