@@ -84,8 +84,7 @@ export default function Chat() {
                 hidden: !isOpen,
               },
             )}
-          >
-          </div>
+          ></div>
 
           {isOpen && (
             <div className="absolute dialog z-[1001] w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">

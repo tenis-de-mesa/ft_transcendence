@@ -63,7 +63,11 @@ export default function Users() {
           return (
             <div key={info.getValue()}>
               <Link to={`/chats/new/${info.getValue()}`}>
-                <Button variant="info" size="sm" TrailingIcon={<BsFillChatDotsFill />}>
+                <Button
+                  variant="info"
+                  size="sm"
+                  TrailingIcon={<BsFillChatDotsFill />}
+                >
                   Chat
                 </Button>
               </Link>

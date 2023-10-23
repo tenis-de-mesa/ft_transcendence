@@ -66,8 +66,8 @@ const Table = ({ columns, data }: TableProps) => {
                           asc: <FaSortUp size={10} />,
                           desc: <FaSortDown size={10} />,
                         }[header.column.getIsSorted() as string] ?? (
-                            <FaSort size={10} />
-                          )}
+                          <FaSort size={10} />
+                        )}
                       </div>
                     )}
                   </th>

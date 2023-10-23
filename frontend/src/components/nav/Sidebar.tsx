@@ -40,36 +40,36 @@ export const Sidebar: FC<ISidebarProps> = ({
 
   const SidebarAnimation = isTab
     ? {
-      open: {
-        x: 0,
-        width: "16rem",
-        transition: {
-          damping: 40,
+        open: {
+          x: 0,
+          width: "16rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-      closed: {
-        x: -250,
-        width: 0,
-        transition: {
-          damping: 40,
-          delay: 0.15,
+        closed: {
+          x: -250,
+          width: 0,
+          transition: {
+            damping: 40,
+            delay: 0.15,
+          },
         },
-      },
-    }
+      }
     : {
-      open: {
-        width: "16rem",
-        transition: {
-          damping: 40,
+        open: {
+          width: "16rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-      closed: {
-        width: "4rem",
-        transition: {
-          damping: 40,
+        closed: {
+          width: "4rem",
+          transition: {
+            damping: 40,
+          },
         },
-      },
-    };
+      };
 
   const closeMobileMenu = useCallback((isTab: boolean) => {
     isTab && setIsOpen(false);

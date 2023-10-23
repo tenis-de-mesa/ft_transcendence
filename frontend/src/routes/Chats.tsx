@@ -73,8 +73,7 @@ export default function Chats() {
             hidden: !isOpen,
           },
         )}
-      >
-      </div>
+      ></div>
 
       <div className="w-1/4">
         <Card className="h-full">
