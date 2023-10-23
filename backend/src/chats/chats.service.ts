@@ -128,7 +128,7 @@ export class ChatsService {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
-      relations: ['users', 'messages', 'messages.sender'],
+      relations: { users: true, messages: { sender: true } },
       where: { id: id },
       order: {
         messages: {
@@ -143,11 +143,11 @@ export class ChatsService {
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
     const findUserPromise = this.userRepository.findOne({
-      relations: ['userBlocked'],
+      relations: { userBlocked: true },
       where: { id: dto.senderId },
     });
     const findChatPromise = this.chatRepository.findOne({
-      relations: ['chatMembers'],
+      relations: { chatMembers: true },
       where: { id: dto.chatId },
     });
 
