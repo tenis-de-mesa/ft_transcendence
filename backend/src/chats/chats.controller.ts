@@ -45,8 +45,26 @@ export class ChatsController {
     return await this.chatsService.update(id, dto);
   }
 
+  @Post('verify/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async verifyPassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('password') password: string,
+  ): Promise<void> {
+    await this.chatsService.verifyPassword(id, password);
+  }
+
   @Get(':id')
   async show(@Param('id', ParseIntPipe) id: number): Promise<ChatEntity> {
     return await this.chatsService.findOne(id);
+  }
+
+  @Get('role/:id')
+  async getMemberRole(
+    @Param('id', ParseIntPipe) id: number,
+    @User('id') userId: number,
+  ): Promise<{ role: ChatMemberRole }> {
+    const role = await this.chatsService.getMemberRole(id, userId);
+    return { role };
   }
 }

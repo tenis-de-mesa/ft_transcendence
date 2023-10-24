@@ -9,7 +9,7 @@ import {
   logout,
 } from "./loaders";
 
-import { createChannel, createChat } from "./actions";
+import { createChannel, createChat, updateChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
@@ -68,6 +68,10 @@ const router = createBrowserRouter([
             loader: loadChat,
             action: sendChatMessage,
           },
+          {
+            path: "update/:id",
+            action: updateChat,
+          }
         ],
       },
       {

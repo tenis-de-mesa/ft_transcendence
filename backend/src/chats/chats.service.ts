@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -141,12 +142,47 @@ export class ChatsService {
   async update(id: number, dto: UpdateChatDto): Promise<void> {
     const chat = await this.findOne(id);
 
-    const { password } = dto;
+    const { password, access } = dto;
 
-    chat.password = password ? await argon2.hash(password) : chat.password;
-    chat.access = password ? ChatAccess.PROTECTED : chat.access;
+    chat.password = password ? await argon2.hash(password) : password;
+    chat.access = access ?? chat.access;
 
     await this.chatRepository.save(chat);
+  }
+
+  async verifyPassword(id: number, password: string): Promise<void> {
+    const chat = await this.findOne(id);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
+    }
+    if (chat.access !== ChatAccess.PROTECTED) {
+      throw new BadRequestException('Channel is not password protected');
+    }
+
+    const isPasswordValid = await argon2.verify(chat.password, password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid channel password');
+    }
+  }
+
+  async getMember(chatId: number, userId: number): Promise<ChatMemberEntity> {
+    const member = await this.chatMemberRepository.findOne({
+      where: { userId, chatId },
+    });
+
+    if (!member) {
+      throw new NotFoundException('Chat member not found');
+    }
+
+    return member;
+  }
+
+  async getMemberRole(chatId: number, userId: number): Promise<ChatMemberRole> {
+    const member = await this.getMember(chatId, userId);
+
+    return member.role;
   }
 
   mapChatsToChatsWithName(

@@ -24,6 +24,7 @@ export type Chat = {
   users: User[];
   messages: Message[];
   newMessage: string;
+  access: "public" | "protected" | "private";
 };
 
 export type NewChatMessage = {
