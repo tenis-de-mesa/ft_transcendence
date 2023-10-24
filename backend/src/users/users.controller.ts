@@ -39,7 +39,17 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   @Get('me')
   async getMe(@User() user: UserEntity) {
-    return user;
+    let blockedBy = [];
+    let blockedUsers = [];
+    if (user?.id) {
+      const [_blockedUsers, _blockedBy] = await Promise.all([
+        await this.usersService.getBlockedUsers(user.id),
+        await this.usersService.getUsersWhoBlockedMe(user.id),
+      ]);
+      blockedBy = _blockedBy;
+      blockedUsers = _blockedUsers;
+    }
+    return { ...user, blockedBy, blockedUsers };
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -53,6 +63,24 @@ export class UsersController {
       login: user.login,
       status: user.status,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('block/:id')
+  async blockUser(
+    @User() user: UserEntity,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.usersService.blockUserById(user.id, id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('unblock/:id')
+  async unblockUser(
+    @User() user: UserEntity,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return await this.usersService.unblockUserById(user.id, id);
   }
 
   @UseGuards(AuthenticatedGuard)

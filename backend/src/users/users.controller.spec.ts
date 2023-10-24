@@ -5,6 +5,7 @@ import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -49,6 +50,12 @@ describe('UsersController', () => {
           provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(BlockListEntity),
+          useValue: {
+            save: jest.fn(),
           },
         },
       ],

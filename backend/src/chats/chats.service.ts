@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -174,7 +176,7 @@ export class ChatsService {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
-      relations: ['users', 'messages', 'messages.sender'],
+      relations: { users: true, messages: { sender: true } },
       where: { id: id },
       order: {
         messages: {
@@ -188,10 +190,32 @@ export class ChatsService {
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
-    const findUserPromise = this.userRepository.findOneBy({ id: dto.senderId });
-    const findChatPromise = this.chatRepository.findOneBy({ id: dto.chatId });
+    const findUserPromise = this.userRepository.findOne({
+      relations: { blockedBy: true, blockedUsers: true },
+      where: { id: dto.senderId },
+    });
+    const findChatPromise = this.chatRepository.findOne({
+      relations: { chatMembers: true },
+      where: { id: dto.chatId },
+    });
 
     const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
+
+    if (chat?.type == ChatType.DIRECT) {
+      const blockedUsersList = user.blockedUsers.map(
+        (block) => block.blockedUserId,
+      );
+      const blockedList = user.blockedBy.map((block) => block.blockedById);
+      const membersList = chat.chatMembers.map((member) => member.userId);
+      for (const member of membersList) {
+        if (blockedList.includes(member)) {
+          throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
+        }
+        if (blockedUsersList.includes(member)) {
+          throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
+        }
+      }
+    }
 
     if (!chat) {
       throw new NotFoundException('Chat not found');

@@ -1,5 +1,5 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData, useRevalidator } from "react-router-dom";
+import { Form, Link, useLoaderData, useRouteLoaderData, useRevalidator } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -7,7 +7,9 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
+import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { Input } from "../components/Input";
+import { blockUser, unblockUser } from "../actions/blockUser";
 import classNames from "classnames";
 
 export default function Chat() {
@@ -19,13 +21,26 @@ export default function Chat() {
 
   let lastUser: User | null = null;
 
-  const chat = useLoaderData() as Chat;
+  const userMe = useRouteLoaderData("root") as User;
+
+  const [chat] = useState(useLoaderData() as Chat);
   const [newMessage, setNewMessage] = useState("");
   const chatId = chat.id;
+
+  const members = chat.users.map((user) => user.id)
+  const isBlockedForOthers: boolean = chat.type == "direct"
+    && userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
+
+  const isBlockedByMe = userMe.blockedUsers
+    .find((user) => members.includes(user)) !== undefined
 
   const handleSubmitNewMessage = () => {
     setNewMessage("");
   };
+
+  const checkUserIsBlocked = (userBlockedId: number) => {
+    return userMe.blockedUsers.includes(userBlockedId);
+  }
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -100,6 +115,33 @@ export default function Chat() {
                     <Typography variant="h6">
                       <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
                     </Typography>
+
+                    {
+                      userMe.id != user?.id && chat.type == "direct" && (
+                        !checkUserIsBlocked(user?.id) ? (
+                          <Button
+                            IconOnly={<LiaUserSlashSolid />}
+                            size="md"
+                            variant="error"
+                            onClick={() => {
+                              setIsOpen(false);
+                              blockUser(user?.id);
+                            }}
+                          />
+                        ) : (
+                          <Button
+                            IconOnly={<LiaUserSolid />}
+                            size="md"
+                            variant="success"
+                            onClick={() => {
+                              setIsOpen(false);
+                              unblockUser(user?.id);
+                            }}
+                          />
+                        )
+                      )
+                    }
+
                     <Button
                       IconOnly={<AiFillCloseCircle />}
                       size="md"
@@ -166,8 +208,11 @@ export default function Chat() {
                 type="text"
                 value={newMessage}
                 name="message"
-                placeholder="Enter your message"
+                placeholder={
+                  isBlockedForOthers ? "You have been blocked" : isBlockedByMe
+                    ? "You blocked this user" : "Enter your message"}
                 onChange={(e) => setNewMessage(e.target.value)}
+                {...((isBlockedForOthers || isBlockedByMe) && { disabled: true })}
               />
             </Form>
           </div>
