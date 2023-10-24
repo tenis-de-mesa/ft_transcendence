@@ -27,18 +27,18 @@ export default function Chat() {
   const chatId = chat.id;
 
   const members = chat.users.map((user) => user.id)
-  const isBlocked: boolean = chat.type == "direct" && userMe.userBlocked.find((user) => members.includes(user.userId)) !== undefined;
+  const isBlockedForOthers: boolean = chat.type == "direct"
+    && userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
 
-  console.log(isBlocked)
+  const isBlockedByMe = userMe.blockedUsers
+    .find((user) => members.includes(user)) !== undefined
 
   const handleSubmitNewMessage = () => {
     setNewMessage("");
   };
 
   const checkUserIsBlocked = (userBlockedId: number) => {
-    console.log(userBlockedId)
-    console.log(userMe)
-    return userMe.userBlocker.find((user) => user.userBlockedId == userBlockedId) !== undefined;
+    return userMe.blockedUsers.includes(userBlockedId);
   }
 
   useEffect(() => {
@@ -207,9 +207,11 @@ export default function Chat() {
                 type="text"
                 value={newMessage}
                 name="message"
-                placeholder="Enter your message"
+                placeholder={
+                  isBlockedForOthers ? "You have been blocked" : isBlockedByMe
+                    ? "You blocked this user" : "Enter your message"}
                 onChange={(e) => setNewMessage(e.target.value)}
-                {...(isBlocked && { disabled: true })}
+                {...((isBlockedForOthers || isBlockedByMe) && { disabled: true })}
               />
             </Form>
           </div>

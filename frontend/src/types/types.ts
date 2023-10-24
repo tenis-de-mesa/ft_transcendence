@@ -3,20 +3,14 @@ export type UserStatus = {
   status: string;
 };
 
-export type BlockList = {
-  userId: number;
-  userBlockedId: number;
-  createdAt: Date;
-};
-
 export type User = {
   id: number;
   login: string;
   status: string;
   nickname: string;
   avatarUrl: string;
-  userBlocker: BlockList[];
-  userBlocked: BlockList[];
+  blockedBy: number[];
+  blockedUsers: number[];
 };
 
 export type Message = {
