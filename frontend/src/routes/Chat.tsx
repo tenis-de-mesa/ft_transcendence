@@ -1,5 +1,5 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData, useRouteLoaderData, useRevalidator } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -13,6 +13,7 @@ import { blockUser, unblockUser } from "../actions/blockUser";
 import classNames from "classnames";
 
 export default function Chat() {
+  const revalidator = useRevalidator();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User>(null);
 
@@ -22,7 +23,7 @@ export default function Chat() {
 
   const userMe = useRouteLoaderData("root") as User;
 
-  const [chat, setChat] = useState(useLoaderData() as Chat);
+  const [chat] = useState(useLoaderData() as Chat);
   const [newMessage, setNewMessage] = useState("");
   const chatId = chat.id;
 
@@ -55,7 +56,7 @@ export default function Chat() {
 
       if (!chat.messages.find((message) => message.id == data.id)) {
         chat.messages.push(data);
-        setChat({ ...chat });
+        revalidator.revalidate();
       }
     });
   });
