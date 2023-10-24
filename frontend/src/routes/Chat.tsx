@@ -7,7 +7,7 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { AiFillCloseCircle } from "react-icons/ai";
-import { LuUserX, LuUserCheck2 } from "react-icons/lu";
+import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { Input } from "../components/Input";
 import { blockUser, unblockUser } from "../actions/blockUser";
 import classNames from "classnames";
@@ -119,7 +119,7 @@ export default function Chat() {
                       userMe.id != user?.id && chat.type == "direct" && (
                         !checkUserIsBlocked(user?.id) ? (
                           <Button
-                            IconOnly={<LuUserX />}
+                            IconOnly={<LiaUserSlashSolid />}
                             size="md"
                             variant="error"
                             onClick={() => {
@@ -129,7 +129,7 @@ export default function Chat() {
                           />
                         ) : (
                           <Button
-                            IconOnly={<LuUserCheck2 />}
+                            IconOnly={<LiaUserSolid />}
                             size="md"
                             variant="success"
                             onClick={() => {
