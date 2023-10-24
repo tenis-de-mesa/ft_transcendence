@@ -146,11 +146,13 @@ describe('Chats', () => {
           senderId: user2.id,
         });
       } catch (e) {}
-      await chatsService.addMessage({
-        content: 'message 3',
-        chatId: chat.id,
-        senderId: user1.id,
-      });
+      try {
+        await chatsService.addMessage({
+          content: 'message 3',
+          chatId: chat.id,
+          senderId: user1.id,
+        });
+      } catch (e) {}
       await usersService.unblockUserById(user1.id, user2.id);
       await chatsService.addMessage({
         content: 'message 4',
@@ -161,8 +163,7 @@ describe('Chats', () => {
       const { messages } = await chatsService.findOne(chat.id);
       // Assert
       expect(messages[0].content).toEqual('message 1');
-      expect(messages[1].content).toEqual('message 3');
-      expect(messages[2].content).toEqual('message 4');
+      expect(messages[1].content).toEqual('message 4');
     });
   });
 });

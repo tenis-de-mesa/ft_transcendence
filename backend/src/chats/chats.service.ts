@@ -191,7 +191,7 @@ export class ChatsService {
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
     const findUserPromise = this.userRepository.findOne({
-      relations: { blockedBy: true },
+      relations: { blockedBy: true, blockedUsers: true },
       where: { id: dto.senderId },
     });
     const findChatPromise = this.chatRepository.findOne({
@@ -202,10 +202,16 @@ export class ChatsService {
     const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
 
     if (chat?.type == ChatType.DIRECT) {
+      const blockedUsersList = user.blockedUsers.map(
+        (block) => block.blockedUserId,
+      );
       const blockedList = user.blockedBy.map((block) => block.blockedById);
       const membersList = chat.chatMembers.map((member) => member.userId);
       for (const member of membersList) {
         if (blockedList.includes(member)) {
+          throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
+        }
+        if (blockedUsersList.includes(member)) {
           throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
         }
       }
