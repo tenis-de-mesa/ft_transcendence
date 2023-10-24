@@ -4,6 +4,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,8 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(SessionEntity)
     private readonly sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(BlockListEntity)
+    private readonly blockListRepository: Repository<BlockListEntity>,
     @Inject(S3Client) private readonly s3Client: S3Client,
   ) {}
 
@@ -43,6 +46,33 @@ export class UsersService {
 
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async blockUserById(
+    blockedById: number,
+    blockedUserId: number,
+  ): Promise<BlockListEntity> {
+    if (blockedById === blockedUserId) {
+      return null;
+    }
+    return await this.blockListRepository.save({ blockedById, blockedUserId });
+  }
+
+  async unblockUserById(
+    blockedById: number,
+    blockedUserId: number,
+  ): Promise<void> {
+    await this.blockListRepository.delete({ blockedById, blockedUserId });
+  }
+
+  async getBlockedUsers(blockedById: number): Promise<number[]> {
+    const blockedUsers = await this.blockListRepository.findBy({ blockedById });
+    return blockedUsers.map(({ blockedUserId }) => blockedUserId);
+  }
+
+  async getUsersWhoBlockedMe(blockedUserId: number): Promise<number[]> {
+    const blockedBy = await this.blockListRepository.findBy({ blockedUserId });
+    return blockedBy.map(({ blockedById }) => blockedById);
   }
 
   async killAllSessionsByUserId(

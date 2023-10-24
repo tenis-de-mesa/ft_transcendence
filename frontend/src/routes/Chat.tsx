@@ -1,21 +1,28 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData } from "react-router-dom";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useRouteLoaderData,
+  useRevalidator,
+} from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
+import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { Input } from "../components/Input";
 import { FiX, FiLock, FiUnlock } from "react-icons/fi";
 import { Hr } from "../components/Hr";
+import { blockUser, unblockUser } from "../actions/blockUser";
+import classNames from "classnames";
 
 export default function Chat() {
-  const [isCreateChannelDialogOpen, setIsCreateChannelDialogOpen] =
-    useState(false);
-
-  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] =
-    useState(false);
+  const revalidator = useRevalidator();
+  const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
+  const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -27,21 +34,35 @@ export default function Chat() {
 
   let lastUser: User | null = null;
 
-  const [chat, setChat] = useState(useLoaderData() as Chat);
+  const userMe = useRouteLoaderData("root") as User;
+
+  const chat = useLoaderData() as Chat;
   const [userRole, setUserRole] = useState(null);
   const [newMessage, setNewMessage] = useState("");
   const isAdmin = userRole === "owner" || userRole === "admin";
   const chatId = chat.id;
 
+  const members = chat.users.map((user) => user.id);
+  const isBlockedForOthers: boolean =
+    chat.type === "direct" &&
+    userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
+
+  const isBlockedByMe =
+    userMe.blockedUsers.find((user) => members.includes(user)) !== undefined;
+
   const handleSubmitNewMessage = () => {
     setNewMessage("");
+  };
+
+  const checkUserIsBlocked = (userBlockedId: number) => {
+    return userMe.blockedUsers.includes(userBlockedId);
   };
 
   const handleSubmitChangePassword = () => {
     setCurrentPassword("");
     setNewPassword("");
     setNewConfirmPassword("");
-    setIsChangePasswordDialogOpen(false);
+    setIsChangePassCardOpen(false);
   };
 
   useEffect(() => {
@@ -68,15 +89,12 @@ export default function Chat() {
   // Add event listener to close change password dialog when clicking outside of it
   useEffect(() => {
     const handleOutsideClick = (e: any) => {
-      if (
-        isChangePasswordDialogOpen &&
-        !e.target.closest("#changePasswordDialog")
-      ) {
+      if (isChangePassCardOpen && !e.target.closest("#change-password-card")) {
         handleSubmitChangePassword();
       }
     };
 
-    if (isChangePasswordDialogOpen) {
+    if (isChangePassCardOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
     } else {
       document.removeEventListener("mousedown", handleOutsideClick);
@@ -85,7 +103,7 @@ export default function Chat() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isChangePasswordDialogOpen, handleSubmitChangePassword]);
+  }, [isChangePassCardOpen, handleSubmitChangePassword]);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -101,10 +119,29 @@ export default function Chat() {
 
       if (!chat.messages.find((message) => message.id == data.id)) {
         chat.messages.push(data);
-        setChat({ ...chat });
+        revalidator.revalidate();
       }
     });
   });
+
+  // Add event listener to close profile card when clicking outside of it
+  useEffect(() => {
+    const handleOutsideClick = (e: any) => {
+      if (isProfileCardOpen && !e.target.closest("#profile-card")) {
+        setIsProfileCardOpen(false);
+      }
+    };
+
+    if (isProfileCardOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isProfileCardOpen, setIsProfileCardOpen]);
 
   return (
     <Card className="w-full h-full">
@@ -118,17 +155,29 @@ export default function Chat() {
               IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
               size="md"
               variant="info"
-              onClick={() =>
-                setIsChangePasswordDialogOpen(!isChangePasswordDialogOpen)
-              }
+              onClick={() => setIsChangePassCardOpen(!isChangePassCardOpen)}
             ></Button>
           )}
         </div>
       </Card.Title>
       <Card.Body position="left" className="h-5/6">
         <div className="h-full">
-          {isCreateChannelDialogOpen && (
-            <div className="absolute w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+          <div
+            onClick={() => setIsProfileCardOpen(false)}
+            className={classNames(
+              "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
+              {
+                block: isProfileCardOpen,
+                hidden: !isProfileCardOpen,
+              }
+            )}
+          ></div>
+
+          {isProfileCardOpen && (
+            <div
+              id="profile-card"
+              className="absolute z-[1001] w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+            >
               <Card className="dark:bg-gray-900">
                 <Card.Title>
                   <div className="flex items-center justify-between">
@@ -140,11 +189,36 @@ export default function Chat() {
                     <Typography variant="h6">
                       <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
                     </Typography>
+
+                    {userMe.id != user?.id &&
+                      chat.type == "direct" &&
+                      (!checkUserIsBlocked(user?.id) ? (
+                        <Button
+                          IconOnly={<LiaUserSlashSolid />}
+                          size="md"
+                          variant="error"
+                          onClick={() => {
+                            setIsProfileCardOpen(false);
+                            blockUser(user?.id);
+                          }}
+                        />
+                      ) : (
+                        <Button
+                          IconOnly={<LiaUserSolid />}
+                          size="md"
+                          variant="success"
+                          onClick={() => {
+                            setIsProfileCardOpen(false);
+                            unblockUser(user?.id);
+                          }}
+                        />
+                      ))}
+
                     <Button
                       IconOnly={<FiX />}
                       size="md"
                       variant="info"
-                      onClick={() => setIsCreateChannelDialogOpen(false)}
+                      onClick={() => setIsProfileCardOpen(false)}
                     />
                   </div>
                 </Card.Title>
@@ -163,14 +237,14 @@ export default function Chat() {
             </div>
           )}
 
-          {isChangePasswordDialogOpen && (
+          {isChangePassCardOpen && (
             <>
               <div
                 className="overlay fixed top-0 left-0 w-full h-full z-999"
                 style={{ background: "rgba(0, 0, 0, .65)" }} // TODO: Tailwind
               ></div>
               <div
-                id="changePasswordDialog"
+                id="change-password-card"
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2"
               >
                 <Card className="dark:bg-gray-900">
@@ -184,7 +258,7 @@ export default function Chat() {
                         size="md"
                         variant="info"
                         onClick={() => {
-                          setIsChangePasswordDialogOpen(false);
+                          setIsChangePassCardOpen(false);
                           setCurrentPassword("");
                           setNewPassword("");
                           setNewConfirmPassword("");
@@ -319,9 +393,7 @@ export default function Chat() {
                       />
                       <div
                         onClick={() => {
-                          setIsCreateChannelDialogOpen(
-                            !isCreateChannelDialogOpen
-                          );
+                          setIsProfileCardOpen(!isProfileCardOpen);
                           setUser(message.sender);
                         }}
                         className="cursor-pointer"
@@ -346,8 +418,17 @@ export default function Chat() {
                 type="text"
                 value={newMessage}
                 name="message"
-                placeholder="Enter your message"
+                placeholder={
+                  isBlockedForOthers
+                    ? "You have been blocked"
+                    : isBlockedByMe
+                    ? "You blocked this user"
+                    : "Enter your message"
+                }
                 onChange={(e) => setNewMessage(e.target.value)}
+                {...((isBlockedForOthers || isBlockedByMe) && {
+                  disabled: true,
+                })}
               />
             </Form>
           </div>

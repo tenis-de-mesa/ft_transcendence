@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { Chat, User } from "../types/types";
-
-import { Form, Outlet, useLoaderData } from "react-router-dom";
+import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
 import { RootUser } from "./Root";
-import { Hr } from "../components/Hr";
 import { Input } from "../components/Input";
+import classNames from "classnames";
+import { Hr } from "../components/Hr";
 
 export default function Chats() {
   const currentUser = RootUser();
   const [chats, users] = useLoaderData() as [Chat[], User[]];
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isCreateChannelCard, setIsCreateChannelCard] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
@@ -36,26 +36,22 @@ export default function Chats() {
 
   // Close dialog, clear search and selected users on submit
   const handleNewChannelSubmit = () => {
-    setIsOpen(false);
+    setIsCreateChannelCard(false);
     setSearchTerm("");
     setSelectedUsers([]);
     setHasPassword(false);
     setPassword("");
   };
 
-  // Add event listener to close new channel dialog when clicking outside of it
+  // Add event listener to close create channel card when clicking outside of it
   useEffect(() => {
-    const handleOutsideClick = (e) => {
-      if (
-        isOpen &&
-        !e.target.closest(".dialog") &&
-        !e.target.closest(".new-channel-button")
-      ) {
-        setIsOpen(false);
+    const handleOutsideClick = (e: any) => {
+      if (isCreateChannelCard && !e.target.closest("#create-channel-card")) {
+        setIsCreateChannelCard(false);
       }
     };
 
-    if (isOpen) {
+    if (isCreateChannelCard) {
       document.addEventListener("mousedown", handleOutsideClick);
     } else {
       document.removeEventListener("mousedown", handleOutsideClick);
@@ -64,30 +60,33 @@ export default function Chats() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isOpen]);
+  }, [isCreateChannelCard, setIsCreateChannelCard]);
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
+      <div
+        onClick={() => setIsCreateChannelCard(false)}
+        className={classNames(
+          "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
+          {
+            block: isCreateChannelCard,
+            hidden: !isCreateChannelCard,
+          }
+        )}
+      ></div>
+
       <div className="w-1/4">
         <Card className="h-full">
           <Card.Title>
             <Typography variant="h6">Chats</Typography>
           </Card.Title>
-          <Card.Body className="pt-0">
-            <>
-              <Button
-                className="flex items-center justify-center w-full"
-                LeadingIcon={<FiPlus />}
-                variant="info"
-                onClick={() => {
-                  setIsOpen(!isOpen);
-                }}
-              >
-                New channel
-              </Button>
-
-              {isOpen && (
-                <div className="absolute z-10 dialog">
+          <Card.Body className="h-full pt-0">
+            <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
+              {isCreateChannelCard && (
+                <div
+                  id="create-channel-card"
+                  className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+                >
                   <Card className="dark:bg-gray-900">
                     <Card.Title>
                       <div className="flex items-center justify-between gap-5">
@@ -98,7 +97,7 @@ export default function Chats() {
                           IconOnly={<FiX />}
                           size="sm"
                           variant="info"
-                          onClick={() => setIsOpen(false)}
+                          onClick={() => setIsCreateChannelCard(false)}
                         />
                       </div>
                     </Card.Title>
@@ -186,7 +185,7 @@ export default function Chats() {
                           )}
 
                           <Button
-                            className="w-full"
+                            className="justify-center w-full"
                             type="submit"
                             variant="info"
                             disabled={hasPassword && password.length === 0}
@@ -200,21 +199,34 @@ export default function Chats() {
                 </div>
               )}
 
-              <Hr className="my-3" />
-
-              {chats.map((chat) => (
-                <div key={chat.id} className="mt-2 text-left">
-                  <a href={`/chats/${chat.id}`}>
-                    <Typography variant="sm">
-                      [{chat.id}] - {chat.name}
-                    </Typography>
-                  </a>
-                </div>
-              ))}
-            </>
+              <div>
+                {chats.map((chat) => (
+                  <div key={chat.id} className="mt-2 text-left">
+                    <Link to={`/chats/${chat.id}`}>
+                      <Typography variant="sm">
+                        [{chat.id}] - {chat.name}
+                      </Typography>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <Button
+                  className="flex items-center justify-center w-full"
+                  LeadingIcon={<FiPlus />}
+                  variant="info"
+                  onClick={() => {
+                    setIsCreateChannelCard(!isCreateChannelCard);
+                  }}
+                >
+                  New channel
+                </Button>
+              </div>
+            </div>
           </Card.Body>
         </Card>
       </div>
+
       <div className="w-3/4 h-full">
         <Outlet />
       </div>

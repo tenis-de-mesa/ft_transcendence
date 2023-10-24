@@ -5,6 +5,7 @@ import { SessionEntity, UserEntity } from '../core/entities';
 import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -51,6 +52,12 @@ describe('UsersController', () => {
             createQueryBuilder: jest.fn(),
           },
         },
+        {
+          provide: getRepositoryToken(BlockListEntity),
+          useValue: {
+            save: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -76,7 +83,7 @@ describe('UsersController', () => {
       jest.spyOn(userRepository, 'find').mockResolvedValueOnce(usersEntityList);
 
       // Act
-      const result = await usersController.index();
+      const result = await usersController.findAll();
 
       // Assert
       expect(result).toEqual(usersEntityList);

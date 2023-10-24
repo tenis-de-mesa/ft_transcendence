@@ -14,6 +14,7 @@ import {
   MessageEntity,
   ChatMemberEntity,
 } from '.';
+import { BlockListEntity } from './blockList.entity';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -103,6 +104,12 @@ export class UserEntity {
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
+
+  @OneToMany(() => BlockListEntity, (block) => block.blockedUser)
+  blockedBy: BlockListEntity[];
+
+  @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
+  blockedUsers: BlockListEntity[];
 
   constructor(user?: UserEntity) {
     this.id = user?.id;
