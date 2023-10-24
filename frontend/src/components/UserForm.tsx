@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
 import { User } from "../types/types";
-import { Avatar } from "./Avatar";
 import { Input } from "./Input";
 import { Button } from "./Button";
 
