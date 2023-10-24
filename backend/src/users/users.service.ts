@@ -65,14 +65,14 @@ export class UsersService {
     await this.blockListRepository.delete({ blockedById, blockedUserId });
   }
 
-  async getBlockedUsers(blockedById: number): Promise<BlockListEntity[]> {
-    return await this.blockListRepository.findBy({ blockedById });
+  async getBlockedUsers(blockedById: number): Promise<number[]> {
+    const blockedUsers = await this.blockListRepository.findBy({ blockedById });
+    return blockedUsers.map(({ blockedUserId }) => blockedUserId);
   }
 
-  async getUsersWhoBlockedMe(
-    blockedUserId: number,
-  ): Promise<BlockListEntity[]> {
-    return await this.blockListRepository.findBy({ blockedUserId });
+  async getUsersWhoBlockedMe(blockedUserId: number): Promise<number[]> {
+    const blockedBy = await this.blockListRepository.findBy({ blockedUserId });
+    return blockedBy.map(({ blockedById }) => blockedById);
   }
 
   async killAllSessionsByUserId(

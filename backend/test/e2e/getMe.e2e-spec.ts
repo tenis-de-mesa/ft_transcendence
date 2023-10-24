@@ -12,7 +12,6 @@ import { AuthenticatedGuard } from '../../src/auth/guards';
 import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { UsersService } from '../../src/users/users.service';
 import { AppModule } from '../../src/app.module';
-import { BlockListEntity } from '../../src/core/entities/blockList.entity';
 
 describe('e2e', () => {
   let app: INestApplication;
@@ -92,11 +91,11 @@ describe('e2e', () => {
     expect(response.statusCode).toEqual(HttpStatus.OK);
 
     const blockedUsers = response.body.blockedUsers.find(
-      (user: BlockListEntity) => user.blockedById === mockUser.id,
+      (user) => user === tempBlockedUser.id,
     );
 
     const blockedBy = response.body.blockedBy.find(
-      (user: BlockListEntity) => user.blockedUserId === mockUser.id,
+      (user) => user === tempBlockerUser.id,
     );
 
     expect(blockedBy).toBeDefined();

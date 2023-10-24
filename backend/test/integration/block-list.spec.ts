@@ -56,7 +56,7 @@ describe('User Status', () => {
       // Act
       await usersService.blockUserById(user1.id, user2.id);
       const user2blocked = (await usersService.getBlockedUsers(user1.id)).find(
-        (user) => user.blockedUserId === user2.id,
+        (user) => user === user2.id,
       );
       // Assert
       expect(user2blocked).toBeDefined();
@@ -67,7 +67,7 @@ describe('User Status', () => {
       // Act
       await usersService.unblockUserById(user1.id, user2.id);
       const user2blocked = (await usersService.getBlockedUsers(user1.id)).find(
-        (user) => user.blockedUserId === user2.id,
+        (user) => user === user2.id,
       );
       // Assert
       expect(user2blocked).toBeUndefined();
