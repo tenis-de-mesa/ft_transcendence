@@ -1,5 +1,5 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -10,6 +10,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { Input } from "../components/Input";
 
 export default function Chat() {
+  const revalidator = useRevalidator();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User>(null);
 
@@ -17,7 +18,7 @@ export default function Chat() {
 
   let lastUser: User | null = null;
 
-  const [chat, setChat] = useState(useLoaderData() as Chat);
+  const chat = useLoaderData() as Chat;
   const [newMessage, setNewMessage] = useState("");
   const chatId = chat.id;
 
@@ -39,7 +40,7 @@ export default function Chat() {
 
       if (!chat.messages.find((message) => message.id == data.id)) {
         chat.messages.push(data);
-        setChat({ ...chat });
+        revalidator.revalidate();
       }
     });
   });
