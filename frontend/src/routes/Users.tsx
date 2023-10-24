@@ -10,10 +10,12 @@ import { Button } from "../components/Button";
 import Table from "../components/Table";
 import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
+import { RootUser } from "./Root";
 
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
+  const currentUser = RootUser();
   const initialUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(initialUsers);
 
@@ -32,7 +34,17 @@ export default function Users() {
         }),
       );
     });
-  }, []);
+
+    // The current user is online by default
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => {
+        if (user.id === currentUser.id) {
+          return { ...user, status: "online" };
+        }
+        return user;
+      }),
+    );
+  }, [currentUser.id]);
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
