@@ -24,13 +24,13 @@ export const Navitem: FC<INavitemProps> = ({
       <li onClick={() => onClick(item.label)}>
         <NavLink to={item.path!} className="link">
           <item.icon.type
-            size={23}
+            size={20}
             className={classNames("text-gray-900 min-w-max dark:text-white", {
               "text-primary-400": isActive,
             })}
           />
           <Typography
-            variant="lg"
+            variant="md"
             className={classNames({
               "opacity-0 transition ease-in-out delay-75": !isOpen,
             })}

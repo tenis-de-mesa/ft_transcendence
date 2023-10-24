@@ -8,6 +8,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import Table from "../components/Table";
+import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
 
 const columnHelper = createColumnHelper<User>();
@@ -50,8 +51,8 @@ export default function Users() {
             </div>
           ) : (
             <div className="flex items-center">
-              <div className="h-2.5 w-2.5 rounded-full bg-error-500 mr-2"></div>
-              <span className="text-error-500">Offline</span>
+              <div className="h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></div>
+              <span className="text-gray-500">Offline</span>
             </div>
           );
         },
@@ -61,9 +62,15 @@ export default function Users() {
         cell: (info) => {
           return (
             <div key={info.getValue()}>
-              <Button variant="info" size="sm">
-                <Link to={`/chats/new/${info.getValue()}`}> Chat 💬</Link>
-              </Button>
+              <Link to={`/chats/with/${info.getValue()}`}>
+                <Button
+                  variant="info"
+                  size="sm"
+                  TrailingIcon={<BsFillChatDotsFill />}
+                >
+                  Chat
+                </Button>
+              </Link>
             </div>
           );
         },
@@ -76,7 +83,7 @@ export default function Users() {
     <>
       <Typography variant="h5">Users</Typography>
 
-      <div className="h-[92%]">
+      <div className="h-[92%] mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
           data={users as unknown as Data[]}
