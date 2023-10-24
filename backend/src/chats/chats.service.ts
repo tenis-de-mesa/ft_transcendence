@@ -191,7 +191,7 @@ export class ChatsService {
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
     const findUserPromise = this.userRepository.findOne({
-      relations: { userBlocked: true },
+      relations: { blockedBy: true },
       where: { id: dto.senderId },
     });
     const findChatPromise = this.chatRepository.findOne({
@@ -202,7 +202,7 @@ export class ChatsService {
     const [chat, user] = await Promise.all([findChatPromise, findUserPromise]);
 
     if (chat?.type == ChatType.DIRECT) {
-      const blockedList = user.userBlocked.map((block) => block.userId);
+      const blockedList = user.blockedBy.map((block) => block.blockedById);
       const membersList = chat.chatMembers.map((member) => member.userId);
       for (const member of membersList) {
         if (blockedList.includes(member)) {

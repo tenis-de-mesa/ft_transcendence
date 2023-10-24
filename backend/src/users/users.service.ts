@@ -49,27 +49,30 @@ export class UsersService {
   }
 
   async blockUserById(
-    userId: number,
-    userBlockedId: number,
+    blockedById: number,
+    blockedUserId: number,
   ): Promise<BlockListEntity> {
-    if (userId === userBlockedId) {
+    if (blockedById === blockedUserId) {
       return null;
     }
-    return await this.blockListRepository.save({ userId, userBlockedId });
+    return await this.blockListRepository.save({ blockedById, blockedUserId });
   }
 
-  async unblockUserById(userId: number, userBlockedId: number): Promise<void> {
-    await this.blockListRepository.delete({ userId, userBlockedId });
+  async unblockUserById(
+    blockedById: number,
+    blockedUserId: number,
+  ): Promise<void> {
+    await this.blockListRepository.delete({ blockedById, blockedUserId });
   }
 
-  async getBlockedUsers(userId: number): Promise<BlockListEntity[]> {
-    return await this.blockListRepository.findBy({ userId });
+  async getBlockedUsers(blockedById: number): Promise<BlockListEntity[]> {
+    return await this.blockListRepository.findBy({ blockedById });
   }
 
   async getUsersWhoBlockedMe(
-    userBlockedId: number,
+    blockedUserId: number,
   ): Promise<BlockListEntity[]> {
-    return await this.blockListRepository.findBy({ userBlockedId });
+    return await this.blockListRepository.findBy({ blockedUserId });
   }
 
   async killAllSessionsByUserId(

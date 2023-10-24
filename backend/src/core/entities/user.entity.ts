@@ -117,11 +117,11 @@ export class UserEntity {
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
 
-  @OneToMany(() => BlockListEntity, (block) => block.userBlocker)
-  userBlocker: BlockListEntity[];
+  @OneToMany(() => BlockListEntity, (block) => block.blockedUser)
+  blockedBy: BlockListEntity[];
 
-  @OneToMany(() => BlockListEntity, (block) => block.userBlocked)
-  userBlocked: BlockListEntity[];
+  @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
+  blockedUsers: BlockListEntity[];
 
   constructor(user?: UserEntity) {
     this.id = user?.id;

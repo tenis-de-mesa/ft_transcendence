@@ -40,12 +40,12 @@ export class UsersController {
   @Get('me')
   async getMe(@User() user: UserEntity) {
     if (user?.id) {
-      const [userBlocker, userBlocked] = await Promise.all([
+      const [blockedUsers, blockedBy] = await Promise.all([
         await this.usersService.getBlockedUsers(user.id),
         await this.usersService.getUsersWhoBlockedMe(user.id),
       ]);
-      user.userBlocker = userBlocker;
-      user.userBlocked = userBlocked;
+      user.blockedBy = blockedBy;
+      user.blockedUsers = blockedUsers;
     }
     return user;
   }

@@ -12,6 +12,7 @@ import { AuthenticatedGuard } from '../../src/auth/guards';
 import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { UsersService } from '../../src/users/users.service';
 import { AppModule } from '../../src/app.module';
+import { BlockListEntity } from '../../src/core/entities/blockList.entity';
 
 describe('e2e', () => {
   let app: INestApplication;
@@ -90,16 +91,16 @@ describe('e2e', () => {
     // Assert
     expect(response.statusCode).toEqual(HttpStatus.OK);
 
-    const userBlocker = response.body.userBlocker.find(
-      (user) => user.userBlockedId === tempBlockedUser.id,
+    const blockedUsers = response.body.blockedUsers.find(
+      (user: BlockListEntity) => user.blockedById === mockUser.id,
     );
 
-    const userBlocked = response.body.userBlocked.find(
-      (user) => user.userId === tempBlockerUser.id,
+    const blockedBy = response.body.blockedBy.find(
+      (user: BlockListEntity) => user.blockedUserId === mockUser.id,
     );
 
-    expect(userBlocked).toBeDefined();
-    expect(userBlocker).toBeDefined();
+    expect(blockedBy).toBeDefined();
+    expect(blockedUsers).toBeDefined();
 
     await Promise.all([
       await usersService.unblockUserById(tempBlockerUser.id, mockUser.id),

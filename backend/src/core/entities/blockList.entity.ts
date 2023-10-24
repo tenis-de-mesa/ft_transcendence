@@ -10,28 +10,25 @@ import { UserEntity } from './user.entity';
 @Entity({ name: 'blockList' })
 export class BlockListEntity {
   @PrimaryColumn()
-  userId: number;
+  blockedById: number;
 
   @PrimaryColumn()
-  userBlockedId: number;
+  blockedUserId: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
-  userBlocker: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'blockedById', referencedColumnName: 'id' })
+  blockedBy: UserEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'userBlockedId', referencedColumnName: 'id' })
-  userBlocked: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'blockedUserId', referencedColumnName: 'id' })
+  blockedUser: UserEntity;
 
   constructor(blockList?: BlockListEntity) {
-    this.userId = blockList?.userId;
-    this.userBlockedId = blockList?.userBlockedId;
+    this.blockedById = blockList?.blockedById;
+    this.blockedUserId = blockList?.blockedUserId;
+    this.createdAt = blockList?.createdAt;
   }
 }
