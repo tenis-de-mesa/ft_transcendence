@@ -10,6 +10,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { LuUserX, LuUserCheck2 } from "react-icons/lu";
 import { Input } from "../components/Input";
 import { blockUser, unblockUser } from "../actions/blockUser";
+import classNames from "classnames";
 
 export default function Chat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +60,29 @@ export default function Chat() {
     });
   });
 
+  // Add event listener to close new channel dialog when clicking outside of it
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        isOpen &&
+        !e.target.closest(".dialog") &&
+        !e.target.closest(".new-channel-button")
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOpen]);
+
   return (
     <Card className="w-full h-full">
       <Card.Title>
@@ -66,8 +90,19 @@ export default function Chat() {
       </Card.Title>
       <Card.Body position="left" className="h-5/6">
         <div className="h-full">
+          <div
+            onClick={() => setIsOpen(false)}
+            className={classNames(
+              "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
+              {
+                block: isOpen,
+                hidden: !isOpen,
+              },
+            )}
+          ></div>
+
           {isOpen && (
-            <div className="absolute w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+            <div className="absolute dialog z-[1001] w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
               <Card className="dark:bg-gray-900">
                 <Card.Title>
                   <div className="flex items-center justify-between">

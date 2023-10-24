@@ -24,6 +24,14 @@ export class ChatsController {
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
 
+  @Get('with/:userId')
+  async findWith(
+    @Param('userId', ParseIntPipe) userId: number,
+    @User() user: UserEntity,
+  ): Promise<ChatEntity> {
+    return await this.chatsService.findDirectChat(user, userId);
+  }
+
   @Post()
   async create(
     @Body() dto: CreateChatDto,

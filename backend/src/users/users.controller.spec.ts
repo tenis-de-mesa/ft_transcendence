@@ -83,7 +83,7 @@ describe('UsersController', () => {
       jest.spyOn(userRepository, 'find').mockResolvedValueOnce(usersEntityList);
 
       // Act
-      const result = await usersController.index();
+      const result = await usersController.findAll();
 
       // Assert
       expect(result).toEqual(usersEntityList);
