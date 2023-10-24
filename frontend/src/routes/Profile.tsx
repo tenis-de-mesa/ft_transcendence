@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useParams } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
@@ -12,8 +12,8 @@ import UserUpdateAvatar from "../components/UserUpdateAvatar";
 
 export default function Profile() {
   const currentUser = RootUser();
-  const userOther = useLoaderData() as User; // loadUserById
-  const isViewingOwnProfile = currentUser.id === userOther.id;
+  const profileUser = useLoaderData() as User; // loadUserById
+  const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
     const alternate = document.querySelector(".flip-card .wrapper");
@@ -26,37 +26,22 @@ export default function Profile() {
     <div className="profile h-full">
       <div className="flip-card grid">
         <div className="wrapper self-center">
-          <Card className="card back">
-            <Button
-              variant="info"
-              onClick={flipCard}
-              className="absolute top-0 left-0 p-2"
-            >
-              Voltar
-            </Button>
-            <Card.Title>
-              <UserUpdateAvatar user={userOther} />
-            </Card.Title>
-            <Card.Body position="left">
-              <UserForm user={userOther} />
-            </Card.Body>
-          </Card>
           <Card className="card front">
             <Card.Title>
               <>
                 <Avatar
-                  seed={userOther.login}
-                  src={userOther.avatarUrl}
+                  seed={profileUser.login}
+                  src={profileUser.avatarUrl}
                   className="inline"
                 />
                 <Typography customWeight="regular" variant="h4">
-                  {userOther.nickname}
+                  {profileUser.nickname}
                 </Typography>
                 {isViewingOwnProfile && (
                   <Button
                     variant="info"
                     onClick={flipCard}
-                    className="absolute top-0 right-0 p-2"
+                    className="absolute top-0 right-0 p-2 shadow-none"
                   >
                     Editar
                   </Button>
@@ -67,13 +52,28 @@ export default function Profile() {
               <Typography customWeight="regular" variant="md">
                 <span className="flex justify-between">
                   <strong>Login:</strong>
-                  {userOther.login}
+                  {profileUser.login}
                 </span>
                 <span className="flex justify-between">
                   <strong>Nickname:</strong>
                   {currentUser.nickname}
                 </span>
               </Typography>
+            </Card.Body>
+          </Card>
+          <Card className="card back">
+            <Button
+              variant="info"
+              onClick={flipCard}
+              className="absolute top-0 left-0 p-2 shadow-none"
+            >
+              Voltar
+            </Button>
+            <Card.Title>
+              <UserUpdateAvatar user={profileUser} />
+            </Card.Title>
+            <Card.Body position="left">
+              <UserForm user={profileUser} />
             </Card.Body>
           </Card>
         </div>

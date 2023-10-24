@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { User } from "../types/types";
 import { Avatar } from "./Avatar";
-import { Button } from "./Button";
+import { FaPencilAlt } from "react-icons/fa";
 
 interface UserFormProps {
   user: User;
@@ -42,8 +42,16 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
 
   return (
     <>
-      <div className="inline-block mb-2" onClick={handleButtonClick}>
+      <div className="inline-block mb-2 hover:cursor-pointer relative">
         <Avatar seed={user.login} src={avatarUrl} className="inline" />
+        <div
+          className="absolute inset-0 flex justify-end items-end hover:cursor-pointer hover:bg-gray-200 hover:bg-opacity-50 rounded-full"
+          onClick={handleButtonClick}
+        >
+          <span className="p-1 border-2 rounded-full bg-white">
+            <FaPencilAlt />
+          </span>
+        </div>
       </div>
       <input
         type="file"
