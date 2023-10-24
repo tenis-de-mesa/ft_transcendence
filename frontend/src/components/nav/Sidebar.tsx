@@ -95,7 +95,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           {
             block: isOpen,
             hidden: !isOpen,
-          }
+          },
         )}
       ></div>
 
@@ -109,7 +109,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           "shadow-xl",
           "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 overflow-hidden md:relative fixed",
           "border-r border-gray-100 dark:border-opacity-10",
-          className
+          className,
         )}
         onHoverStart={() => !isTab && setIsOpen(true)}
         onHoverEnd={() => !isTab && setIsOpen(false)}
@@ -119,7 +119,7 @@ export const Sidebar: FC<ISidebarProps> = ({
             "flex flex-row w-full py-3 mx-2 mb-8 transform ease-out duration-100",
             {
               "px-5": isOpen,
-            }
+            },
           )}
         >
           <img
@@ -145,7 +145,7 @@ export const Sidebar: FC<ISidebarProps> = ({
               "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar",
               {
                 "h-[60%]": isMob,
-              }
+              },
             )}
           >
             {options.map((item) => (
