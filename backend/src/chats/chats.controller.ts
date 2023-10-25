@@ -14,7 +14,12 @@ import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
 import { ChatEntity, ChatMemberRole, UserEntity } from '../core/entities';
-import { CreateChatDto, ChatWithName, UpdateChatDto } from './dto';
+import {
+  CreateChatDto,
+  ChatWithName,
+  UpdateChatDto,
+  ChangePasswordDto,
+} from './dto';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
@@ -60,6 +65,16 @@ export class ChatsController {
     @Body('password') password: string,
   ): Promise<void> {
     await this.chatsService.verifyPassword(id, password);
+  }
+
+  @Post(':id/change-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<void> {
+    return await this.chatsService.changePassword(id, dto);
   }
 
   @Get(':id')

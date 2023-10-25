@@ -26,6 +26,7 @@ import Games from "./routes/Games.tsx";
 import Settings from "./routes/Settings.tsx";
 import { redirectToChat } from "./loaders/redirectToChat.ts";
 import ErrorBoundary from "./routes/ErrorBoundary.tsx";
+import { changeChatPassword } from "./actions/changeChatPassword.ts";
 
 const router = createBrowserRouter([
   {
@@ -78,7 +79,11 @@ const router = createBrowserRouter([
           {
             path: "update/:id",
             action: updateChat,
-          }
+          },
+          {
+            path: ":id/change-password",
+            action: changeChatPassword,
+          },
         ],
       },
       {

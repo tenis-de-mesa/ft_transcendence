@@ -23,6 +23,7 @@ import {
   ChatWithName,
   CreateMessageDto,
   UpdateChatDto,
+  ChangePasswordDto,
 } from './dto';
 
 @Injectable()
@@ -148,6 +149,42 @@ export class ChatsService {
 
     chat.password = password ? await argon2.hash(password) : password;
     chat.access = access ?? chat.access;
+
+    await this.chatRepository.save(chat);
+  }
+
+  async changePassword(id: number, dto: ChangePasswordDto): Promise<void> {
+    const chat = await this.findOne(id);
+
+    const { currentPassword, newPassword, confirmPassword } = dto;
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException(
+        'Non-channel chats cannot be password protected',
+      );
+    }
+
+    if (chat.access === ChatAccess.PROTECTED) {
+      if (!currentPassword) {
+        throw new BadRequestException('Current password is required');
+      }
+
+      const isPasswordValid = await argon2.verify(
+        chat.password,
+        currentPassword,
+      );
+
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid channel password');
+      }
+    }
+
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
+    chat.password = newPassword ? await argon2.hash(newPassword) : null;
+    chat.access = newPassword ? ChatAccess.PROTECTED : ChatAccess.PUBLIC;
 
     await this.chatRepository.save(chat);
   }

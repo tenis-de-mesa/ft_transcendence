@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reflector } from '@nestjs/core';
 import { Repository } from 'typeorm';
@@ -16,7 +21,7 @@ export class ChannelRoleGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Get roles from decorator metadata
     const roles = this.reflector.get<ChatMemberRole[]>(
-      'channelRoles',
+      'ChatMemberRoles',
       context.getHandler(),
     );
 
@@ -31,7 +36,7 @@ export class ChannelRoleGuard implements CanActivate {
     const chatId = request.params?.id;
 
     if (!userId || !chatId) {
-      return false;
+      throw new UnauthorizedException('User or chat not found');
     }
 
     // Check if user is a member of the chat
@@ -41,10 +46,14 @@ export class ChannelRoleGuard implements CanActivate {
 
     // If user is not a member of the chat, deny access
     if (!member) {
-      return false;
+      throw new UnauthorizedException('User is not a member of the chat');
     }
 
     // Check if user has one of the specified roles
-    return roles.includes(member.role);
+    if (!roles.includes(member.role)) {
+      throw new UnauthorizedException('User does not have the required role');
+    }
+
+    return true;
   }
 }

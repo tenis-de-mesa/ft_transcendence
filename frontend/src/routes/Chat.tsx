@@ -26,7 +26,7 @@ export default function Chat() {
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [newConfirmPassword, setNewConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [user, setUser] = useState<User>(null);
 
@@ -61,7 +61,7 @@ export default function Chat() {
   const handleSubmitChangePassword = () => {
     setCurrentPassword("");
     setNewPassword("");
-    setNewConfirmPassword("");
+    setConfirmPassword("");
     setIsChangePassCardOpen(false);
   };
 
@@ -261,7 +261,7 @@ export default function Chat() {
                           setIsChangePassCardOpen(false);
                           setCurrentPassword("");
                           setNewPassword("");
-                          setNewConfirmPassword("");
+                          setConfirmPassword("");
                         }}
                       />
                     </div>
@@ -270,8 +270,8 @@ export default function Chat() {
                     <>
                       <Form
                         className="flex flex-col gap-3 text-left"
-                        method="PATCH"
-                        action={`/chats/update/${chatId}`}
+                        method="POST"
+                        action={`/chats/${chatId}/change-password`}
                         onSubmit={handleSubmitChangePassword}
                       >
                         {chat.access === "protected" && (
@@ -302,22 +302,22 @@ export default function Chat() {
                           name="newPassword"
                           placeholder="Insert new password"
                           error={
-                            newPassword !== newConfirmPassword ? true : false
+                            newPassword !== confirmPassword ? true : false
                           }
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
                         <Input
-                          value={newConfirmPassword}
+                          value={confirmPassword}
                           type="password"
-                          name="newConfirmPassword"
+                          name="confirmPassword"
                           placeholder="Confirm new password"
                           error={
-                            newPassword !== newConfirmPassword
+                            newPassword !== confirmPassword
                               ? "Passwords must match"
                               : false
                           }
                           onChange={(e) =>
-                            setNewConfirmPassword(e.target.value)
+                            setConfirmPassword(e.target.value)
                           }
                         />
                         <Button
@@ -327,8 +327,8 @@ export default function Chat() {
                           size="md"
                           disabled={
                             newPassword.length === 0 ||
-                            newConfirmPassword.length === 0 ||
-                            newPassword !== newConfirmPassword ||
+                            confirmPassword.length === 0 ||
+                            newPassword !== confirmPassword ||
                             (currentPassword.length === 0 &&
                               chat.access === "protected")
                           }
@@ -342,8 +342,8 @@ export default function Chat() {
                             Or
                           </Typography>
                           <Form
-                            method="PATCH"
-                            action={`/chats/update/${chatId}`}
+                            method="POST"
+                            action={`/chats/${chatId}/change-password`}
                             onSubmit={handleSubmitChangePassword}
                           >
                             <input

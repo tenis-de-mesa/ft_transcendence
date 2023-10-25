@@ -1,3 +1,3 @@
 export * from './get-sessionid.decorator';
 export * from './get-user.decorator';
-export * from './chat-member-roles.decorator';
+export * from './channel-roles.decorator';
