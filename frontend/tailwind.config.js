@@ -8,6 +8,7 @@ export default {
     colors: {
       transparent: "transparent",
       white: "#FFF",
+      black: "#000",
       gray: {
         25: "#FCFCFD",
         50: "#F9FAFB",

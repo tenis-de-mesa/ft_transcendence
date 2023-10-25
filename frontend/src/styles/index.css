@@ -11,6 +11,71 @@
 }
 
 @layer components {
+  /* Alert */
+  .alert-base {
+    @apply inline-flex gap-1 items-center rounded-sm font-semibold;
+  }
+
+  .alert-primary {
+    @apply bg-gray-500 text-white;
+  }
+
+  .alert-primary-outlined {
+    @apply bg-transparent border-solid border-2 border-gray-500 text-gray-500 dark:border-gray-400 dark:text-gray-400;
+  }
+
+  .alert-success {
+    @apply bg-success-500 text-black;
+  }
+
+  .alert-success-outlined {
+    @apply bg-transparent border-solid border-2 border-success-500 text-success-500;
+  }
+
+  .alert-info {
+    @apply bg-info-500 text-black;
+  }
+
+  .alert-info-outlined {
+    @apply bg-transparent border-solid border-2 border-info-500 text-info-500;
+  }
+
+  .alert-warning {
+    @apply bg-warning-500 text-black;
+  }
+
+  .alert-warning-outlined {
+    @apply bg-transparent border-solid border-2 border-warning-500 text-warning-500;
+  }
+
+  .alert-error {
+    @apply bg-error-500 text-white;
+  }
+
+  .alert-error-outlined {
+    @apply bg-transparent border-solid border-2 border-error-500 text-error-500;
+  }
+
+  .alert-sm {
+    @apply h-9 px-3.5 text-sm;
+  }
+
+  .alert-md {
+    @apply h-10 px-4 text-sm;
+  }
+
+  .alert-lg {
+    @apply px-4 h-11 text-md;
+  }
+
+  .alert-xl {
+    @apply h-12 px-5 text-md;
+  }
+
+  .alert-2xl {
+    @apply h-16 text-lg px-7;
+  }
+
   /* Badge */
   .badge-base {
     @apply inline-flex items-center font-medium rounded-2xl;

@@ -7,7 +7,7 @@ import {
   useRevalidator,
 } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -18,12 +18,14 @@ import { FiX, FiLock, FiUnlock } from "react-icons/fi";
 import { Hr } from "../components/Hr";
 import { blockUser, unblockUser } from "../actions/blockUser";
 import classNames from "classnames";
+import { Alert } from "../components/Alert";
 
 export default function Chat() {
   const revalidator = useRevalidator();
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
-
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -58,11 +60,59 @@ export default function Chat() {
     return userMe.blockedUsers.includes(userBlockedId);
   };
 
-  const handleSubmitChangePassword = () => {
+  const unsetErrorAndSuccess = () => {
+    setError("");
+    setSuccess("");
+  };
+
+  const unsetChangePassCard = () => {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setIsChangePassCardOpen(false);
+  };
+
+  const handleSubmitChangePassword = async (e: any) => {
+    e.preventDefault();
+
+    const url = `http://localhost:3001/chats/${chatId}/change-password`;
+
+    const body = {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      unsetChangePassCard();
+
+      if (!response.ok) {
+        const { message } = await response.json();
+        setError(message);
+        return;
+      }
+    } catch (error) {
+      setError(error.message);
+      return;
+    }
+
+    setSuccess(
+      currentPassword && newPassword && confirmPassword
+        ? "Password changed successfully"
+        : currentPassword
+        ? "Password removed successfully"
+        : "Password set successfully"
+    );
+
+    revalidator.revalidate();
   };
 
   useEffect(() => {
@@ -86,11 +136,17 @@ export default function Chat() {
     );
   }, [chatId]);
 
+  const handleCloseChangePassCard = useCallback(async () => {
+    unsetChangePassCard();
+    unsetErrorAndSuccess();
+    setIsChangePassCardOpen(false);
+  }, [unsetChangePassCard, unsetErrorAndSuccess, setIsChangePassCardOpen]);
+
   // Add event listener to close change password dialog when clicking outside of it
   useEffect(() => {
     const handleOutsideClick = (e: any) => {
       if (isChangePassCardOpen && !e.target.closest("#change-password-card")) {
-        handleSubmitChangePassword();
+        handleCloseChangePassCard();
       }
     };
 
@@ -103,7 +159,7 @@ export default function Chat() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isChangePassCardOpen, handleSubmitChangePassword]);
+  }, [handleCloseChangePassCard]);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -257,12 +313,7 @@ export default function Chat() {
                         IconOnly={<FiX />}
                         size="md"
                         variant="info"
-                        onClick={() => {
-                          setIsChangePassCardOpen(false);
-                          setCurrentPassword("");
-                          setNewPassword("");
-                          setConfirmPassword("");
-                        }}
+                        onClick={handleCloseChangePassCard}
                       />
                     </div>
                   </Card.Title>
@@ -270,8 +321,7 @@ export default function Chat() {
                     <>
                       <Form
                         className="flex flex-col gap-3 text-left"
-                        method="POST"
-                        action={`/chats/${chatId}/change-password`}
+                        onChange={unsetErrorAndSuccess}
                         onSubmit={handleSubmitChangePassword}
                       >
                         {chat.access === "protected" && (
@@ -301,9 +351,7 @@ export default function Chat() {
                           type="password"
                           name="newPassword"
                           placeholder="Insert new password"
-                          error={
-                            newPassword !== confirmPassword ? true : false
-                          }
+                          error={newPassword !== confirmPassword ? true : false}
                           onChange={(e) => setNewPassword(e.target.value)}
                         />
                         <Input
@@ -316,9 +364,7 @@ export default function Chat() {
                               ? "Passwords must match"
                               : false
                           }
-                          onChange={(e) =>
-                            setConfirmPassword(e.target.value)
-                          }
+                          onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                         <Button
                           className="w-full justify-center"
@@ -341,11 +387,7 @@ export default function Chat() {
                           <Typography className="my-3" variant="md">
                             Or
                           </Typography>
-                          <Form
-                            method="POST"
-                            action={`/chats/${chatId}/change-password`}
-                            onSubmit={handleSubmitChangePassword}
-                          >
+                          <Form onSubmit={handleSubmitChangePassword}>
                             <input
                               type="hidden"
                               name="currentPassword"
@@ -367,6 +409,26 @@ export default function Chat() {
                             </Button>
                           </Form>
                         </>
+                      )}
+
+                      {error && (
+                        <Alert
+                          className="w-full mt-3"
+                          severity="error"
+                          variant="filled"
+                        >
+                          {error}
+                        </Alert>
+                      )}
+
+                      {success && (
+                        <Alert
+                          className="w-full mt-3"
+                          severity="success"
+                          variant="filled"
+                        >
+                          {success}
+                        </Alert>
                       )}
                     </>
                   </Card.Body>
