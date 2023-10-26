@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiMeh } from "react-icons/fi";
 import { Alert, AlertProps } from "../components/Alert";
 import StoryLayout from "./StoryLayout";
 
@@ -17,7 +17,7 @@ interface Props extends AlertProps {
 
 const StoryAlert = (args: Props) => (
   <StoryLayout {...args} className="space-y-2">
-  {/* TODO: Better solution than <br/> */}
+    {/* TODO: Better solution than <br/> */}
 
     <Alert {...args} severity="primary">
       Standard
@@ -49,11 +49,13 @@ const StoryAlert = (args: Props) => (
 
     <br />
 
-    <Alert {...args}>Default</Alert>
+    <Alert {...args} LeadingIcon={<FiMeh />}>
+      Custom Icon
+    </Alert>
 
     <br />
 
-    <Alert {...args} TrailingIcon={<FiArrowRight />}>
+    <Alert {...args} TrailingIcon={<FiMeh />}>
       Trailing Icon
     </Alert>
   </StoryLayout>
