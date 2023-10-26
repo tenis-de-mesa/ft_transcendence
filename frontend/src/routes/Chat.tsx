@@ -218,90 +218,81 @@ export default function Chat() {
       </Card.Title>
       <Card.Body position="left" className="h-5/6">
         <div className="h-full">
-          <div
-            onClick={() => setIsProfileCardOpen(false)}
-            className={classNames(
-              "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
-              {
-                block: isProfileCardOpen,
-                hidden: !isProfileCardOpen,
-              }
-            )}
-          ></div>
-
           {isProfileCardOpen && (
-            <div
-              id="profile-card"
-              className="absolute z-[1001] w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-            >
-              <Card className="dark:bg-gray-900">
-                <Card.Title>
-                  <div className="flex items-center justify-between">
-                    <Avatar
-                      size="sm"
-                      seed={user?.login}
-                      src={user?.avatarUrl}
-                    />
-                    <Typography variant="h6">
-                      <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
-                    </Typography>
+            <>
+              <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>
+              <div
+                id="profile-card"
+                className="absolute z-[1001] w-1/2 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+              >
+                <Card className="dark:bg-gray-900">
+                  <Card.Title>
+                    <div className="flex items-center justify-between">
+                      <Avatar
+                        size="sm"
+                        seed={user?.login}
+                        src={user?.avatarUrl}
+                      />
+                      <Typography variant="h6">
+                        <Link to={`/profile/${user?.id}`}>
+                          {user?.nickname}
+                        </Link>
+                      </Typography>
 
-                    {userMe.id != user?.id &&
-                      chat.type == "direct" &&
-                      (!checkUserIsBlocked(user?.id) ? (
-                        <Button
-                          IconOnly={<LiaUserSlashSolid />}
-                          size="md"
-                          variant="error"
-                          onClick={() => {
-                            setIsProfileCardOpen(false);
-                            blockUser(user?.id);
-                          }}
-                        />
-                      ) : (
-                        <Button
-                          IconOnly={<LiaUserSolid />}
-                          size="md"
-                          variant="success"
-                          onClick={() => {
-                            setIsProfileCardOpen(false);
-                            unblockUser(user?.id);
-                          }}
-                        />
-                      ))}
+                      {userMe.id != user?.id &&
+                        chat.type == "direct" &&
+                        (!checkUserIsBlocked(user?.id) ? (
+                          <Button
+                            IconOnly={<LiaUserSlashSolid />}
+                            size="md"
+                            variant="error"
+                            onClick={() => {
+                              setIsProfileCardOpen(false);
+                              blockUser(user?.id);
+                            }}
+                          />
+                        ) : (
+                          <Button
+                            IconOnly={<LiaUserSolid />}
+                            size="md"
+                            variant="success"
+                            onClick={() => {
+                              setIsProfileCardOpen(false);
+                              unblockUser(user?.id);
+                            }}
+                          />
+                        ))}
 
-                    <Button
-                      IconOnly={<FiX />}
-                      size="md"
-                      variant="info"
-                      onClick={() => setIsProfileCardOpen(false)}
-                    />
-                  </div>
-                </Card.Title>
-                <Card.Body>
-                  <div className="flip-card">
-                    <div className="wrapper">
-                      <div className="card front">
-                        <Typography variant="sm">
-                          <strong>Nickname:</strong> {user?.nickname}
-                        </Typography>
+                      <Button
+                        IconOnly={<FiX />}
+                        size="md"
+                        variant="info"
+                        onClick={() => setIsProfileCardOpen(false)}
+                      />
+                    </div>
+                  </Card.Title>
+                  <Card.Body>
+                    <div className="flip-card">
+                      <div className="wrapper">
+                        <div className="card front">
+                          <Typography variant="sm">
+                            <strong>Nickname:</strong> {user?.nickname}
+                          </Typography>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </div>
+                  </Card.Body>
+                </Card>
+              </div>
+            </>
           )}
 
           {isChangePassCardOpen && (
             <>
-              <div
-                className="overlay fixed top-0 left-0 w-full h-full z-999"
-                style={{ background: "rgba(0, 0, 0, .65)" }} // TODO: Tailwind
-              ></div>
+              <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>
               <div
                 id="change-password-card"
-                className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2"
+                className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2 z-[1001]"
               >
                 <Card className="dark:bg-gray-900">
                   <Card.Title>
