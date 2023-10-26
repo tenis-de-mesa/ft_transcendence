@@ -21,7 +21,7 @@
   }
 
   .alert-primary-outlined {
-    @apply bg-transparent border-solid border-2 border-gray-500 text-gray-500 dark:border-gray-400 dark:text-gray-400;
+    @apply bg-transparent ring-inset ring-2 ring-gray-500 text-gray-500 dark:ring-gray-400 dark:text-gray-400;
   }
 
   .alert-success {
@@ -29,7 +29,7 @@
   }
 
   .alert-success-outlined {
-    @apply bg-transparent border-solid border-2 border-success-500 text-success-500;
+    @apply bg-transparent ring-inset ring-2 ring-success-500 text-success-500;
   }
 
   .alert-info {
@@ -37,7 +37,7 @@
   }
 
   .alert-info-outlined {
-    @apply bg-transparent border-solid border-2 border-info-500 text-info-500;
+    @apply bg-transparent ring-inset ring-2 ring-info-500 text-info-500;
   }
 
   .alert-warning {
@@ -45,7 +45,7 @@
   }
 
   .alert-warning-outlined {
-    @apply bg-transparent border-solid border-2 border-warning-500 text-warning-500;
+    @apply bg-transparent ring-inset ring-2 ring-warning-500 text-warning-500;
   }
 
   .alert-error {
@@ -53,7 +53,7 @@
   }
 
   .alert-error-outlined {
-    @apply bg-transparent border-solid border-2 border-error-500 text-error-500;
+    @apply bg-transparent ring-inset ring-2 ring-error-500 text-error-500;
   }
 
   .alert-sm {
