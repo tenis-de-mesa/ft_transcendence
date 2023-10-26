@@ -17,27 +17,41 @@ interface Props extends AlertProps {
 
 const StoryAlert = (args: Props) => (
   <StoryLayout {...args} className="space-y-2">
+  {/* TODO: Better solution than <br/> */}
+
     <Alert {...args} severity="primary">
       Standard
     </Alert>
+
+    <br />
 
     <Alert {...args} severity="success">
       Success
     </Alert>
 
+    <br />
+
     <Alert {...args} severity="info">
       Info
     </Alert>
+
+    <br />
 
     <Alert {...args} severity="warning">
       Warning
     </Alert>
 
+    <br />
+
     <Alert {...args} severity="error">
       Error
     </Alert>
 
+    <br />
+
     <Alert {...args}>Default</Alert>
+
+    <br />
 
     <Alert {...args} TrailingIcon={<FiArrowRight />}>
       Trailing Icon

@@ -13,7 +13,7 @@
 @layer components {
   /* Alert */
   .alert-base {
-    @apply inline-flex gap-1 items-center rounded-sm font-semibold;
+    @apply inline-flex gap-2 items-center rounded-sm font-semibold;
   }
 
   .alert-primary {

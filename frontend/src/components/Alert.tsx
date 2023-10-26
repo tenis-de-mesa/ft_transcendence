@@ -6,6 +6,7 @@ import {
   FiCheckCircle,
   FiInfo,
 } from "react-icons/fi";
+import { Typography } from "./Typography";
 
 type AlertSeverity = "primary" | "success" | "info" | "warning" | "error";
 type AlertVariant = "filled" | "outlined";
@@ -54,7 +55,7 @@ const AlertSizeClasses: Record<AlertSize, string> = {
 };
 
 export interface AlertProps {
-  children?: React.ReactElement | string;
+  children?: string;
   className?: string;
   severity?: AlertSeverity;
   variant?: AlertVariant;
@@ -63,6 +64,7 @@ export interface AlertProps {
   LeadingIcon?: React.ReactElement;
 }
 
+// TODO: Fix border box sizing
 export const Alert: FC<AlertProps> = ({
   children,
   className,
@@ -92,7 +94,7 @@ export const Alert: FC<AlertProps> = ({
       ) : (
         AlertSeverityIconClassName
       )}
-      {children}
+      {children && <span className="mb-[.12em]">{children}</span>}
       {TrailingIcon ? (
         <TrailingIcon.type
           {...TrailingIcon.props}
