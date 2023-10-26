@@ -17,7 +17,6 @@ import { Input } from "../components/Input";
 import { FiX, FiLock, FiUnlock } from "react-icons/fi";
 import { Hr } from "../components/Hr";
 import { blockUser, unblockUser } from "../actions/blockUser";
-import classNames from "classnames";
 import { Alert } from "../components/Alert";
 
 export default function Chat() {
