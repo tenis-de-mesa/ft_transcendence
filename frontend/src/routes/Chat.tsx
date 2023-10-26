@@ -7,7 +7,7 @@ import {
   useRevalidator,
 } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -69,6 +69,12 @@ export default function Chat() {
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
+  };
+
+  const handleCloseChangePassCard = () => {
+    unsetChangePassCard();
+    unsetErrorAndSuccess();
+    setIsChangePassCardOpen(false);
   };
 
   const handleSubmitChangePassword = async (e: any) => {
@@ -136,16 +142,10 @@ export default function Chat() {
     );
   }, [chatId]);
 
-  const handleCloseChangePassCard = useCallback(async () => {
-    unsetChangePassCard();
-    unsetErrorAndSuccess();
-    setIsChangePassCardOpen(false);
-  }, [unsetChangePassCard, unsetErrorAndSuccess, setIsChangePassCardOpen]);
-
   // Add event listener to close change password dialog when clicking outside of it
   useEffect(() => {
     const handleOutsideClick = (e: any) => {
-      if (isChangePassCardOpen && !e.target.closest("#change-password-card")) {
+      if (!e.target.closest("#change-password-card")) {
         handleCloseChangePassCard();
       }
     };
@@ -159,7 +159,7 @@ export default function Chat() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [handleCloseChangePassCard]);
+  }, [isChangePassCardOpen]);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -178,12 +178,12 @@ export default function Chat() {
         revalidator.revalidate();
       }
     });
-  });
+  }, []);
 
   // Add event listener to close profile card when clicking outside of it
   useEffect(() => {
     const handleOutsideClick = (e: any) => {
-      if (isProfileCardOpen && !e.target.closest("#profile-card")) {
+      if (!e.target.closest("#profile-card")) {
         setIsProfileCardOpen(false);
       }
     };
@@ -197,7 +197,7 @@ export default function Chat() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isProfileCardOpen, setIsProfileCardOpen]);
+  }, [isProfileCardOpen]);
 
   return (
     <Card className="w-full h-full">
