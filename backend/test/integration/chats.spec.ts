@@ -126,7 +126,6 @@ describe('Chats', () => {
       const chat = await chatsService.create(
         {
           userIds: [user1.id, user2.id],
-          access: ChatAccess.PUBLIC,
           type: ChatType.DIRECT,
         },
         user1,
