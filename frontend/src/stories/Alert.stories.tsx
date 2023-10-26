@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { FiArrowRight, FiMeh } from "react-icons/fi";
+import { FiMeh } from "react-icons/fi";
 import { Alert, AlertProps } from "../components/Alert";
 import StoryLayout from "./StoryLayout";
 
