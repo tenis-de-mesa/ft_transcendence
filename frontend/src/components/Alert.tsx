@@ -6,7 +6,6 @@ import {
   FiCheckCircle,
   FiInfo,
 } from "react-icons/fi";
-import { Typography } from "./Typography";
 
 type AlertSeverity = "primary" | "success" | "info" | "warning" | "error";
 type AlertVariant = "filled" | "outlined";
@@ -38,12 +37,12 @@ const AlertSeverityClasses: Record<
   },
 };
 
-const AlertSeverityIconClasses: Record<AlertSeverity, JSX.Element> = {
-  primary: <FiInfo />,
-  success: <FiCheckCircle />,
-  info: <FiInfo />,
-  warning: <FiAlertTriangle />,
-  error: <FiAlertCircle />,
+const AlertSeverityIconClasses: Record<AlertSeverity, any> = {
+  primary: FiInfo,
+  success: FiCheckCircle,
+  info: FiInfo,
+  warning: FiAlertTriangle,
+  error: FiAlertCircle,
 };
 
 const AlertSizeClasses: Record<AlertSize, string> = {
@@ -52,6 +51,14 @@ const AlertSizeClasses: Record<AlertSize, string> = {
   lg: "alert-lg",
   xl: "alert-xl",
   "2xl": "alert-2xl",
+};
+
+const AlertIconSizeClasses: Record<AlertSize, number> = {
+  sm: 20,
+  md: 25,
+  lg: 30,
+  xl: 35,
+  "2xl": 40,
 };
 
 export interface AlertProps {
@@ -64,7 +71,6 @@ export interface AlertProps {
   LeadingIcon?: React.ReactElement;
 }
 
-// TODO: Fix border box sizing
 export const Alert: FC<AlertProps> = ({
   children,
   className,
@@ -77,6 +83,8 @@ export const Alert: FC<AlertProps> = ({
   const AlertSeverityClassName = AlertSeverityClasses[severity];
   const AlertVariantClassName = AlertSeverityClassName[variant];
   const AlertSeverityIconClassName = AlertSeverityIconClasses[severity];
+  const AlertIconSizeClassName = AlertIconSizeClasses[size];
+
   return (
     <div
       className={classNames(
@@ -89,16 +97,18 @@ export const Alert: FC<AlertProps> = ({
       {LeadingIcon ? (
         <LeadingIcon.type
           {...LeadingIcon.props}
+          size={AlertIconSizeClassName}
           className={classNames(LeadingIcon.props.className)}
         />
       ) : (
-        AlertSeverityIconClassName
+        <AlertSeverityIconClassName size={AlertIconSizeClassName} />
       )}
-      {children && <span className="mb-[.12em]">{children}</span>}
+      {children && <span className="mb-[.115em]">{children}</span>}
       {TrailingIcon ? (
         <TrailingIcon.type
           {...TrailingIcon.props}
-          className={classNames(TrailingIcon.props.className)}
+          size={AlertIconSizeClassName}
+          className={classNames(TrailingIcon.props.className, "ml-auto")}
         />
       ) : null}
     </div>

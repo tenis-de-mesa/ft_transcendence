@@ -89,11 +89,11 @@ export default {
       }
     },
     fontSize: {
-      xs: ["12px", "18px"],
+      xs: ["12px", "16px"],
       sm: ["14px", "20px"],
       md: ["16px", "24px"],
       lg: ["18px", "28px"],
-      xl: ["20px", "30px"],
+      xl: ["20px", "32px"],
 
       h6: ["24px", "32px"],
       h5: ["30px", "38px"],
