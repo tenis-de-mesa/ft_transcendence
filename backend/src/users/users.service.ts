@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
@@ -19,7 +24,42 @@ export class UsersService {
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({ relations: { friends: true } });
+  }
+
+  async addFriend(currentUser: UserEntity, friendId: number): Promise<void> {
+    if (currentUser.id == friendId) {
+      throw new BadRequestException('You cannot add yourself as a friend');
+    }
+    const newFriend = await this.userRepository.findOne({
+      where: { id: friendId },
+    });
+    if (!newFriend) {
+      throw new BadRequestException('Friend not found');
+    }
+    const isAlreadyFriend = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friends', 'friend')
+      .where('user.id = :userId and friend.id = :friendId', {
+        userId: currentUser.id,
+        friendId,
+      })
+      .getOne();
+    if (isAlreadyFriend) {
+      throw new ConflictException('Friend already added');
+    }
+    // Add the new friend to the current user's list of friends
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(UserEntity, 'friends')
+      .of(currentUser.id)
+      .add(friendId);
+    // Add the current user to the new friend's list of friends
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(UserEntity, 'friends')
+      .of(friendId)
+      .add(currentUser.id);
   }
 
   async createUser(dto: CreateUserDto): Promise<UserEntity> {

@@ -15,7 +15,7 @@ import {
 import { AuthenticatedGuard } from '../auth/guards';
 import { UsersService } from './users.service';
 import { User } from '../core/decorators';
-import { UpdateUserDto } from './dto';
+import { UpdateUserDto, AddFriendDto } from './dto';
 import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -50,6 +50,12 @@ export class UsersController {
       blockedUsers = _blockedUsers;
     }
     return { ...user, blockedBy, blockedUsers };
+  }
+
+  @Get('friends')
+  async getUserFriends(@Request() req: any) {
+    const currentUser = req.user;
+    return this.usersService.getUserFriends(currentUser);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -89,10 +95,10 @@ export class UsersController {
     return this.usersService.deleteUser(id);
   }
 
-  @Get('/friends')
-  async getUserFriends(@Request() req: any) {
-    const currentUser = req.user;
-    return this.usersService.getUserFriends(currentUser);
+  @UseGuards(AuthenticatedGuard)
+  @Post('/friends')
+  async addFriends(@User() user: UserEntity, @Body() body: AddFriendDto) {
+    return await this.usersService.addFriend(user, body.friendId);
   }
 
   @UseGuards(AuthenticatedGuard)

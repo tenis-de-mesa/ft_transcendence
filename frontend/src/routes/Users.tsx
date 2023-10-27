@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { socket } from "../socket";
 import { useEffect, useMemo, useState } from "react";
 import { User, UserStatus } from "../types/types";
@@ -11,13 +11,21 @@ import Table from "../components/Table";
 import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
 import { RootUser } from "./Root";
+import { FiCheck, FiPlus } from "react-icons/fi";
+import { Badge } from "../components/Badge";
 
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
   const currentUser = RootUser();
-  const initialUsers: User[] = useLoaderData() as User[];
-  const [users, setUsers] = useState(initialUsers);
+  const revalidator = useRevalidator();
+  const loadedUsers: User[] = useLoaderData() as User[];
+  const [users, setUsers] = useState(loadedUsers);
+
+  // When loadedUsers changes, update the users state
+  useEffect(() => {
+    setUsers(loadedUsers);
+  }, [loadedUsers]);
 
   useEffect(() => {
     // Listen for user status updates from the server
@@ -31,7 +39,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        }),
+        })
       );
     });
 
@@ -42,12 +50,57 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      }),
+      })
     );
   }, [currentUser.id]);
 
+  const handleAddFriend = async (userId: number) => {
+    const response = await fetch(`http://localhost:3001/users/friends`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ friendId: userId }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to add friend");
+    }
+    revalidator.revalidate();
+  };
+
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
+      columnHelper.accessor("friends", {
+        header: "friends",
+        cell: (info) => {
+          const friends = info.getValue();
+          const isFriend = friends.some(
+            (friend) => friend.id === currentUser.id
+          );
+          // If is yourself, return nothing
+          if (info.row.original.id === currentUser.id) {
+            return <></>;
+          }
+          if (isFriend) {
+            return (
+              <Badge TrailingIcon={<FiCheck />} size="md" variant="info">
+                Amigos
+              </Badge>
+            );
+          }
+          return (
+            <Button
+              variant="info"
+              size="sm"
+              TrailingIcon={<FiPlus />}
+              onClick={() => handleAddFriend(info.row.original.id)}
+            >
+              Adicionar
+            </Button>
+          );
+        },
+      }),
       columnHelper.accessor("nickname", {
         header: "Nickname",
         cell: (info) => <i>{info.getValue()}</i>,
@@ -88,7 +141,7 @@ export default function Users() {
         },
       }),
     ],
-    [],
+    []
   );
 
   return (
