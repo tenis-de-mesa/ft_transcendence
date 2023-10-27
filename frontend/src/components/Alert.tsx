@@ -1,5 +1,6 @@
-import { FC } from "react";
 import classNames from "classnames";
+import { FC } from "react";
+import { IconType } from "react-icons";
 import {
   FiAlertCircle,
   FiAlertTriangle,
@@ -37,7 +38,7 @@ const AlertSeverityClasses: Record<
   },
 };
 
-const AlertSeverityIconClasses: Record<AlertSeverity, any> = {
+const AlertSeverityIconClasses: Record<AlertSeverity, IconType> = {
   primary: FiInfo,
   success: FiCheckCircle,
   info: FiInfo,
