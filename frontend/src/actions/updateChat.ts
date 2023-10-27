@@ -12,7 +12,7 @@ export async function updateChat({ request, params }: ActionFunctionArgs) {
   }
 
   if (chatAccess === "protected") {
-    const verifyURL = `http://localhost:3001/chats/verify/${chatId}`;
+    const verifyURL = `http://localhost:3001/chats/${chatId}/verify`;
     const verifyBody = { password: currentPassword };
 
     try {
