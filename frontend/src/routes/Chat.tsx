@@ -7,7 +7,7 @@ import {
   useRevalidator,
 } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -70,11 +70,11 @@ export default function Chat() {
     setConfirmPassword("");
   };
 
-  const handleCloseChangePassCard = () => {
+  const handleCloseChangePassCard = useCallback(() => {
     unsetChangePassCard();
     unsetErrorAndSuccess();
     setIsChangePassCardOpen(false);
-  };
+  }, []);
 
   const handleSubmitChangePassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
