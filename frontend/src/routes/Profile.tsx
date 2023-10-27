@@ -1,21 +1,19 @@
-import {
-  Link,
-  useLoaderData,
-  useParams,
-  useRouteLoaderData,
-} from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
 import "./Profile.css";
 import { Avatar } from "../components/Avatar";
+import { RootUser } from "./Root";
+import { Card } from "../components/Card";
+import { Button } from "../components/Button";
+import { Typography } from "../components/Typography";
+import UserUpdateAvatar from "../components/UserUpdateAvatar";
 
 export default function Profile() {
-  const { id } = useParams();
-
-  const userId = Number(id);
-  const userMe = useRouteLoaderData("root") as User;
-  const userOther = useLoaderData() as User;
+  const currentUser = RootUser();
+  const profileUser = useLoaderData() as User; // loadUserById
+  const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
     const alternate = document.querySelector(".flip-card .wrapper");
@@ -24,50 +22,60 @@ export default function Profile() {
     }
   };
 
-  return !userId ? (
-    <div className="profile">
-      <div className="flip-card">
-        <div className="wrapper">
-          <div className="card back">
-            <UserForm user={userMe} />
-            <button onClick={flipCard} className="back-button">
+  return (
+    <div className="profile h-full">
+      <div className="flip-card grid">
+        <div className="wrapper self-center">
+          <Card className="card front">
+            <Card.Title>
+              <>
+                <Avatar
+                  seed={profileUser.login}
+                  src={profileUser.avatarUrl}
+                  className="inline"
+                />
+                <Typography customWeight="regular" variant="h4">
+                  {profileUser.nickname}
+                </Typography>
+                {isViewingOwnProfile && (
+                  <Button
+                    variant="info"
+                    onClick={flipCard}
+                    className="absolute top-0 right-0 p-2 shadow-none"
+                  >
+                    Editar
+                  </Button>
+                )}
+              </>
+            </Card.Title>
+            <Card.Body>
+              <Typography customWeight="regular" variant="md">
+                <span className="flex justify-between">
+                  <strong>Login:</strong>
+                  {profileUser.login}
+                </span>
+                <span className="flex justify-between">
+                  <strong>Nickname:</strong>
+                  {currentUser.nickname}
+                </span>
+              </Typography>
+            </Card.Body>
+          </Card>
+          <Card className="card back">
+            <Button
+              variant="info"
+              onClick={flipCard}
+              className="absolute top-0 left-0 p-2 shadow-none"
+            >
               Voltar
-            </button>
-          </div>
-          <div className="card front">
-            <center>
-              <Avatar seed={userMe.login} src={userMe.avatarUrl} />
-              <h1>{userMe.nickname}</h1>
-              <button onClick={flipCard} className="edit-button">
-                Editar
-              </button>
-            </center>
-            <hr />
-            <p>
-              <strong>Login:</strong> {userMe.login}
-            </p>
-            <p>
-              <strong>Nickname:</strong> {userMe.nickname}
-            </p>
-            <Link to={"/logout"}>Sair</Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  ) : (
-    <div className="profile">
-      <div className="flip-card">
-        <div className="wrapper">
-          <div className="card front">
-            <center>
-              <Avatar seed={userOther.login} src={userOther.avatarUrl} />
-              <h1>{userOther.nickname}</h1>
-            </center>
-            <hr />
-            <p>
-              <strong>Nickname:</strong> {userOther.nickname}
-            </p>
-          </div>
+            </Button>
+            <Card.Title>
+              <UserUpdateAvatar user={profileUser} />
+            </Card.Title>
+            <Card.Body position="left">
+              <UserForm user={profileUser} />
+            </Card.Body>
+          </Card>
         </div>
       </div>
     </div>
