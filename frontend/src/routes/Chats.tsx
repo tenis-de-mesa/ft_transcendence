@@ -45,8 +45,10 @@ export default function Chats() {
 
   // Add event listener to close create channel card when clicking outside of it
   useEffect(() => {
-    const handleOutsideClick = (e: any) => {
-      if (isCreateChannelCard && !e.target.closest("#create-channel-card")) {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+
+      if (!target.closest("#create-channel-card")) {
         setIsCreateChannelCard(false);
       }
     };
@@ -60,21 +62,10 @@ export default function Chats() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isCreateChannelCard, setIsCreateChannelCard]);
+  }, [isCreateChannelCard]);
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
-      <div
-        onClick={() => setIsCreateChannelCard(false)}
-        className={classNames(
-          "fixed inset-0 max-h-screen z-[1000] bg-gray-900/50",
-          {
-            block: isCreateChannelCard,
-            hidden: !isCreateChannelCard,
-          }
-        )}
-      ></div>
-
       <div className="w-1/4">
         <Card className="h-full">
           <Card.Title>
@@ -83,120 +74,123 @@ export default function Chats() {
           <Card.Body className="h-full pt-0">
             <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
               {isCreateChannelCard && (
-                <div
-                  id="create-channel-card"
-                  className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                >
-                  <Card className="dark:bg-gray-900">
-                    <Card.Title>
-                      <div className="flex items-center justify-between gap-5">
-                        <Typography variant="md">
-                          Select friends to chat with
-                        </Typography>
-                        <Button
-                          IconOnly={<FiX />}
-                          size="sm"
-                          variant="info"
-                          onClick={() => setIsCreateChannelCard(false)}
-                        />
-                      </div>
-                    </Card.Title>
-                    <Card.Body>
-                      <div>
-                        <Input
-                          type="text"
-                          placeholder="Search users"
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-
-                        <div className="my-3 overflow-y-auto">
-                          <ul className="flex flex-col items-start">
-                            {filteredUsers.map((user) => {
-                              if (user.id === currentUser.id) return null;
-                              return (
-                                <li key={user.id}>
-                                  <input
-                                    className="mr-1"
-                                    type="checkbox"
-                                    checked={selectedUsers.includes(user.id)}
-                                    onChange={() =>
-                                      toggleUserSelection(user.id)
-                                    }
-                                  />
-                                  <Typography variant="sm" as="label">
-                                    {user.nickname}
-                                  </Typography>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                <>
+                  <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>
+                  <div
+                    id="create-channel-card"
+                    className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+                  >
+                    <Card className="dark:bg-gray-900">
+                      <Card.Title>
+                        <div className="flex items-center justify-between gap-5">
+                          <Typography variant="md">
+                            Select friends to chat with
+                          </Typography>
+                          <Button
+                            IconOnly={<FiX />}
+                            size="sm"
+                            variant="info"
+                            onClick={() => setIsCreateChannelCard(false)}
+                          />
                         </div>
+                      </Card.Title>
+                      <Card.Body>
+                        <div>
+                          <Input
+                            type="text"
+                            placeholder="Search users"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
 
-                        <Form
-                          method="POST"
-                          action="/channels"
-                          onSubmit={handleNewChannelSubmit}
-                        >
-                          {selectedUsers.map((userId, index) => (
+                          <div className="my-3 overflow-y-auto">
+                            <ul className="flex flex-col items-start">
+                              {filteredUsers.map((user) => {
+                                if (user.id === currentUser.id) return null;
+                                return (
+                                  <li key={user.id}>
+                                    <input
+                                      className="mr-1"
+                                      type="checkbox"
+                                      checked={selectedUsers.includes(user.id)}
+                                      onChange={() =>
+                                        toggleUserSelection(user.id)
+                                      }
+                                    />
+                                    <Typography variant="sm" as="label">
+                                      {user.nickname}
+                                    </Typography>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+
+                          <Form
+                            method="POST"
+                            action="/channels"
+                            onSubmit={handleNewChannelSubmit}
+                          >
+                            {selectedUsers.map((userId, index) => (
+                              <input
+                                type="hidden"
+                                name="users[]"
+                                value={userId}
+                                key={index}
+                              />
+                            ))}
                             <input
                               type="hidden"
                               name="users[]"
-                              value={userId}
-                              key={index}
+                              value={currentUser.id}
                             />
-                          ))}
-                          <input
-                            type="hidden"
-                            name="users[]"
-                            value={currentUser.id}
-                          />
 
-                          <Hr className="my-3"></Hr>
+                            <Hr className="my-3"></Hr>
 
-                          <input
-                            type="checkbox"
-                            name="hasPassword"
-                            id="hasPassword"
-                            className="mr-1 mb-3"
-                            onChange={() => setHasPassword(!hasPassword)}
-                          />
-                          <Typography variant="sm" as="label">
-                            Protect with password
-                          </Typography>
-
-                          {hasPassword && (
-                            <div className="mb-3">
-                              <Input
-                                type="password"
-                                placeholder="Insert password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                              ></Input>
-                            </div>
-                          )}
-
-                          {hasPassword && (
                             <input
-                              type="hidden"
-                              name="password"
-                              value={password}
+                              type="checkbox"
+                              name="hasPassword"
+                              id="hasPassword"
+                              className="mr-1 mb-3"
+                              onChange={() => setHasPassword(!hasPassword)}
                             />
-                          )}
+                            <Typography variant="sm" as="label">
+                              Protect with password
+                            </Typography>
 
-                          <Button
-                            className="justify-center w-full"
-                            type="submit"
-                            variant="info"
-                            disabled={hasPassword && password.length === 0}
-                          >
-                            Create Channel
-                          </Button>
-                        </Form>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </div>
+                            {hasPassword && (
+                              <div className="mb-3">
+                                <Input
+                                  type="password"
+                                  placeholder="Insert password"
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                ></Input>
+                              </div>
+                            )}
+
+                            {hasPassword && (
+                              <input
+                                type="hidden"
+                                name="password"
+                                value={password}
+                              />
+                            )}
+
+                            <Button
+                              className="justify-center w-full"
+                              type="submit"
+                              variant="info"
+                              disabled={hasPassword && password.length === 0}
+                            >
+                              Create Channel
+                            </Button>
+                          </Form>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                </>
               )}
 
               <div>

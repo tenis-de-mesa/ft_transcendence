@@ -7,7 +7,7 @@ import {
   useRevalidator,
 } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -76,7 +76,7 @@ export default function Chat() {
     setIsChangePassCardOpen(false);
   };
 
-  const handleSubmitChangePassword = async (e: any) => {
+  const handleSubmitChangePassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const url = `http://localhost:3001/chats/${chatId}/change-password`;
@@ -143,8 +143,10 @@ export default function Chat() {
 
   // Add event listener to close change password dialog when clicking outside of it
   useEffect(() => {
-    const handleOutsideClick = (e: any) => {
-      if (!e.target.closest("#change-password-card")) {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+
+      if (!target.closest("#change-password-card")) {
         handleCloseChangePassCard();
       }
     };
@@ -158,7 +160,7 @@ export default function Chat() {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isChangePassCardOpen]);
+  }, [isChangePassCardOpen, handleCloseChangePassCard]);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -174,15 +176,16 @@ export default function Chat() {
 
       if (!chat.messages.find((message) => message.id == data.id)) {
         chat.messages.push(data);
-        revalidator.revalidate();
       }
     });
-  }, []);
+  }, [chat.messages, chatId]);
 
   // Add event listener to close profile card when clicking outside of it
   useEffect(() => {
-    const handleOutsideClick = (e: any) => {
-      if (!e.target.closest("#profile-card")) {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+
+      if (!target.closest("#profile-card")) {
         setIsProfileCardOpen(false);
       }
     };
