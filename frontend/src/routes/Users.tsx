@@ -18,7 +18,6 @@ const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
   const currentUser = RootUser();
-  const revalidator = useRevalidator();
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
@@ -66,7 +65,15 @@ export default function Users() {
     if (!response.ok) {
       throw new Error("Failed to add friend");
     }
-    revalidator.revalidate();
+    // Update the user state in the users list
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => {
+        if (user.id === userId) {
+          return { ...user, friends: [...user.friends, currentUser] };
+        }
+        return user;
+      })
+    );
   };
 
   const columns = useMemo<ColumnDef<User>[]>(
@@ -103,7 +110,10 @@ export default function Users() {
       }),
       columnHelper.accessor("nickname", {
         header: "Nickname",
-        cell: (info) => <i>{info.getValue()}</i>,
+        cell: (info) => {
+          const user = info.row.original;
+          return <Link to={`/profile/${user.id}`}>{info.getValue()}</Link>;
+        },
       }),
       columnHelper.accessor("status", {
         header: "Status",

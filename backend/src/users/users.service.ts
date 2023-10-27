@@ -8,7 +8,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Brackets, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto } from './dto';
-import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
+import {
+  UserEntity,
+  SessionEntity,
+  AuthProvider,
+  UserStatus,
+} from '../core/entities';
 import { BlockListEntity } from '../core/entities/blockList.entity';
 
 @Injectable()
@@ -25,6 +30,17 @@ export class UsersService {
 
   async findAll(): Promise<UserEntity[]> {
     return await this.userRepository.find({ relations: { friends: true } });
+  }
+
+  async seedUsers(n: number): Promise<void> {
+    for (let i = 1; i <= n; i++) {
+      const user = new UserEntity();
+      user.login = `testuser${i}`;
+      user.nickname = `Test User ${i}`;
+      user.provider = AuthProvider.GUEST;
+      user.status = UserStatus.OFFLINE;
+      await this.userRepository.save(user);
+    }
   }
 
   async addFriend(currentUser: UserEntity, friendId: number): Promise<void> {

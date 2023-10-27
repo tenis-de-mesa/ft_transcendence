@@ -58,6 +58,13 @@ export class UsersController {
     return this.usersService.getUserFriends(currentUser);
   }
 
+  // Route to seed the database with test users
+  @UseGuards(AuthenticatedGuard)
+  @Post('/seed')
+  async seedUsers() {
+    return await this.usersService.seedUsers(5);
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number) {

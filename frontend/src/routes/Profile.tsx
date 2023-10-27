@@ -56,7 +56,7 @@ export default function Profile() {
                 </span>
                 <span className="flex justify-between">
                   <strong>Nickname:</strong>
-                  {currentUser.nickname}
+                  {profileUser.nickname}
                 </span>
               </Typography>
             </Card.Body>
