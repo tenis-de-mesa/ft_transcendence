@@ -7,7 +7,6 @@ import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
 import { RootUser } from "./Root";
 import { Input } from "../components/Input";
-import classNames from "classnames";
 import { Hr } from "../components/Hr";
 
 export default function Chats() {
