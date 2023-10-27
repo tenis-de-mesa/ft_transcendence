@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToMany,
-  Column,
-} from 'typeorm';
-import { UserEntity, MessageEntity, ChatMemberEntity } from '.';
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
+import { MessageEntity, ChatMemberEntity } from '.';
 
 export enum ChatAccess {
   PUBLIC = 'public',

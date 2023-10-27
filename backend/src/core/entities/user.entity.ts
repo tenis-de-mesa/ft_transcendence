@@ -10,7 +10,6 @@ import {
 import {
   SessionEntity,
   FriendRequestEntity,
-  ChatEntity,
   MessageEntity,
   ChatMemberEntity,
 } from '.';
