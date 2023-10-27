@@ -11,8 +11,6 @@ export async function createChannel({ request }: ActionFunctionArgs) {
     password: password ?? undefined,
   };
 
-  console.log({body})
-
   const result = await fetch(url, {
     method: "POST",
     credentials: "include",

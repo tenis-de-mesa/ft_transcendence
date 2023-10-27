@@ -58,7 +58,7 @@ export class ChatsController {
     return await this.chatsService.update(id, dto);
   }
 
-  @Post('verify/:id')
+  @Post(':id/verify')
   @HttpCode(HttpStatus.NO_CONTENT)
   async verifyPassword(
     @Param('id', ParseIntPipe) id: number,
@@ -82,7 +82,7 @@ export class ChatsController {
     return await this.chatsService.findOne(id);
   }
 
-  @Get('role/:id')
+  @Get(':id/role')
   async getMemberRole(
     @Param('id', ParseIntPipe) id: number,
     @User('id') userId: number,

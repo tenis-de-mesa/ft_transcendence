@@ -146,16 +146,18 @@ export default function Chats() {
 
                             <Hr className="my-3"></Hr>
 
-                            <input
-                              type="checkbox"
-                              name="hasPassword"
-                              id="hasPassword"
-                              className="mr-1 mb-3"
-                              onChange={() => setHasPassword(!hasPassword)}
-                            />
-                            <Typography variant="sm" as="label">
-                              Protect with password
-                            </Typography>
+                            <div className="text-left">
+                              <input
+                                type="checkbox"
+                                name="hasPassword"
+                                id="hasPassword"
+                                className="mr-1 mb-3"
+                                onChange={() => setHasPassword(!hasPassword)}
+                              />
+                              <Typography variant="sm" as="label">
+                                Protect with password
+                              </Typography>
+                            </div>
 
                             {hasPassword && (
                               <div className="mb-3">

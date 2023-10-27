@@ -124,7 +124,7 @@ export default function Chat() {
     const fetchChannelRole = async (chatId: number) => {
       try {
         const response = await fetch(
-          `http://localhost:3001/chats/role/${chatId}`,
+          `http://localhost:3001/chats/${chatId}/role`,
           {
             credentials: "include",
           }
