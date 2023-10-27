@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { UserEntity, ChatEntity } from '.';
 
 export enum ChatMemberRole {
@@ -21,13 +15,10 @@ export enum ChatMemberStatus {
 
 @Entity({ name: 'members' })
 export class ChatMemberEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
+  @PrimaryColumn()
   userId: number;
 
-  @Column()
+  @PrimaryColumn()
   chatId: number;
 
   @Column({

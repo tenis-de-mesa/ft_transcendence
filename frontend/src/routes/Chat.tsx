@@ -176,9 +176,10 @@ export default function Chat() {
 
       if (!chat.messages.find((message) => message.id == data.id)) {
         chat.messages.push(data);
+        revalidator.revalidate();
       }
     });
-  }, [chat.messages, chatId]);
+  }, [chat.messages, chatId, revalidator]);
 
   // Add event listener to close profile card when clicking outside of it
   useEffect(() => {
