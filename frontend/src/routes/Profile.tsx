@@ -54,10 +54,6 @@ export default function Profile() {
               <>
                 <Typography customWeight="regular" variant="md">
                   <span className="flex justify-between">
-                    <strong>Login:</strong>
-                    {profileUser.login}
-                  </span>
-                  <span className="flex justify-between">
                     <strong>Nickname:</strong>
                     {profileUser.nickname}
                   </span>
