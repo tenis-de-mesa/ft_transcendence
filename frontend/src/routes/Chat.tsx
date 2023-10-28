@@ -1,5 +1,11 @@
 import { socket } from "../socket";
-import { Form, Link, useLoaderData, useRouteLoaderData, useRevalidator } from "react-router-dom";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useRouteLoaderData,
+  useRevalidator,
+} from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "../components/Avatar";
@@ -27,12 +33,13 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const chatId = chat.id;
 
-  const members = chat.users.map((user) => user.id)
-  const isBlockedForOthers: boolean = chat.type == "direct"
-    && userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
+  const members = chat.users.map((user) => user.id);
+  const isBlockedForOthers: boolean =
+    chat.type == "direct" &&
+    userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
 
-  const isBlockedByMe = userMe.blockedUsers
-    .find((user) => members.includes(user)) !== undefined
+  const isBlockedByMe =
+    userMe.blockedUsers.find((user) => members.includes(user)) !== undefined;
 
   const handleSubmitNewMessage = () => {
     setNewMessage("");
@@ -40,7 +47,7 @@ export default function Chat() {
 
   const checkUserIsBlocked = (userBlockedId: number) => {
     return userMe.blockedUsers.includes(userBlockedId);
-  }
+  };
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -116,31 +123,29 @@ export default function Chat() {
                       <Link to={`/profile/${user?.id}`}>{user?.nickname}</Link>
                     </Typography>
 
-                    {
-                      userMe.id != user?.id && chat.type == "direct" && (
-                        !checkUserIsBlocked(user?.id) ? (
-                          <Button
-                            IconOnly={<LiaUserSlashSolid />}
-                            size="md"
-                            variant="error"
-                            onClick={() => {
-                              setIsOpen(false);
-                              blockUser(user?.id);
-                            }}
-                          />
-                        ) : (
-                          <Button
-                            IconOnly={<LiaUserSolid />}
-                            size="md"
-                            variant="success"
-                            onClick={() => {
-                              setIsOpen(false);
-                              unblockUser(user?.id);
-                            }}
-                          />
-                        )
-                      )
-                    }
+                    {userMe.id != user?.id &&
+                      chat.type == "direct" &&
+                      (!checkUserIsBlocked(user?.id) ? (
+                        <Button
+                          IconOnly={<LiaUserSlashSolid />}
+                          size="md"
+                          variant="error"
+                          onClick={() => {
+                            setIsOpen(false);
+                            blockUser(user?.id);
+                          }}
+                        />
+                      ) : (
+                        <Button
+                          IconOnly={<LiaUserSolid />}
+                          size="md"
+                          variant="success"
+                          onClick={() => {
+                            setIsOpen(false);
+                            unblockUser(user?.id);
+                          }}
+                        />
+                      ))}
 
                     <Button
                       IconOnly={<AiFillCloseCircle />}
@@ -209,10 +214,16 @@ export default function Chat() {
                 value={newMessage}
                 name="message"
                 placeholder={
-                  isBlockedForOthers ? "You have been blocked" : isBlockedByMe
-                    ? "You blocked this user" : "Enter your message"}
+                  isBlockedForOthers
+                    ? "You have been blocked"
+                    : isBlockedByMe
+                    ? "You blocked this user"
+                    : "Enter your message"
+                }
                 onChange={(e) => setNewMessage(e.target.value)}
-                {...((isBlockedForOthers || isBlockedByMe) && { disabled: true })}
+                {...((isBlockedForOthers || isBlockedByMe) && {
+                  disabled: true,
+                })}
               />
             </Form>
           </div>

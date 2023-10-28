@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useRevalidator } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
 import { useEffect, useMemo, useState } from "react";
 import { User, UserStatus } from "../types/types";
@@ -6,13 +6,9 @@ import { User, UserStatus } from "../types/types";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 import { Typography } from "../components/Typography";
-import { Button } from "../components/Button";
 import Table from "../components/Table";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
 import { RootUser } from "./Root";
-import { FiCheck, FiPlus } from "react-icons/fi";
-import { Badge } from "../components/Badge";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { Avatar } from "../components/Avatar";
 
