@@ -78,6 +78,28 @@ export class UsersService {
       .add(currentUser.id);
   }
 
+  // this.usersService.deleteFriend(user, friendId);
+  async deleteFriend(currentUser: UserEntity, friendId: number): Promise<void> {
+    const friendToDelete = await this.userRepository.findOne({
+      where: { id: friendId },
+    });
+    if (!friendToDelete) {
+      throw new BadRequestException('Friend not found');
+    }
+    // Remove the friend from the current user's list of friends
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(UserEntity, 'friends')
+      .of(currentUser.id)
+      .remove(friendId);
+    // Remove the current user from the friend's list of friends
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(UserEntity, 'friends')
+      .of(friendId)
+      .remove(currentUser.id);
+  }
+
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     let nickname = dto.login;
 

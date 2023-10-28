@@ -108,6 +108,14 @@ export class UsersController {
     return await this.usersService.addFriend(user, body.friendId);
   }
 
+  @Delete('/friends/:friendId')
+  async deleteFriend(
+    @User() user: UserEntity,
+    @Param('friendId', ParseIntPipe) friendId: number,
+  ) {
+    return await this.usersService.deleteFriend(user, friendId);
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Post('avatar')
   @UseInterceptors(

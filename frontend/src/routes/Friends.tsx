@@ -1,29 +1,60 @@
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { User } from "../types/types";
 import { Avatar } from "../components/Avatar";
+import Table from "../components/Table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { useState } from "react";
+import { Data } from "../data/tableData";
+import { Button } from "../components/Button";
+import { FiX } from "react-icons/fi";
 
 export default function Friends() {
-  const friends = useLoaderData() as User[];
+  const loaderData = useLoaderData() as User[];
+  const [data, setData] = useState(() => [...loaderData]);
+
+  const columnHelper = createColumnHelper<User>();
+
+  const handleRemoveFriend = async (userId: number) => {
+    const response = await fetch(
+      `http://localhost:3001/users/friends/${userId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      setData((prevData) => prevData.filter((user) => user.id !== userId));
+    } else {
+      console.error("Friend not removed");
+    }
+  };
+
+  const columns = [
+    columnHelper.accessor("nickname", {
+      cell: (info) => (
+        <Link to={`/profile/${info.row.original.id}`}>{info.getValue()}</Link>
+      ),
+    }),
+
+    columnHelper.display({
+      header: "actions",
+      cell: (props) => (
+        <Button
+          variant={"error"}
+          TrailingIcon={<FiX />}
+          size="sm"
+          onClick={() => handleRemoveFriend(props.row.original.id)}
+        >
+          Remove friend
+        </Button>
+      ),
+    }),
+  ];
 
   return (
-    // Map friends and show each user in a card
-    <section>
-      {friends.map((friend) => (
-        <div key={friend.id}>
-          <div className="flex items-center">
-            <Avatar
-              seed={friend.login}
-              src={friend.avatarUrl}
-              className="inline mr-2"
-              size="sm"
-            />
-            <div>
-              <h4 className="text-lg font-bold">{friend.nickname}</h4>
-              <p className="text-gray-600">{friend.login}</p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </section>
+    <Table
+      columns={columns as unknown as ColumnDef<Data>[]}
+      data={data as unknown as Data[]}
+    />
   );
 }
