@@ -65,12 +65,12 @@ export class UsersService {
       throw new ConflictException('Friend already added');
     }
     // Add the new friend to the current user's list of friends
+    // AND add the current user to the new friend's list of friends
     await this.userRepository
       .createQueryBuilder()
       .relation(UserEntity, 'friends')
       .of(currentUser.id)
       .add(friendId);
-    // Add the current user to the new friend's list of friends
     await this.userRepository
       .createQueryBuilder()
       .relation(UserEntity, 'friends')
@@ -78,7 +78,6 @@ export class UsersService {
       .add(currentUser.id);
   }
 
-  // this.usersService.deleteFriend(user, friendId);
   async deleteFriend(currentUser: UserEntity, friendId: number): Promise<void> {
     const friendToDelete = await this.userRepository.findOne({
       where: { id: friendId },
@@ -87,12 +86,12 @@ export class UsersService {
       throw new BadRequestException('Friend not found');
     }
     // Remove the friend from the current user's list of friends
+    // AND remove the current user from the friend's list of friends
     await this.userRepository
       .createQueryBuilder()
       .relation(UserEntity, 'friends')
       .of(currentUser.id)
       .remove(friendId);
-    // Remove the current user from the friend's list of friends
     await this.userRepository
       .createQueryBuilder()
       .relation(UserEntity, 'friends')
@@ -113,7 +112,7 @@ export class UsersService {
   async getUserById(id: number): Promise<UserEntity> {
     return await this.userRepository.findOne({
       where: { id: id },
-      relations: { friends: true, chats: true },
+      relations: { friends: true },
     });
   }
 

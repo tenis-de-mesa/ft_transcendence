@@ -3,11 +3,6 @@ export type UserStatus = {
   status: string;
 };
 
-export type FriendRequest = {
-  sender: User;
-  receiver: User;
-};
-
 export type User = {
   id: number;
   login: string;
@@ -18,7 +13,6 @@ export type User = {
   blockedUsers: number[];
   friends: User[];
   chats: Chat[];
-  friendRequestsSent: FriendRequest[];
 };
 
 export type Message = {

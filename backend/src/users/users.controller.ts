@@ -52,15 +52,29 @@ export class UsersController {
     return { ...user, blockedBy, blockedUsers };
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('friends')
   async getUserFriends(@Request() req: any) {
     const currentUser = req.user;
     return this.usersService.getUserFriends(currentUser);
   }
 
-  // Route to seed the database with test users
   @UseGuards(AuthenticatedGuard)
-  @Post('/seed')
+  @Post('friends')
+  async addFriends(@User() user: UserEntity, @Body() body: AddFriendDto) {
+    return await this.usersService.addFriend(user, body.friendId);
+  }
+
+  @Delete('friends/:friendId')
+  async deleteFriend(
+    @User() user: UserEntity,
+    @Param('friendId', ParseIntPipe) friendId: number,
+  ) {
+    return await this.usersService.deleteFriend(user, friendId);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('seed')
   async seedUsers() {
     return await this.usersService.seedUsers(5);
   }
@@ -93,20 +107,6 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
-  }
-
-  @UseGuards(AuthenticatedGuard)
-  @Post('/friends')
-  async addFriends(@User() user: UserEntity, @Body() body: AddFriendDto) {
-    return await this.usersService.addFriend(user, body.friendId);
-  }
-
-  @Delete('/friends/:friendId')
-  async deleteFriend(
-    @User() user: UserEntity,
-    @Param('friendId', ParseIntPipe) friendId: number,
-  ) {
-    return await this.usersService.deleteFriend(user, friendId);
   }
 
   @UseGuards(AuthenticatedGuard)
