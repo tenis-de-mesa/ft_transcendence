@@ -15,7 +15,7 @@ import {
 import { AuthenticatedGuard } from '../auth/guards';
 import { UsersService } from './users.service';
 import { User } from '../core/decorators';
-import { UpdateUserDto } from './dto';
+import { UpdateUserDto, AddFriendDto } from './dto';
 import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -53,16 +53,36 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get('friends')
+  async getUserFriends(@Request() req: any) {
+    const currentUser = req.user;
+    return this.usersService.getUserFriends(currentUser);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('friends')
+  async addFriends(@User() user: UserEntity, @Body() body: AddFriendDto) {
+    return await this.usersService.addFriend(user, body.friendId);
+  }
+
+  @Delete('friends/:friendId')
+  async deleteFriend(
+    @User() user: UserEntity,
+    @Param('friendId', ParseIntPipe) friendId: number,
+  ) {
+    return await this.usersService.deleteFriend(user, friendId);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('seed')
+  async seedUsers() {
+    return await this.usersService.seedUsers(5);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get(':id')
   async getUser(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.usersService.getUserById(id);
-    return {
-      nickname: user.nickname,
-      id: user.id,
-      avatarUrl: user.avatarUrl,
-      login: user.login,
-      status: user.status,
-    };
+    return await this.usersService.getUserById(id);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -87,12 +107,6 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
-  }
-
-  @Get('/friends')
-  async getUserFriends(@Request() req: any) {
-    const currentUser = req.user;
-    return this.usersService.getUserFriends(currentUser);
   }
 
   @UseGuards(AuthenticatedGuard)

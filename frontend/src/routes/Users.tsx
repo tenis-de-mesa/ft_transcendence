@@ -6,18 +6,23 @@ import { User, UserStatus } from "../types/types";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 import { Typography } from "../components/Typography";
-import { Button } from "../components/Button";
 import Table from "../components/Table";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { Data } from "../data";
 import { RootUser } from "./Root";
+import { AddFriendButton } from "../components/AddFriendButton";
+import { Avatar } from "../components/Avatar";
 
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
   const currentUser = RootUser();
-  const initialUsers: User[] = useLoaderData() as User[];
-  const [users, setUsers] = useState(initialUsers);
+  const loadedUsers: User[] = useLoaderData() as User[];
+  const [users, setUsers] = useState(loadedUsers);
+
+  // When loadedUsers changes, update the users state
+  useEffect(() => {
+    setUsers(loadedUsers);
+  }, [loadedUsers]);
 
   useEffect(() => {
     // Listen for user status updates from the server
@@ -31,7 +36,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        }),
+        })
       );
     });
 
@@ -42,15 +47,27 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      }),
+      })
     );
   }, [currentUser.id]);
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
       columnHelper.accessor("nickname", {
-        header: "Nickname",
-        cell: (info) => <i>{info.getValue()}</i>,
+        cell: (info) => (
+          <Link
+            to={`/profile/${info.row.original.id}`}
+            className="flex items-center"
+          >
+            <Avatar
+              className="mr-2"
+              seed={info.row.original.login}
+              size="sm"
+              src={info.row.original.avatarUrl}
+            />
+            {info.getValue()}
+          </Link>
+        ),
       }),
       columnHelper.accessor("status", {
         header: "Status",
@@ -71,24 +88,10 @@ export default function Users() {
       }),
       columnHelper.accessor("id", {
         header: "Action",
-        cell: (info) => {
-          return (
-            <div key={info.getValue()}>
-              <Link to={`/chats/with/${info.getValue()}`}>
-                <Button
-                  variant="info"
-                  size="sm"
-                  TrailingIcon={<BsFillChatDotsFill />}
-                >
-                  Chat
-                </Button>
-              </Link>
-            </div>
-          );
-        },
+        cell: (info) => <AddFriendButton user={info.row.original} />,
       }),
     ],
-    [],
+    []
   );
 
   return (

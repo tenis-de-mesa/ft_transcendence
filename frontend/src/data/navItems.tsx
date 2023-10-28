@@ -30,6 +30,12 @@ export const navitems: INavitem[] = [
     icon: <LuUsers />,
   },
   {
+    order: 2,
+    path: "friends",
+    label: "Friends",
+    icon: <LuUsers />,
+  },
+  {
     order: 3,
     path: "leaderboard",
     label: "Leaderboard",

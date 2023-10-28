@@ -51,9 +51,12 @@ describe('Unique Name', () => {
 
     // Assert
     expect(users.length).toEqual(2);
-    expect(users[0].id).toEqual(1);
-    expect(users[1].id).toEqual(2);
-    expect(users[0].nickname).toEqual('test2');
-    expect(users[1].nickname).toEqual('test2-1');
+    const firstWithNickname = users.find((u) => u.id === user1.id);
+    expect(firstWithNickname).toBeDefined();
+    expect(firstWithNickname.nickname).toEqual('test2');
+
+    const newUser = users.find((u) => u.id !== user1.id);
+    expect(newUser).toBeDefined();
+    expect(newUser.nickname).toEqual('test2-1');
   });
 });
