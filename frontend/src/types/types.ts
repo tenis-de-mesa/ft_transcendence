@@ -17,6 +17,7 @@ export type User = {
   blockedBy: number[];
   blockedUsers: number[];
   friends: User[];
+  chats: Chat[];
   friendRequestsSent: FriendRequest[];
 };
 

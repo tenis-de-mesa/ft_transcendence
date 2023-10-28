@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { User } from "../types/types";
 import UserForm from "../components/UserForm";
 
@@ -9,6 +9,8 @@ import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
+import { AddFriendButton } from "../components/AddFriendButton";
+import { BsFillChatDotsFill } from "react-icons/bs";
 
 export default function Profile() {
   const currentUser = RootUser();
@@ -49,16 +51,31 @@ export default function Profile() {
               </>
             </Card.Title>
             <Card.Body>
-              <Typography customWeight="regular" variant="md">
-                <span className="flex justify-between">
-                  <strong>Login:</strong>
-                  {profileUser.login}
-                </span>
-                <span className="flex justify-between">
-                  <strong>Nickname:</strong>
-                  {profileUser.nickname}
-                </span>
-              </Typography>
+              <>
+                <Typography customWeight="regular" variant="md">
+                  <span className="flex justify-between">
+                    <strong>Login:</strong>
+                    {profileUser.login}
+                  </span>
+                  <span className="flex justify-between">
+                    <strong>Nickname:</strong>
+                    {profileUser.nickname}
+                  </span>
+                </Typography>
+                <div className="flex flex-col gap-2 p-2 mt-2">
+                  <AddFriendButton user={profileUser} />
+
+                  <Link to={`/chats/with/${profileUser.id}`} className="grid">
+                    <Button
+                      variant="info"
+                      size="sm"
+                      LeadingIcon={<BsFillChatDotsFill />}
+                    >
+                      Chat
+                    </Button>
+                  </Link>
+                </div>
+              </>
             </Card.Body>
           </Card>
           <Card className="card back">

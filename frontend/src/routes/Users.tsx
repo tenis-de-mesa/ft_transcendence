@@ -13,6 +13,8 @@ import { Data } from "../data";
 import { RootUser } from "./Root";
 import { FiCheck, FiPlus } from "react-icons/fi";
 import { Badge } from "../components/Badge";
+import { AddFriendButton } from "../components/AddFriendButton";
+import { Avatar } from "../components/Avatar";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -53,67 +55,23 @@ export default function Users() {
     );
   }, [currentUser.id]);
 
-  const handleAddFriend = async (userId: number) => {
-    const response = await fetch(`http://localhost:3001/users/friends`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ friendId: userId }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to add friend");
-    }
-    // Update the user state in the users list
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => {
-        if (user.id === userId) {
-          return { ...user, friends: [...user.friends, currentUser] };
-        }
-        return user;
-      })
-    );
-  };
-
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
-      columnHelper.accessor("friends", {
-        header: "friends",
-        cell: (info) => {
-          const friends = info.getValue();
-          const isFriend = friends.some(
-            (friend) => friend.id === currentUser.id
-          );
-          // If is yourself, return nothing
-          if (info.row.original.id === currentUser.id) {
-            return <></>;
-          }
-          if (isFriend) {
-            return (
-              <Badge TrailingIcon={<FiCheck />} size="md" variant="info">
-                Amigos
-              </Badge>
-            );
-          }
-          return (
-            <Button
-              variant="info"
-              size="sm"
-              TrailingIcon={<FiPlus />}
-              onClick={() => handleAddFriend(info.row.original.id)}
-            >
-              Adicionar
-            </Button>
-          );
-        },
-      }),
       columnHelper.accessor("nickname", {
-        header: "Nickname",
-        cell: (info) => {
-          const user = info.row.original;
-          return <Link to={`/profile/${user.id}`}>{info.getValue()}</Link>;
-        },
+        cell: (info) => (
+          <Link
+            to={`/profile/${info.row.original.id}`}
+            className="flex items-center"
+          >
+            <Avatar
+              className="mr-2"
+              seed={info.row.original.login}
+              size="sm"
+              src={info.row.original.avatarUrl}
+            />
+            {info.getValue()}
+          </Link>
+        ),
       }),
       columnHelper.accessor("status", {
         header: "Status",
@@ -132,24 +90,9 @@ export default function Users() {
           );
         },
       }),
-
       columnHelper.accessor("id", {
         header: "Action",
-        cell: (info) => {
-          return (
-            <div key={info.getValue()}>
-              <Link to={`/chats/with/${info.getValue()}`}>
-                <Button
-                  variant="info"
-                  size="sm"
-                  TrailingIcon={<BsFillChatDotsFill />}
-                >
-                  Chat
-                </Button>
-              </Link>
-            </div>
-          );
-        },
+        cell: (info) => <AddFriendButton user={info.row.original} />,
       }),
     ],
     []

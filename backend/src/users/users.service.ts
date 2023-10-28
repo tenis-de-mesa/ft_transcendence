@@ -111,7 +111,10 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOneBy({ id: id });
+    return await this.userRepository.findOne({
+      where: { id: id },
+      relations: { friends: true, chats: true },
+    });
   }
 
   async getUserByIntraId(id: number): Promise<UserEntity> {
