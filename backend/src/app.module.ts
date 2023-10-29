@@ -15,6 +15,7 @@ import { GuestCleanupService } from './users/guest-cleanup/guest-cleanup.service
 import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './users/status/status.module';
 import { ChatsModule } from './chats/chats.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ChatsModule } from './chats/chats.module';
     FriendRequestModule,
     StatusModule,
     ChatsModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService, GuestCleanupService],
