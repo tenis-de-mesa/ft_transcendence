@@ -101,6 +101,10 @@ export class ChatsService {
     });
   }
 
+  async listAllChats(): Promise<ChatEntity[]> {
+    return await this.chatRepository.find({ relations: { users: true } });
+  }
+
   async findDirectChat(
     currentUser: UserEntity,
     otherUserId: number,
@@ -187,6 +191,18 @@ export class ChatsService {
 
     if (!chat) throw new NotFoundException('Chat not found');
     return chat;
+  }
+
+  async joinChat(chatId: number, user: UserEntity): Promise<ChatMemberEntity> {
+    const chat = this.findOne(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    return await this.chatMemberRepository.save({
+      userId: user.id,
+      chatId: chatId,
+    });
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
