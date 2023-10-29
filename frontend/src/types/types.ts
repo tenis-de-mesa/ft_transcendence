@@ -11,6 +11,7 @@ export type User = {
   avatarUrl: string;
   blockedBy: number[];
   blockedUsers: number[];
+  friends: User[];
 };
 
 export type Message = {
