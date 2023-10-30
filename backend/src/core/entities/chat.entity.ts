@@ -1,11 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToMany,
-  Column,
-} from 'typeorm';
-import { UserEntity, MessageEntity, ChatMemberEntity } from '.';
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
+import { MessageEntity, ChatMemberEntity } from '.';
 
 export enum ChatAccess {
   PUBLIC = 'public',
@@ -37,17 +31,20 @@ export class ChatEntity {
   })
   access: ChatAccess;
 
-  @ManyToMany(() => UserEntity, (user) => user.chats)
-  users: UserEntity[];
+  @Column({ nullable: true })
+  password: string;
 
   @OneToMany(() => ChatMemberEntity, (member) => member.chat)
-  chatMembers: ChatMemberEntity[];
+  users: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.chat, { cascade: true })
   messages: MessageEntity[];
 
-  constructor(chat?: ChatEntity) {
+  constructor(chat?: Partial<ChatEntity>) {
     this.id = chat?.id;
+    this.type = chat?.type;
+    this.access = chat?.access;
+    this.password = chat?.password;
     this.users = chat?.users;
     this.messages = chat?.messages;
   }

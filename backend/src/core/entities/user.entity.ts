@@ -10,7 +10,6 @@ import {
 import {
   SessionEntity,
   FriendRequestEntity,
-  ChatEntity,
   MessageEntity,
   ChatMemberEntity,
 } from '.';
@@ -99,20 +98,8 @@ export class UserEntity {
   @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.sender)
   friendRequestsSent: FriendRequestEntity[];
 
-  @ManyToMany(() => ChatEntity, (chat) => chat.users, { cascade: true })
-  @JoinTable({
-    name: 'members',
-    joinColumn: {
-      name: 'userId',
-    },
-    inverseJoinColumn: {
-      name: 'chatId',
-    },
-  })
-  chats: ChatEntity[];
-
   @OneToMany(() => ChatMemberEntity, (member) => member.user)
-  chatMembers: ChatMemberEntity[];
+  chats: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
