@@ -7,6 +7,7 @@ import {
   loadChat,
   login,
   logout,
+  loadFriendsList,
 } from "./loaders";
 
 import { createChannel, createChat, updateChat } from "./actions";
@@ -27,6 +28,7 @@ import Settings from "./routes/Settings.tsx";
 import { redirectToChat } from "./loaders/redirectToChat.ts";
 import ErrorBoundary from "./routes/ErrorBoundary.tsx";
 import { changeChatPassword } from "./actions/changeChatPassword.ts";
+import Friends from "./routes/Friends.tsx";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +46,11 @@ const router = createBrowserRouter([
         path: "users",
         element: <Users />,
         loader: loadUsersList,
+      },
+      {
+        path: "friends",
+        element: <Friends />,
+        loader: loadFriendsList,
       },
       {
         path: "channels",
