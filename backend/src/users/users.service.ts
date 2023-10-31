@@ -147,7 +147,7 @@ export class UsersService {
      * seem to work. Even though the @BeforeSoftRemove hook is triggered,
      * the entity isn't properly updated in the database. However, it is
      * in memory. So, we manually update the entity in the database by
-     * saving the returned sotf-removed entity.
+     * saving the returned soft-removed entity.
      *
      * The reason why this hook is important is to prevent a deleted user from
      * constraining the creation of a new user with the same intraId, login or
