@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
@@ -110,14 +111,26 @@ export class UsersService {
   }
 
   async getUserById(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id: id },
       relations: { friends: true },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async getUserByIntraId(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOneBy({ intraId: id });
+    const user = await this.userRepository.findOneBy({ intraId: id });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    return user;
   }
 
   async updateUser(id: number, dto: UpdateUserDto): Promise<UpdateResult> {
@@ -125,7 +138,24 @@ export class UsersService {
   }
 
   async deleteUser(id: number): Promise<void> {
-    await this.userRepository.softDelete(id);
+    const user = await this.getUserById(id);
+
+    const deleted = await this.userRepository.softRemove(user);
+
+    /* FIXME: This is a workaround!
+     * Currently, doing what TypeORM describes in its documentation doesn't
+     * seem to work. Even though the @BeforeSoftRemove hook is triggered,
+     * the entity isn't properly updated in the database. However, it is
+     * in memory. So, we manually update the entity in the database by
+     * saving the returned sotf-removed entity.
+     *
+     * The reason why this hook is important is to prevent a deleted user from
+     * constraining the creation of a new user with the same intraId, login or
+     * nickname. If we don't do this, we'll get a unique constraint error in
+     * case it happens. This error was noticed in the 'getMe.e2e-spec.ts' test,
+     * where we create the same user repeatedly using the beforeEach hook.
+     */
+    await this.userRepository.save(deleted);
   }
 
   async blockUserById(

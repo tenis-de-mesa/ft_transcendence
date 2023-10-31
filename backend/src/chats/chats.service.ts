@@ -120,6 +120,7 @@ export class ChatsService {
       relations: { users: true, messages: { sender: true } },
       where: { id },
       order: { messages: { createdAt: 'ASC' } },
+      withDeleted: true,
     });
 
     if (!chat) {
@@ -139,6 +140,7 @@ export class ChatsService {
     return await this.chatRepository.find({
       relations: { users: { user: true } },
       where: { id: In(chatIds) },
+      withDeleted: true,
     });
   }
 

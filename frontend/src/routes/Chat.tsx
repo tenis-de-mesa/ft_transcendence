@@ -436,8 +436,7 @@ export default function Chat() {
             className="h-full mb-4 overflow-scroll break-words no-scrollbar"
           >
             {chat.messages.map((message) => {
-              const showAvatar =
-                lastUser?.id != message.sender?.id || !message.sender;
+              const showAvatar = lastUser?.id != message.sender?.id;
 
               lastUser = message.sender;
 

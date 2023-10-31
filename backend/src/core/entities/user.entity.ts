@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   DeleteDateColumn,
+  BeforeSoftRemove,
 } from 'typeorm';
 import {
   SessionEntity,
@@ -37,10 +38,16 @@ export class UserEntity {
   })
   intraId: number;
 
-  @Column({ unique: true })
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   login: string;
 
-  @Column({ unique: true })
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   nickname: string;
 
   @Column({ nullable: true })
@@ -134,5 +141,12 @@ export class UserEntity {
     this.blockedBy = user?.blockedBy;
     this.blockedUsers = user?.blockedUsers;
     this.deletedAt = user?.deletedAt;
+  }
+
+  @BeforeSoftRemove()
+  beforeSoftRemove() {
+    this.login = null;
+    this.nickname = null;
+    this.intraId = null;
   }
 }
