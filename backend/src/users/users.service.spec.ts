@@ -4,6 +4,7 @@ import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -47,6 +48,12 @@ describe('UsersService', () => {
           provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(BlockListEntity),
+          useValue: {
+            save: jest.fn(),
           },
         },
       ],
@@ -126,6 +133,20 @@ describe('UsersService', () => {
 
       // Assert
       expect(result).toEqual({ ...dataUser, nickname: dataUser.login + '-1' });
+    });
+  });
+
+  describe('blockUserById', () => {
+    it("shouldn't block user", async () => {
+      // Arrange
+      const userId = 1;
+      const userBlockedId = 1;
+
+      // Act
+      const result = await usersService.blockUserById(userId, userBlockedId);
+
+      // Assert
+      expect(result).toEqual(null);
     });
   });
 });

@@ -9,6 +9,9 @@ export type User = {
   status: string;
   nickname: string;
   avatarUrl: string;
+  blockedBy: number[];
+  blockedUsers: number[];
+  friends: User[];
 };
 
 export type Message = {
@@ -24,6 +27,8 @@ export type Chat = {
   users: User[];
   messages: Message[];
   newMessage: string;
+  access: "public" | "protected" | "private";
+  type: "direct" | "channel";
 };
 
 export type NewChatMessage = {

@@ -8,7 +8,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   leadingText?: string;
   placeholder: string;
-  error?: string;
+  error?: string | boolean;
   helperText?: string;
   LeadingIcon?: React.ReactElement;
   TrailingIcon?: React.ReactElement;
@@ -29,7 +29,7 @@ export const Input: FC<InputProps> = ({
   ...props
 }) => {
   return (
-    <>
+    <div>
       {label ? (
         <Typography
           as="label"
@@ -104,13 +104,13 @@ export const Input: FC<InputProps> = ({
         />
       </div>
 
-      {error ? (
+      {(error && typeof error === "string") ? (
         <div className="mt-1.5 text-error-500 text-sm">{error}</div>
       ) : null}
 
       {helperText ? (
         <div className="mt-1.5 text-gray-500 text-sm">{helperText}</div>
       ) : null}
-    </>
+    </div>
   );
 };

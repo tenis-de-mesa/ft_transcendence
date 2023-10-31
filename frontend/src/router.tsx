@@ -7,9 +7,10 @@ import {
   loadChat,
   login,
   logout,
+  loadFriendsList,
 } from "./loaders";
 
-import { createChannel, createChat } from "./actions";
+import { createChannel, createChat, updateChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
@@ -24,11 +25,16 @@ import { loadUserById } from "./loaders/loadUserById.ts";
 import Leaderboard from "./routes/Leaderboard.tsx";
 import Games from "./routes/Games.tsx";
 import Settings from "./routes/Settings.tsx";
+import { redirectToChat } from "./loaders/redirectToChat.ts";
+import ErrorBoundary from "./routes/ErrorBoundary.tsx";
+import { changeChatPassword } from "./actions/changeChatPassword.ts";
+import Friends from "./routes/Friends.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     id: "root",
+    errorElement: <ErrorBoundary />,
     element: <Root />,
     loader: loadRootUser,
     children: [
@@ -40,6 +46,11 @@ const router = createBrowserRouter([
         path: "users",
         element: <Users />,
         loader: loadUsersList,
+      },
+      {
+        path: "friends",
+        element: <Friends />,
+        loader: loadFriendsList,
       },
       {
         path: "channels",
@@ -58,6 +69,10 @@ const router = createBrowserRouter([
         action: createChat,
         children: [
           {
+            path: "with/:userId",
+            loader: redirectToChat,
+          },
+          {
             path: "new/:id",
             element: <ChatNew />,
             loader: loadUserById,
@@ -67,6 +82,14 @@ const router = createBrowserRouter([
             element: <Chat />,
             loader: loadChat,
             action: sendChatMessage,
+          },
+          {
+            path: "update/:id",
+            action: updateChat,
+          },
+          {
+            path: ":id/change-password",
+            action: changeChatPassword,
           },
         ],
       },

@@ -35,13 +35,13 @@ export class ChatMemberEntity {
   })
   status: ChatMemberStatus;
 
-  @ManyToOne(() => UserEntity, (user) => user.chatMembers, {
+  @ManyToOne(() => UserEntity, (user) => user.chats, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
   user: UserEntity;
 
-  @ManyToOne(() => ChatEntity, (chat) => chat.chatMembers, {
+  @ManyToOne(() => ChatEntity, (chat) => chat.users, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'chatId', referencedColumnName: 'id' })

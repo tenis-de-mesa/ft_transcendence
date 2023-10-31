@@ -2,15 +2,23 @@ import { Outlet, useLoaderData, useOutletContext } from "react-router-dom";
 
 import classNames from "classnames";
 import { Sidebar } from "../components/nav/Sidebar";
-import { navitems } from "../data";
+import { navitems as navitemsTemplate } from "../data";
 
 import { User } from "../types/types";
 import Login from "./Login";
 
-const isDark = true;
+export const isDark = true;
 
 export default function Root() {
   const user: User = useLoaderData() as User;
+
+  // On the navitem with label profile, append the user id to the path
+  const navitems = navitemsTemplate.map((navitem) => {
+    if (navitem.label === "Profile") {
+      return { ...navitem, path: `${navitem.path}/${user?.id}` };
+    }
+    return navitem;
+  });
 
   return (
     <div

@@ -11,10 +11,10 @@ import {
 import {
   SessionEntity,
   FriendRequestEntity,
-  ChatEntity,
   MessageEntity,
   ChatMemberEntity,
 } from '.';
+import { BlockListEntity } from './blockList.entity';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -99,23 +99,17 @@ export class UserEntity {
   @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.sender)
   friendRequestsSent: FriendRequestEntity[];
 
-  @ManyToMany(() => ChatEntity, (chat) => chat.users)
-  @JoinTable({
-    name: 'members',
-    joinColumn: {
-      name: 'userId',
-    },
-    inverseJoinColumn: {
-      name: 'chatId',
-    },
-  })
-  chats: ChatEntity[];
-
   @OneToMany(() => ChatMemberEntity, (member) => member.user)
-  chatMembers: ChatMemberEntity[];
+  chats: ChatMemberEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
+
+  @OneToMany(() => BlockListEntity, (block) => block.blockedUser)
+  blockedBy: BlockListEntity[];
+
+  @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
+  blockedUsers: BlockListEntity[];
 
   @DeleteDateColumn()
   deletedAt?: Date;
@@ -136,8 +130,9 @@ export class UserEntity {
     this.friendRequestsReceived = user?.friendRequestsReceived;
     this.friendRequestsSent = user?.friendRequestsSent;
     this.chats = user?.chats;
-    this.chatMembers = user?.chatMembers;
     this.messages = user?.messages;
+    this.blockedBy = user?.blockedBy;
+    this.blockedUsers = user?.blockedUsers;
     this.deletedAt = user?.deletedAt;
   }
 }
