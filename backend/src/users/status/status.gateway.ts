@@ -27,7 +27,8 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
-    const session = await this.sessionService.getSessionByClientSocket(client);
+    const session: SessionEntity =
+      await this.sessionService.getSessionByClientSocket(client);
     // If the client is not authenticated, disconnect it
     if (!session) {
       return client.disconnect();
