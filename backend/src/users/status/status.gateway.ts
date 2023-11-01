@@ -29,14 +29,13 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     const session = await this.sessionService.getSessionByClientSocket(client);
     if (!session) {
-      client.disconnect();
+      return client.disconnect();
     }
 
-    // A client connecting for the first time doesn't have a userId
-    // We disconnect them and wait for them to reconnect with a userId
+    // A valid client connecting for the first time doesn't have the userId
+    // We send the userId to the client so that it can authenticate
     if (!client.handshake.auth?.userId) {
-      client.emit('authSuccess', session.userId);
-      client.disconnect();
+      return client.emit('authSuccess', session.userId);
     }
 
     // Client is connected and authenticated
