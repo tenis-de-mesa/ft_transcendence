@@ -5,9 +5,9 @@ export type UserStatus = {
 
 export type User = {
   id: number;
-  login: string;
+  login?: string;
   status: string;
-  nickname: string;
+  nickname?: string;
   avatarUrl: string;
   blockedBy: number[];
   blockedUsers: number[];

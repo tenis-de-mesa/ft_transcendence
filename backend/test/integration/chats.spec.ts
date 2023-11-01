@@ -105,10 +105,14 @@ describe('Chats', () => {
         await usersService.deleteUser(user1.id);
         const { messages } = await chatsService.findOne(chat.id);
         // Assert
-        expect(messages[0].sender).toEqual(null);
+        expect(messages[0].sender?.id).toEqual(user1.id);
+        expect(messages[0].sender?.login).toEqual(null);
         expect(messages[1].sender?.id).toEqual(user2.id);
-        expect(messages[2].sender).toEqual(null);
+        expect(messages[1].sender?.login).toEqual(user2.login);
+        expect(messages[2].sender?.id).toEqual(user1.id);
+        expect(messages[2].sender?.login).toEqual(null);
         expect(messages[3].sender?.id).toEqual(user2.id);
+        expect(messages[3].sender?.login).toEqual(user2.login);
       });
     });
   });

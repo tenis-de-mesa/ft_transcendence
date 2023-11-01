@@ -6,6 +6,8 @@ import {
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  BeforeSoftRemove,
 } from 'typeorm';
 import {
   SessionEntity,
@@ -36,10 +38,16 @@ export class UserEntity {
   })
   intraId: number;
 
-  @Column({ unique: true })
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   login: string;
 
-  @Column({ unique: true })
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   nickname: string;
 
   @Column({ nullable: true })
@@ -110,11 +118,35 @@ export class UserEntity {
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
 
-  constructor(user?: UserEntity) {
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  constructor(user?: Partial<UserEntity>) {
     this.id = user?.id;
+    this.intraId = user?.intraId;
     this.login = user?.login;
     this.nickname = user?.nickname;
-    this.intraId = user?.intraId;
+    this.avatarUrl = user?.avatarUrl;
     this.provider = user?.provider;
+    this.tfaEnabled = user?.tfaEnabled;
+    this.tfaSecret = user?.tfaSecret;
+    this.tfaRecoveryCodes = user?.tfaRecoveryCodes;
+    this.status = user?.status;
+    this.sessions = user?.sessions;
+    this.friends = user?.friends;
+    this.friendRequestsReceived = user?.friendRequestsReceived;
+    this.friendRequestsSent = user?.friendRequestsSent;
+    this.chats = user?.chats;
+    this.messages = user?.messages;
+    this.blockedBy = user?.blockedBy;
+    this.blockedUsers = user?.blockedUsers;
+    this.deletedAt = user?.deletedAt;
+  }
+
+  @BeforeSoftRemove()
+  beforeSoftRemove() {
+    this.login = null;
+    this.nickname = null;
+    this.intraId = null;
   }
 }

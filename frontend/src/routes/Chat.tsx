@@ -437,7 +437,9 @@ export default function Chat() {
           >
             {chat.messages.map((message) => {
               const showAvatar = lastUser?.id != message.sender?.id;
+
               lastUser = message.sender;
+
               return (
                 <div key={message.id}>
                   {showAvatar && (
