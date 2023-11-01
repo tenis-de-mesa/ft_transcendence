@@ -7,7 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
-import { UserStatus } from '../../core/entities';
+import { SessionEntity, UserStatus } from '../../core/entities';
 
 @WebSocketGateway({
   cors: {
@@ -29,9 +29,24 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(client: Socket) {
     const session = await this.sessionService.getSessionByClientSocket(client);
     if (!session) {
-      return;
+      client.disconnect();
     }
 
+    // A client connecting for the first time doesn't have a userId
+    // We disconnect them and wait for them to reconnect with a userId
+    if (!client.handshake.auth?.userId) {
+      client.emit('authSuccess', session.userId);
+      client.disconnect();
+    }
+
+    // Client is connected and authenticated
+    if (client.handshake.auth?.userId === session.userId) {
+      this.setUserOnline(client, session);
+      this.emitUserStatus(session.userId, UserStatus.ONLINE);
+    }
+  }
+
+  async setUserOnline(client: Socket, session: SessionEntity) {
     const updateSessionPromise = this.sessionService.updateSession(session.id, {
       socketId: client.id,
     });
@@ -39,8 +54,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
       status: UserStatus.ONLINE,
     });
     await Promise.all([updateSessionPromise, updateUserPromise]);
-
-    this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
   // Called when a client disconnects from the server
