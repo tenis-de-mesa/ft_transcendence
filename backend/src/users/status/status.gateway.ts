@@ -36,18 +36,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (client.handshake.auth.user.id !== session.userId) {
       return client.disconnect();
     }
-    this.setUserOnline(client, session);
-    this.emitUserStatus(session.userId, UserStatus.ONLINE);
-  }
-
-  async setUserOnline(client: Socket, session: SessionEntity) {
+    // Link the socket id to the session
     const updateSessionPromise = this.sessionService.updateSession(session.id, {
       socketId: client.id,
     });
+    // Update the user status to online
     const updateUserPromise = this.userService.updateUser(session.userId, {
       status: UserStatus.ONLINE,
     });
     await Promise.all([updateSessionPromise, updateUserPromise]);
+    this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
   // Called when a client disconnects from the server

@@ -80,6 +80,6 @@ describe('User Status', () => {
     const user = await usersService.getUserById(mockUser.id);
 
     // Assert
-    // expect(user.status).toEqual('online');
+    expect(user.status).toEqual('online');
   });
 });
