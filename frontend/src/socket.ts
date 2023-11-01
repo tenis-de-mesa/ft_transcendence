@@ -1,8 +1,13 @@
 import { io } from "socket.io-client";
 const URL = "http://localhost:3001";
-export const socket = io(URL, { withCredentials: true });
 
-socket.on("authSuccess", (userId: string) => {
-  socket.auth = { userId };
-  socket.disconnect().connect();
+const response: Response = await fetch(`${URL}/users/me`, {
+  credentials: "include",
+});
+const user = await response.json();
+const userId = user.id;
+
+export const socket = io(URL, {
+  auth: { userId },
+  withCredentials: true,
 });

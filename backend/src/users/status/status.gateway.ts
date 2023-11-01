@@ -32,12 +32,6 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return client.disconnect();
     }
 
-    // A valid client connecting for the first time doesn't have the userId
-    // We send the userId to the client so that it can authenticate
-    if (!client.handshake.auth?.userId) {
-      return client.emit('authSuccess', session.userId);
-    }
-
     // Client is connected and authenticated
     if (client.handshake.auth?.userId === session.userId) {
       this.setUserOnline(client, session);
