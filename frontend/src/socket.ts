@@ -5,9 +5,7 @@ const response: Response = await fetch(`${URL}/users/me`, {
   credentials: "include",
 });
 const user = await response.json();
-const userId = user.id;
-
 export const socket = io(URL, {
-  auth: { userId },
+  auth: { user },
   withCredentials: true,
 });

@@ -28,15 +28,16 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
     const session = await this.sessionService.getSessionByClientSocket(client);
+    // If the client is not authenticated, disconnect it
     if (!session) {
       return client.disconnect();
     }
-
-    // Client is connected and authenticated
-    if (client.handshake.auth?.userId === session.userId) {
-      this.setUserOnline(client, session);
-      this.emitUserStatus(session.userId, UserStatus.ONLINE);
+    // Check if the user id in the auth token matches the user id in the session
+    if (client.handshake.auth.user.id !== session.userId) {
+      return client.disconnect();
     }
+    this.setUserOnline(client, session);
+    this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
   async setUserOnline(client: Socket, session: SessionEntity) {
