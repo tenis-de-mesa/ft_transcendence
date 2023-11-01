@@ -7,7 +7,8 @@ import {
 import { Server } from 'socket.io';
 import { ChatsService } from './chats.service';
 import { SessionsService } from '../users/sessions/sessions.service';
-import { GetSessionId } from '../core/decorators/get-sessionid.decorator';
+import { User } from '../core/decorators';
+import { UserEntity } from '../core/entities';
 
 interface NewChatMessage {
   chatId: number;
@@ -33,18 +34,12 @@ export class ChatsGateway {
   // When the client sends a message to the server
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
-    @GetSessionId() sessionId: string,
+    @User() user: UserEntity,
     @MessageBody() data: NewChatMessage,
   ) {
-    const session = await this.sessionService.getSessionById(sessionId);
-
-    if (!session) {
-      return;
-    }
-
     const newMessage = await this.chatService.addMessage({
       content: data.message,
-      senderId: session.userId,
+      senderId: user.id,
       chatId: data.chatId,
     });
 

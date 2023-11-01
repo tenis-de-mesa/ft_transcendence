@@ -7,7 +7,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
-import { UserStatus } from '../../core/entities';
+import { SessionEntity, UserStatus } from '../../core/entities';
 
 @WebSocketGateway({
   cors: {
@@ -27,19 +27,25 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
-    const session = await this.sessionService.getSessionByClientSocket(client);
+    const session: SessionEntity =
+      await this.sessionService.getSessionByClientSocket(client);
+    // If the client is not authenticated, disconnect it
     if (!session) {
-      return;
+      return client.disconnect();
     }
-
+    // Check if the user id in the auth token matches the user id in the session
+    if (client.handshake.auth.user.id !== session.userId) {
+      return client.disconnect();
+    }
+    // Link the socket id to the session
     const updateSessionPromise = this.sessionService.updateSession(session.id, {
       socketId: client.id,
     });
+    // Update the user status to online
     const updateUserPromise = this.userService.updateUser(session.userId, {
       status: UserStatus.ONLINE,
     });
     await Promise.all([updateSessionPromise, updateUserPromise]);
-
     this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
