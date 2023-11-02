@@ -9,6 +9,7 @@ import {
   Patch,
   HttpCode,
   HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
@@ -25,6 +26,7 @@ import {
   UpdateChatDto,
   ChangePasswordDto,
 } from './dto';
+import { DeleteResult } from 'typeorm';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
@@ -36,6 +38,7 @@ export class ChatsController {
     const chats = await this.chatsService.findAll(user);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
+
   @Get('all')
   async findAllChats(): Promise<ChatEntity[]> {
     return await this.chatsService.listAllChats();
@@ -96,9 +99,15 @@ export class ChatsController {
     @Param('id', ParseIntPipe) chatId: number,
     @User() user: UserEntity,
   ): Promise<ChatMemberEntity> {
-    console.log(chatId);
-    console.log(user);
     return await this.chatsService.joinChat(chatId, user);
+  }
+
+  @Delete(':id/leave')
+  async leaveChat(
+    @Param('id', ParseIntPipe) chatId: number,
+    @User() user: UserEntity,
+  ): Promise<DeleteResult> {
+    return await this.chatsService.leaveChat(chatId, user);
   }
 
   @Get(':id/role')

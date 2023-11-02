@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DeleteResult, In, Repository } from 'typeorm';
 import {
   UserEntity,
   ChatEntity,
@@ -95,6 +95,7 @@ export class ChatsService {
       type: ChatType.CHANNEL,
       access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
       password: password ? await argon2.hash(password) : undefined,
+      createdByUser: creator.id,
     });
 
     users.map(async (user) => {
@@ -278,46 +279,6 @@ export class ChatsService {
       .getOne();
   }
 
-  mapChatsToChatsWithName(
-    chats: ChatEntity[],
-    currentUser: UserEntity,
-  ): ChatWithName[] {
-    return chats.map((chat) => ({
-      ...chat,
-      name: this.generateChatName(chat.users, currentUser),
-    }));
-  }
-
-  private generateChatName(
-    users: UserEntity[],
-    currentUser: UserEntity,
-  ): string {
-    const otherUsers = users.filter((user) => user.id !== currentUser.id);
-    // When a user creates a chat with himself
-    if (otherUsers.length === 0) {
-      return `${currentUser.nickname} (You)`;
-    }
-    const names = otherUsers.map((user) => user.nickname);
-    return names.join(', ');
-  }
-
-  async findOne(id: number): Promise<ChatEntity> {
-    // TODO: filter all data user from only userid
-
-    const chat = await this.chatRepository.findOne({
-      relations: { users: true, messages: { sender: true } },
-      where: { id: id },
-      order: {
-        messages: {
-          createdAt: 'ASC',
-        },
-      },
-    });
-
-    if (!chat) throw new NotFoundException('Chat not found');
-    return chat;
-  }
-
   async joinChat(chatId: number, user: UserEntity): Promise<ChatMemberEntity> {
     const chat = this.findOne(chatId);
     if (!chat) {
@@ -328,6 +289,22 @@ export class ChatsService {
       userId: user.id,
       chatId: chatId,
     });
+  }
+
+  async leaveChat(chatId: number, user: UserEntity): Promise<DeleteResult> {
+    const chat = this.findOne(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    const query = this.chatMemberRepository
+      .createQueryBuilder()
+      .delete()
+      .from(ChatMemberEntity)
+      .where('userId = :userId', { userId: user.id })
+      .andWhere('chatId = :chatId', { chatId: chatId });
+
+    return await query.execute();
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
