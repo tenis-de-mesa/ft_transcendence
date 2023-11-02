@@ -6,7 +6,6 @@ import { UsersService } from '../../src/users/users.service';
 import { ChatsService } from '../../src/chats/chats.service';
 import {
   AuthProvider,
-  ChatAccess,
   ChatEntity,
   ChatType,
   UserEntity,
@@ -54,7 +53,6 @@ describe('Chats', () => {
       chat = await chatsService.create(
         {
           userIds: [user1.id, user2.id],
-          access: ChatAccess.PUBLIC,
           type: ChatType.DIRECT,
         },
         user1,
@@ -107,10 +105,14 @@ describe('Chats', () => {
         await usersService.deleteUser(user1.id);
         const { messages } = await chatsService.findOne(chat.id);
         // Assert
-        expect(messages[0].sender).toEqual(null);
+        expect(messages[0].sender?.id).toEqual(user1.id);
+        expect(messages[0].sender?.login).toEqual(null);
         expect(messages[1].sender?.id).toEqual(user2.id);
-        expect(messages[2].sender).toEqual(null);
+        expect(messages[1].sender?.login).toEqual(user2.login);
+        expect(messages[2].sender?.id).toEqual(user1.id);
+        expect(messages[2].sender?.login).toEqual(null);
         expect(messages[3].sender?.id).toEqual(user2.id);
+        expect(messages[3].sender?.login).toEqual(user2.login);
       });
     });
   });
@@ -128,7 +130,6 @@ describe('Chats', () => {
       const chat = await chatsService.create(
         {
           userIds: [user1.id, user2.id],
-          access: ChatAccess.PUBLIC,
           type: ChatType.DIRECT,
         },
         user1,

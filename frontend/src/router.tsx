@@ -10,7 +10,7 @@ import {
   loadFriendsList,
 } from "./loaders";
 
-import { createChannel, createChat } from "./actions";
+import { createChannel, createChat, updateChat } from "./actions";
 
 // Routes
 import Root from "./routes/Root.tsx";
@@ -28,6 +28,7 @@ import Settings from "./routes/Settings.tsx";
 import { redirectToChat } from "./loaders/redirectToChat.ts";
 import ErrorBoundary from "./routes/ErrorBoundary.tsx";
 import Channels from "./routes/Channels.tsx";
+import { changeChatPassword } from "./actions/changeChatPassword.ts";
 import Friends from "./routes/Friends.tsx";
 import { loadAllChats } from "./loaders/loadAllChats.ts";
 
@@ -91,6 +92,14 @@ const router = createBrowserRouter([
             element: <Chat />,
             loader: loadChat,
             action: sendChatMessage,
+          },
+          {
+            path: "update/:id",
+            action: updateChat,
+          },
+          {
+            path: ":id/change-password",
+            action: changeChatPassword,
           },
         ],
       },

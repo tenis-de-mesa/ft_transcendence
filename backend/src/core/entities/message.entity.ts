@@ -18,13 +18,10 @@ export class MessageEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => ChatEntity, (chat) => chat.messages)
+  @ManyToOne(() => ChatEntity, (chat) => chat.messages, { onDelete: 'CASCADE' })
   chat: ChatEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne(() => UserEntity, (user) => user.id)
   sender: UserEntity;
 
   constructor(message?: MessageEntity) {
