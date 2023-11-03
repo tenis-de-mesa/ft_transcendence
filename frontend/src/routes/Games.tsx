@@ -1,6 +1,7 @@
 import { Typography } from "../components/Typography";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import useMovement from "../hooks/useMovement";
 
 const URL = "http://localhost:3001/games";
 const socket = io(URL, {
@@ -9,14 +10,7 @@ const socket = io(URL, {
 });
 
 socket.on("connect", () => {
-  // socket.auth.token = "abcd";
-
-  // alert("connected");
-  // console.log(t);
   console.log("connected");
-  // const user = { id: socket.id };
-  // users[socket.id] = user;
-  // setUsers(users);
 });
 
 const animate = {
@@ -63,62 +57,28 @@ const Games = () => {
 
   const [users, setUsers] = useState({});
 
-  const [move, setMove] = useState([]);
+  useMovement({ timeInterval: 10, defaultMovement: 15 }, (move) => {
+    socket.emit("ON_PLAYER_MOVE", { id: socket.id, move });
+  });
 
   useEffect(() => {
-    animate.render(canvasRef, users);
-
-    const handleKeyDown = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("keydown", e.key);
-
-      const moves = {
-        ArrowUp: { x: 0, y: -1 },
-        ArrowDown: { x: 0, y: 1 },
-        ArrowLeft: { x: -1, y: 0 },
-        ArrowRight: { x: 1, y: 0 },
-      };
-
-      const move = moves[e.key];
-      if (move) {
-        socket.emit("ON_PLAYER_MOVE", { id: socket.id, move });
-      }
-    };
-
-    const keystate = {};
-    document.addEventListener("keydown", function (evt) {
-      keystate[evt.key] = true;
-    });
-    document.addEventListener("keyup", function (evt) {
-      delete keystate[evt.key];
-    });
-
-    setInterval(() => {
-      console.log(keystate);
-    }, 1000);
-
     socket.on("pong", () => {
-      console.log(socket);
-      console.log("pong");
+      console.log("pong", socket);
     });
 
     socket.on("ON_PLAYERS_UPDATE", (players) => {
-      // console.log("ON_PLAYERS_UPDATE", players);
       setUsers(players);
     });
 
-    document.addEventListener("keydown", handleKeyDown, true);
-
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
       socket.off("ON_PLAYERS_UPDATE");
-      socket.off("connect");
       socket.off("pong");
     };
-  });
+  }, []);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    animate.render(canvasRef, users);
+  }, [users]);
 
   return (
     <>
@@ -131,10 +91,7 @@ const Games = () => {
         </button>
       </Typography>
 
-      <div
-        className="mt-10 flex justify-center"
-        onKeyUp={(e) => console.log("onKeyUp")}
-      >
+      <div className="mt-10 flex justify-center">
         <canvas
           ref={canvasRef}
           style={{ backgroundColor: "black" }}
