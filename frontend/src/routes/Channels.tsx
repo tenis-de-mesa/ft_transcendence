@@ -124,7 +124,7 @@ export default function Channels() {
         },
       }),
     ],
-    [],
+    [currentUser.id, userList],
   );
 
   useEffect(() => {
