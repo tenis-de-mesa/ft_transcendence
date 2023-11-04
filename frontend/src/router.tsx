@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     path: "/",
     id: "root",
     errorElement: <ErrorBoundary />,
-    element: <Root/>,
+    element: <Root />,
     loader: loadRootUser,
     children: [
       {
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
             loadUsersList(),
           ]);
           return await Promise.all([chatList.json(), userList.json()]);
-        }
+        },
       },
       {
         path: "newChannel",

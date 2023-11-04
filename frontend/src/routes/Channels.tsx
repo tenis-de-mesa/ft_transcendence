@@ -21,11 +21,8 @@ const columnHelper = createColumnHelper<Chat>();
 
 export default function Channels() {
   const currentUser = RootUser();
-  const [allChats, userList] = useLoaderData() as [
-    Chat[],
-    User[],
-  ];
-  
+  const [allChats, userList] = useLoaderData() as [Chat[], User[]];
+
   const [isOpen, setIsOpen] = useState(false);
   const [chatId, setChatId] = useState<number | undefined>(undefined);
   const [password, setPassword] = useState("");
@@ -55,8 +52,10 @@ export default function Channels() {
         header: "Actions",
         cell: (props) => {
           const users = props.row.original.users;
-          const joined = Boolean(users.find(user => user.userId === currentUser.id));
-          
+          const joined = Boolean(
+            users.find((user) => user.userId === currentUser.id),
+          );
+
           return (
             <>
               {currentUser.id == props.row.original.createdByUser ? (
@@ -69,7 +68,7 @@ export default function Channels() {
                 <>
                   {props.row.original.access == "public" ? (
                     <>
-                      {joined && (
+                      {(joined && (
                         <Link to={"/chats"}>
                           <Button
                             variant="error"
@@ -79,7 +78,7 @@ export default function Channels() {
                             Leave
                           </Button>
                         </Link>
-                      ) || (
+                      )) || (
                         <Link to={"/chats/" + props.getValue()}>
                           <Button
                             variant="info"
@@ -93,7 +92,7 @@ export default function Channels() {
                     </>
                   ) : (
                     <>
-                      {joined && (
+                      {(joined && (
                         <Link to={"/chats"}>
                           <Button
                             variant="error"
@@ -103,13 +102,13 @@ export default function Channels() {
                             Leave
                           </Button>
                         </Link>
-                      ) || (
+                      )) || (
                         <Button
                           variant="info"
                           size="sm"
                           onClick={() => {
-                            setIsOpen(true)
-                            setChatId(props.getValue())
+                            setIsOpen(true);
+                            setChatId(props.getValue());
                           }}
                           TrailingIcon={<FiLock />}
                         >
@@ -125,9 +124,9 @@ export default function Channels() {
         },
       }),
     ],
-    []
+    [],
   );
-  
+
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as Element;
@@ -158,8 +157,8 @@ export default function Channels() {
         setPassword("");
         setIsOpen(false);
       }
-    })
-  }
+    });
+  };
 
   return (
     <>
@@ -180,7 +179,10 @@ export default function Channels() {
               <Card className="w-96">
                 <Card.Body position="left" className="space-y-4">
                   <>
-                    <Form onSubmit={handleProtectedChannelJoin} className="space-y-2">
+                    <Form
+                      onSubmit={handleProtectedChannelJoin}
+                      className="space-y-2"
+                    >
                       <Input
                         type="password"
                         name="password"

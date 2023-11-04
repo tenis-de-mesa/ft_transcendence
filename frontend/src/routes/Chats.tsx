@@ -30,7 +30,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Close dialog, clear search and selected users on submit
