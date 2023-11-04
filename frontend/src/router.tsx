@@ -59,13 +59,7 @@ const router = createBrowserRouter([
       {
         path: "chats",
         element: <Chats />,
-        loader: async () => {
-          const [chats, users] = await Promise.all([
-            loadChatList(),
-            loadUsersList(),
-          ]);
-          return await Promise.all([chats.json(), users.json()]);
-        },
+        loader: loadChatList,
         action: createChat,
         children: [
           {
