@@ -1,5 +1,5 @@
-import { Link, useLoaderData } from "react-router-dom";
-import { useMemo } from "react";
+import { Form, Link, useLoaderData } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { Chat, User } from "../types/types";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
@@ -13,6 +13,9 @@ import { Badge } from "../components/Badge";
 import { joinChannel } from "../actions/joinChannel";
 import { leaveChannel } from "../actions/leaveChannel";
 import { FiLock } from "react-icons/fi";
+import { Input } from "../components/Input";
+import { Card } from "../components/Card";
+import { Alert } from "../components/Alert";
 
 const columnHelper = createColumnHelper<Chat>();
 
@@ -22,6 +25,11 @@ export default function Channels() {
     Chat[],
     User[],
   ];
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [chatId, setChatId] = useState<number | undefined>(undefined);
+  const [password, setPassword] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const chats = allChats.filter((chat) => chat.type !== "direct");
 
@@ -84,16 +92,31 @@ export default function Channels() {
                       )}
                     </>
                   ) : (
-                    <Link to={"/chats/" + props.getValue()}>
-                      <Button
-                        variant="info"
-                        size="sm"
-                        onClick={() => joinChannel(props.getValue())}
-                        TrailingIcon={<FiLock />}
-                      >
-                        Join
-                      </Button>
-                    </Link>
+                    <>
+                      {joined && (
+                        <Link to={"/chats"}>
+                          <Button
+                            variant="error"
+                            size="sm"
+                            onClick={() => leaveChannel(props.getValue())}
+                          >
+                            Leave
+                          </Button>
+                        </Link>
+                      ) || (
+                        <Button
+                          variant="info"
+                          size="sm"
+                          onClick={() => {
+                            setIsOpen(true)
+                            setChatId(props.getValue())
+                          }}
+                          TrailingIcon={<FiLock />}
+                        >
+                          Join
+                        </Button>
+                      )}
+                    </>
                   )}
                 </>
               )}
@@ -104,6 +127,39 @@ export default function Channels() {
     ],
     []
   );
+  
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+
+      if (!target.closest("#join-channel")) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOpen]);
+
+  const handleProtectedChannelJoin = () => {
+    joinChannel(chatId, password).then((isValid) => {
+      if (!isValid) {
+        setIsError(true);
+        setPassword("");
+      } else {
+        setIsError(false);
+        setPassword("");
+        setIsOpen(false);
+      }
+    })
+  }
 
   return (
     <>
@@ -114,6 +170,48 @@ export default function Channels() {
           columns={columns as unknown as ColumnDef<Data>[]}
           data={chats as unknown as Data[]}
         />
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>
+            <div
+              id="join-channel"
+              className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+            >
+              <Card className="w-96">
+                <Card.Body position="left" className="space-y-4">
+                  <>
+                    <Form onSubmit={handleProtectedChannelJoin} className="space-y-2">
+                      <Input
+                        type="password"
+                        name="password"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setIsError(false);
+                        }}
+                        placeholder="Channel password"
+                      />
+                      <Button
+                        className="justify-center w-full"
+                        type="submit"
+                        variant="info"
+                        disabled={password.length === 0}
+                      >
+                        Join
+                      </Button>
+                    </Form>
+
+                    {isError && (
+                      <Alert severity="error" className="w-full">
+                        Invalid password
+                      </Alert>
+                    )}
+                  </>
+                </Card.Body>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
