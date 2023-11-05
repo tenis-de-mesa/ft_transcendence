@@ -5,9 +5,9 @@ export type UserStatus = {
 
 export type User = {
   id: number;
-  login: string;
+  login?: string;
   status: string;
-  nickname: string;
+  nickname?: string;
   avatarUrl: string;
   blockedBy: number[];
   blockedUsers: number[];
@@ -27,7 +27,8 @@ export type Chat = {
   users: User[];
   messages: Message[];
   newMessage: string;
-  type: string;
+  access: "public" | "protected" | "private";
+  type: "direct" | "channel";
 };
 
 export type NewChatMessage = {
