@@ -4,6 +4,7 @@ export type UserStatus = {
 };
 
 export type User = {
+  userId: number;
   id: number;
   login?: string;
   status: string;
@@ -29,6 +30,7 @@ export type Chat = {
   newMessage: string;
   access: "public" | "protected" | "private";
   type: "direct" | "channel";
+  createdByUser: number;
 };
 
 export type NewChatMessage = {

@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DeleteResult, In, Repository } from 'typeorm';
 import {
   UserEntity,
   ChatEntity,
@@ -95,6 +95,7 @@ export class ChatsService {
       type: ChatType.CHANNEL,
       access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
       password: password ? await argon2.hash(password) : undefined,
+      createdByUser: creator.id,
     });
 
     users.map(async (user) => {
@@ -226,6 +227,10 @@ export class ChatsService {
     return member.role;
   }
 
+  async listAllChats(): Promise<ChatEntity[]> {
+    return await this.chatRepository.find({ relations: { users: true } });
+  }
+
   async findDirectChat(
     currentUser: UserEntity,
     otherUserId: number,
@@ -272,6 +277,34 @@ export class ChatsService {
       .groupBy('chat.id')
       .having('COUNT(member.userId) = 1')
       .getOne();
+  }
+
+  async joinChat(chatId: number, user: UserEntity): Promise<ChatMemberEntity> {
+    const chat = this.findOne(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    return await this.chatMemberRepository.save({
+      userId: user.id,
+      chatId: chatId,
+    });
+  }
+
+  async leaveChat(chatId: number, user: UserEntity): Promise<DeleteResult> {
+    const chat = this.findOne(chatId);
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    const query = this.chatMemberRepository
+      .createQueryBuilder()
+      .delete()
+      .from(ChatMemberEntity)
+      .where('userId = :userId', { userId: user.id })
+      .andWhere('chatId = :chatId', { chatId: chatId });
+
+    return await query.execute();
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {

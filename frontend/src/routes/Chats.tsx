@@ -30,7 +30,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Close dialog, clear search and selected users on submit
@@ -127,7 +127,7 @@ export default function Chats() {
 
                           <Form
                             method="POST"
-                            action="/channels"
+                            action="/newChannel"
                             onSubmit={handleNewChannelSubmit}
                           >
                             {selectedUsers.map((userId, index) => (
@@ -151,7 +151,7 @@ export default function Chats() {
                                 type="checkbox"
                                 name="hasPassword"
                                 id="hasPassword"
-                                className="mr-1 mb-3"
+                                className="mb-3 mr-1"
                                 onChange={() => setHasPassword(!hasPassword)}
                               />
                               <Typography variant="sm" as="label">

@@ -27,8 +27,10 @@ import Games from "./routes/Games.tsx";
 import Settings from "./routes/Settings.tsx";
 import { redirectToChat } from "./loaders/redirectToChat.ts";
 import ErrorBoundary from "./routes/ErrorBoundary.tsx";
+import Channels from "./routes/Channels.tsx";
 import { changeChatPassword } from "./actions/changeChatPassword.ts";
 import Friends from "./routes/Friends.tsx";
+import { loadAllChats } from "./loaders/loadAllChats.ts";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +56,17 @@ const router = createBrowserRouter([
       },
       {
         path: "channels",
+        element: <Channels />,
+        loader: async () => {
+          const [chatList, userList] = await Promise.all([
+            loadAllChats(),
+            loadUsersList(),
+          ]);
+          return await Promise.all([chatList.json(), userList.json()]);
+        },
+      },
+      {
+        path: "newChannel",
         action: createChannel,
       },
       {

@@ -7,7 +7,7 @@ import { useState } from "react";
 export const AddFriendButton = ({ user }: { user: User }) => {
   const currentUser = RootUser();
   const [isFriend, setIsFriend] = useState(
-    user.friends.some((friend) => friend.id === currentUser.id)
+    user.friends.some((friend) => friend.id === currentUser.id),
   );
 
   // Don't show a button to add yourself
@@ -39,7 +39,7 @@ export const AddFriendButton = ({ user }: { user: User }) => {
       {
         method: "DELETE",
         credentials: "include",
-      }
+      },
     );
     if (response.ok) {
       setIsFriend(false);

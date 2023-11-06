@@ -10,6 +10,8 @@ import {
   LuUsers,
 } from "react-icons/lu";
 
+import { TbUsersGroup } from "react-icons/tb";
+
 export const navitems: INavitem[] = [
   {
     order: 0,
@@ -30,31 +32,37 @@ export const navitems: INavitem[] = [
     icon: <LuUsers />,
   },
   {
-    order: 2,
+    order: 3,
     path: "friends",
     label: "Friends",
     icon: <LuUsers />,
   },
   {
-    order: 3,
+    order: 4,
     path: "leaderboard",
     label: "Leaderboard",
     icon: <LuBarChart2 />,
   },
   {
-    order: 4,
+    order: 5,
     path: "games",
     label: "Games",
     icon: <LuGlobe />,
   },
   {
-    order: 5,
+    order: 6,
     path: "chats",
     label: "Chats",
     icon: <LuMessagesSquare />,
   },
   {
-    order: 6,
+    order: 7,
+    path: "channels",
+    label: "Channels",
+    icon: <TbUsersGroup />,
+  },
+  {
+    order: 8,
     path: "settings",
     label: "Settings",
     icon: <LuSettings />,
