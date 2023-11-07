@@ -38,59 +38,76 @@ import Settings from "./routes/Settings.tsx";
 import ErrorBoundary from "./routes/ErrorBoundary.tsx";
 import Channels from "./routes/Channels.tsx";
 import Friends from "./routes/Friends.tsx";
+import RequireAuth from "./context/RequireAuth.tsx";
+import Login from "./routes/Login.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route
-      path="/"
-      element={<Root />}
-      errorElement={<ErrorBoundary />}
-      loader={loadRootUser}
-    >
-      <Route index element={<Home />} />
-      <Route path="users" element={<Users />} loader={loadUsersList} />
-      <Route path="friends" element={<Friends />} loader={loadFriendsList} />
-      <Route
-        path="channels"
-        element={<Channels />}
-        loader={async () => {
-          const [chatList, userList] = await Promise.all([
-            loadAllChats(),
-            loadUsersList(),
-          ]);
-          return await Promise.all([chatList.json(), userList.json()]);
-        }}
-      />
-      <Route path="newChannel" action={createChannel} />
-      <Route
-        path="chats"
-        element={<Chats />}
-        loader={async () => {
-          const [chats, users] = await Promise.all([
-            loadChatList(),
-            loadUsersList(),
-          ]);
-          return await Promise.all([chats.json(), users.json()]);
-        }}
-        action={createChat}
-      >
-        <Route path="with/:userId" loader={redirectToChat} />
-        <Route path="new/:id" element={<ChatNew />} loader={loadUserById} />
-        <Route
-          path=":id"
-          element={<Chat />}
-          loader={loadChat}
-          action={sendChatMessage}
-        />
-        <Route path="update/:id" action={updateChat} />
-        <Route path=":id/change-password" action={changeChatPassword} />
-      </Route>
-      <Route path="profile/:id" element={<Profile />} loader={loadUserById} />
-      <Route path="leaderboard" element={<Leaderboard />} />
-      <Route path="games" element={<Games />} />
-      <Route path="settings" element={<Settings />} />
+    <Route>
+      {/* Public routes */}
+      <Route path="/login" element={<Login />} />,
       <Route path="/login/:provider" loader={login} />,
       <Route path="/logout" loader={logout} />,
+      <Route element={<RequireAuth />}>
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={<Root />}
+          errorElement={<ErrorBoundary />}
+          loader={loadRootUser}
+        >
+          <Route index element={<Home />} />
+          <Route path="users" element={<Users />} loader={loadUsersList} />
+          <Route
+            path="friends"
+            element={<Friends />}
+            loader={loadFriendsList}
+          />
+          <Route
+            path="channels"
+            element={<Channels />}
+            loader={async () => {
+              const [chatList, userList] = await Promise.all([
+                loadAllChats(),
+                loadUsersList(),
+              ]);
+              return await Promise.all([chatList.json(), userList.json()]);
+            }}
+          />
+          <Route path="newChannel" action={createChannel} />
+          <Route
+            path="chats"
+            element={<Chats />}
+            loader={async () => {
+              const [chats, users] = await Promise.all([
+                loadChatList(),
+                loadUsersList(),
+              ]);
+              return await Promise.all([chats.json(), users.json()]);
+            }}
+            action={createChat}
+          >
+            <Route path="with/:userId" loader={redirectToChat} />
+            <Route path="new/:id" element={<ChatNew />} loader={loadUserById} />
+            <Route
+              path=":id"
+              element={<Chat />}
+              loader={loadChat}
+              action={sendChatMessage}
+            />
+            <Route path="update/:id" action={updateChat} />
+            <Route path=":id/change-password" action={changeChatPassword} />
+          </Route>
+          <Route
+            path="profile/:id"
+            element={<Profile />}
+            loader={loadUserById}
+          />
+          <Route path="leaderboard" element={<Leaderboard />} />
+          <Route path="games" element={<Games />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Route>
     </Route>
   )
 );
