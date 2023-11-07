@@ -3,7 +3,6 @@ import { User } from "../types/types";
 
 type AuthContextType = {
   user: User;
-  loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<User>>;
 };
 
@@ -11,7 +10,7 @@ export const AuthContext = createContext({} as AuthContextType);
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,18 +18,22 @@ export const AuthContextProvider = ({ children }) => {
         credentials: "include",
       });
       if (!response.ok) {
-        setLoading(false);
+        setIsLoading(false);
         return null;
       }
       const user = await response.json();
       setUser(user);
-      setLoading(false);
+      setIsLoading(false);
     };
     fetchUser();
   }, []);
 
+  if (isLoading) {
+    return null;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser }}>
       {children}
     </AuthContext.Provider>
   );
