@@ -14,7 +14,7 @@ socket.on("connect", () => {
 });
 
 const animate = {
-  render(canvasRef, users) {
+  render(canvasRef, users, ball) {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
@@ -39,7 +39,7 @@ const animate = {
 
     // ball
     context.beginPath();
-    context.arc(canvas.width / 2, canvas.height / 2, 10, 0, 2 * Math.PI);
+    context.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
     context.fill();
 
     // tracejado
@@ -56,8 +56,9 @@ const Games = () => {
   const canvasRef = useRef(null);
 
   const [users, setUsers] = useState({});
+  const [ball, setBall] = useState({ x: 0, y: 0 });
 
-  useMovement({ timeInterval: 10, defaultMovement: 15 }, (move) => {
+  useMovement({ timeInterval: 1, defaultMovement: 10 }, (move) => {
     socket.emit("ON_PLAYER_MOVE", { id: socket.id, move });
   });
 
@@ -70,15 +71,20 @@ const Games = () => {
       setUsers(players);
     });
 
+    socket.on("ON_BALL_UPDATE", (ball) => {
+      setBall(ball);
+    });
+
     return () => {
       socket.off("ON_PLAYERS_UPDATE");
+      socket.off("ON_BALL_UPDATE");
       socket.off("pong");
     };
   }, []);
 
   useEffect(() => {
-    animate.render(canvasRef, users);
-  }, [users]);
+    animate.render(canvasRef, users, ball);
+  }, [users, ball]);
 
   return (
     <>

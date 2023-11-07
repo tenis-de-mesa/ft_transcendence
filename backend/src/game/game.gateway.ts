@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../users/sessions/sessions.service';
 // import { GetSessionId } from '../core/decorators/get-sessionid.decorator';
 import { GameService } from './game.service';
+import { Position2D } from './interfaces';
 
 type Player = {
   id: string;
@@ -40,12 +41,17 @@ export class GameGateway
 {
   @WebSocketServer()
   server: Server;
+  MAXWIDTH = 700;
   MAXHEIGHT = 600;
   players: object;
   total_players: number;
-  // gameLoop = setInterval(() => {
-  //   this.server.emit('ON_PLAYERS_UPDATE', this.players);
-  // }, 1500);
+  ball_x: number;
+  ball_y: number;
+
+  vecDirX = 1;
+  vecDirY = 1;
+
+  interval;
 
   constructor(
     private readonly sessionService: SessionsService,
@@ -59,20 +65,26 @@ export class GameGateway
   }
 
   handleConnection(client: Socket) {
-    console.log(client.handshake.auth);
     console.log('Game connection:', client.id);
     const player: Player = { id: client.id, x: 0, y: 0 };
     this.players[client.id] = player;
-    this.total_players++;
+    this.ball_x = this.MAXWIDTH / 2;
+    this.ball_y = this.MAXHEIGHT / 2;
 
+    this.total_players++;
     this.server.emit('ON_PLAYERS_UPDATE', this.players);
+
+    this.interval = setInterval(() => {
+      this.ball_x = this.ball_x + this.vecDirX;
+      this.ball_y = this.ball_y + this.vecDirY;
+      this.onBallUpdate();
+    }, 100);
   }
 
   handleDisconnect(client: Socket) {
     console.log('Game disconnect:', client.id);
     this.players[client.id] = undefined;
     this.total_players--;
-
     this.server.emit('ON_PLAYERS_UPDATE', this.players);
   }
 
@@ -92,8 +104,38 @@ export class GameGateway
     this.server.emit('ON_PLAYERS_UPDATE', this.players);
   }
 
+  @SubscribeMessage('ON_BALL_MOVE')
+  async handleEventBallMove(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() movement: Move,
+  ) {
+    const move: Position2D = { x: this.MAXWIDTH / 2, y: this.MAXHEIGHT / 2 };
+    this.server.emit('ON_BALL_UPDATE', move);
+  }
+
   @SubscribeMessage('ping')
   async pingPong(@ConnectedSocket() client: Socket) {
     client.emit('pong');
+  }
+
+  async onBallUpdate() {
+    if (this.ball_x > this.MAXWIDTH) {
+      this.ball_x = this.MAXWIDTH;
+      this.vecDirX = -this.vecDirX;
+    }
+    if (this.ball_x < 0) {
+      this.ball_x = 0;
+      this.vecDirX = -this.vecDirX;
+    }
+    if (this.ball_y > this.MAXHEIGHT) {
+      this.ball_y = this.MAXHEIGHT;
+      this.vecDirY = -this.vecDirY;
+    }
+    if (this.ball_y < 0) {
+      this.ball_y = 0;
+      this.vecDirY = -this.vecDirY;
+    }
+    const move: Position2D = { x: this.ball_x, y: this.ball_y };
+    this.server.emit('ON_BALL_UPDATE', move);
   }
 }
