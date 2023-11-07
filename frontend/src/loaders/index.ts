@@ -5,3 +5,6 @@ export * from "./loadChat";
 export * from "./login";
 export * from "./logout";
 export * from "./loadFriendsList";
+export * from "./loadUserById";
+export * from "./redirectToChat";
+export * from "./loadAllChats";
