@@ -4,16 +4,17 @@ import UserForm from "../components/UserForm";
 
 import "./Profile.css";
 import { Avatar } from "../components/Avatar";
-import { RootUser } from "./Root";
 import { Card } from "../components/Card";
 import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { BsFillChatDotsFill } from "react-icons/bs";
+import AuthContext from "../context/AuthContext";
+import { useContext } from "react";
 
 export default function Profile() {
-  const currentUser = RootUser();
+  const { currentUser } = useContext(AuthContext);
   const profileUser = useLoaderData() as User; // loadUserById
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 

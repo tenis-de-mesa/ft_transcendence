@@ -2,7 +2,7 @@ export * from "./loadRootUser";
 export * from "./loadUsersList";
 export * from "./loadChatList";
 export * from "./loadChat";
-export * from "./login";
+export * from "./providerLogin";
 export * from "./logout";
 export * from "./loadFriendsList";
 export * from "./loadUserById";

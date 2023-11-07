@@ -2,14 +2,14 @@ import { createContext, useEffect, useState } from "react";
 import { User } from "../types/types";
 
 type AuthContextType = {
-  user: User;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
+  currentUser: User;
+  setCurrentUser: React.Dispatch<React.SetStateAction<User>>;
 };
 
 export const AuthContext = createContext({} as AuthContextType);
 
 export const AuthContextProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const AuthContextProvider = ({ children }) => {
         return null;
       }
       const user = await response.json();
-      setUser(user);
+      setCurrentUser(user);
       setIsLoading(false);
     };
     fetchUser();
@@ -33,7 +33,7 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ currentUser, setCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

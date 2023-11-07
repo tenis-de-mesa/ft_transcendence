@@ -5,11 +5,10 @@ import {
 } from "react-router-dom";
 
 import {
-  loadRootUser,
   loadUsersList,
   loadChatList,
   loadChat,
-  login,
+  providerLogin,
   logout,
   loadFriendsList,
   loadUserById,
@@ -46,16 +45,11 @@ const router = createBrowserRouter(
     <Route>
       {/* Public routes */}
       <Route path="/login" element={<Login />} />,
-      <Route path="/login/:provider" loader={login} />,
+      <Route path="/login/:provider" loader={providerLogin} />,
       <Route path="/logout" loader={logout} />,
       <Route element={<RequireAuth />}>
         {/* Protected routes */}
-        <Route
-          path="/"
-          element={<Root />}
-          errorElement={<ErrorBoundary />}
-          loader={loadRootUser}
-        >
+        <Route path="/" element={<Root />} errorElement={<ErrorBoundary />}>
           <Route index element={<Home />} />
           <Route path="users" element={<Users />} loader={loadUsersList} />
           <Route
@@ -108,8 +102,8 @@ const router = createBrowserRouter(
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 export default router;
