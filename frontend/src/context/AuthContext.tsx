@@ -1,9 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-
-type User = {
-  login: string;
-  tfaEnabled: boolean;
-};
+import { User } from "../types/types";
 
 type AuthContextType = {
   user: User;
