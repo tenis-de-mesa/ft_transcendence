@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/nav/Sidebar";
 import { navitems as navitemsTemplate } from "../data";
 import { useContext } from "react";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 
 export const isDark = true;
 

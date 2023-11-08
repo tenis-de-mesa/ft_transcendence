@@ -10,7 +10,7 @@ import Table from "../components/Table";
 import { Data } from "../data";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { Avatar } from "../components/Avatar";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 
 const columnHelper = createColumnHelper<User>();
 

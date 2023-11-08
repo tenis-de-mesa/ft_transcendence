@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Typography } from "../components/Typography";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 
 export default function Home() {
   const { currentUser } = useContext(AuthContext);

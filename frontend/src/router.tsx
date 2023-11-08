@@ -24,21 +24,24 @@ import {
   changeChatPassword,
 } from "./actions";
 
-import Root from "./routes/Root.tsx";
-import Users from "./routes/Users.tsx";
-import Profile from "./routes/Profile.tsx";
-import Chats from "./routes/Chats.tsx";
-import Chat from "./routes/Chat.tsx";
-import Home from "./routes/Home.tsx";
-import ChatNew from "./routes/ChatNew.tsx";
-import Leaderboard from "./routes/Leaderboard.tsx";
-import Games from "./routes/Games.tsx";
-import Settings from "./routes/Settings.tsx";
-import ErrorBoundary from "./routes/ErrorBoundary.tsx";
-import Channels from "./routes/Channels.tsx";
-import Friends from "./routes/Friends.tsx";
-import RequireAuth from "./context/RequireAuth.tsx";
-import Login from "./routes/Login.tsx";
+import { RequireAuth } from "./contexts";
+
+import {
+  Root,
+  Users,
+  Profile,
+  Chats,
+  Chat,
+  Home,
+  ChatNew,
+  Leaderboard,
+  Games,
+  Settings,
+  ErrorBoundary,
+  Channels,
+  Friends,
+  Login,
+} from "./routes";
 
 const router = createBrowserRouter(
   createRoutesFromElements(

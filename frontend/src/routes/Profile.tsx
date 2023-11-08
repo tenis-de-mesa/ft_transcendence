@@ -10,7 +10,7 @@ import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { BsFillChatDotsFill } from "react-icons/bs";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 import { useContext } from "react";
 
 export default function Profile() {

@@ -15,7 +15,7 @@ import { FiLock } from "react-icons/fi";
 import { Input } from "../components/Input";
 import { Card } from "../components/Card";
 import { Alert } from "../components/Alert";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 
 const columnHelper = createColumnHelper<Chat>();
 

@@ -25,6 +25,7 @@ export const AuthContextProvider = ({ children }) => {
       setCurrentUser(user);
       setIsLoading(false);
     };
+
     fetchUser();
   }, []);
 

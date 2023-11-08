@@ -7,7 +7,7 @@ import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
 import { Input } from "../components/Input";
 import { Hr } from "../components/Hr";
-import AuthContext from "../context/AuthContext";
+import { AuthContext } from "../contexts";
 
 export default function Chats() {
   const { currentUser } = useContext(AuthContext);
