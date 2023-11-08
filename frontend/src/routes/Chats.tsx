@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Chat, User } from "../types/types";
 import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { FiPlus, FiX } from "react-icons/fi";
-import { RootUser } from "./Root";
 import { Input } from "../components/Input";
 import { Hr } from "../components/Hr";
+import { AuthContext } from "../contexts";
 
 export default function Chats() {
-  const currentUser = RootUser();
+  const { currentUser } = useContext(AuthContext);
   const [chats, users] = useLoaderData() as [Chat[], User[]];
 
   const [isCreateChannelCard, setIsCreateChannelCard] = useState(false);
@@ -30,7 +30,7 @@ export default function Chats() {
 
   // Function to filter users based on search term
   const filteredUsers: User[] = users.filter((user) =>
-    user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
+    user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Close dialog, clear search and selected users on submit

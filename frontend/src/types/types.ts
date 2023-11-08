@@ -6,6 +6,7 @@ export type UserStatus = {
 export type User = {
   userId: number;
   id: number;
+  tfaEnabled: boolean;
   login?: string;
   status: string;
   nickname?: string;

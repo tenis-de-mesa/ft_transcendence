@@ -1,5 +1,5 @@
 import { Form, Link, useLoaderData } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Chat, User } from "../types/types";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
@@ -8,7 +8,6 @@ import { Typography } from "../components/Typography";
 import Table from "../components/Table";
 import { Data } from "../data";
 import { Button } from "../components/Button";
-import { RootUser } from "./Root";
 import { Badge } from "../components/Badge";
 import { joinChannel } from "../actions/joinChannel";
 import { leaveChannel } from "../actions/leaveChannel";
@@ -16,11 +15,12 @@ import { FiLock } from "react-icons/fi";
 import { Input } from "../components/Input";
 import { Card } from "../components/Card";
 import { Alert } from "../components/Alert";
+import { AuthContext } from "../contexts";
 
 const columnHelper = createColumnHelper<Chat>();
 
 export default function Channels() {
-  const currentUser = RootUser();
+  const { currentUser } = useContext(AuthContext);
   const [allChats, userList] = useLoaderData() as [Chat[], User[]];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -53,7 +53,7 @@ export default function Channels() {
         cell: (props) => {
           const users = props.row.original.users;
           const joined = Boolean(
-            users.find((user) => user.userId === currentUser.id),
+            users.find((user) => user.userId === currentUser.id)
           );
 
           return (
@@ -124,7 +124,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser.id, userList],
+    [currentUser.id, userList]
   );
 
   useEffect(() => {

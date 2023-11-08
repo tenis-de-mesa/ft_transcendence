@@ -1,6 +1,6 @@
 import { Link, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { User, UserStatus } from "../types/types";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
@@ -8,14 +8,14 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
 import { Data } from "../data";
-import { RootUser } from "./Root";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { Avatar } from "../components/Avatar";
+import { AuthContext } from "../contexts";
 
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
-  const currentUser = RootUser();
+  const { currentUser } = useContext(AuthContext);
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
@@ -36,7 +36,7 @@ export default function Users() {
           }
           // Otherwise, return the user as is
           return user;
-        }),
+        })
       );
     });
 
@@ -47,7 +47,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      }),
+      })
     );
   }, [currentUser.id]);
 
@@ -91,7 +91,7 @@ export default function Users() {
         cell: (info) => <AddFriendButton user={info.row.original} />,
       }),
     ],
-    [],
+    []
   );
 
   return (
