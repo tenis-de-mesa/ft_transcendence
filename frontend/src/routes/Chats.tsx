@@ -4,7 +4,7 @@ import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Button } from "../components/Button";
 import { useContext, useEffect, useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiX } from "react-icons/fi";
 import { Input } from "../components/Input";
 import { Hr } from "../components/Hr";
 import { AuthContext } from "../contexts";
@@ -20,20 +20,21 @@ export default function Chats() {
             <Typography variant="h6">Chats</Typography>
           </Card.Title>
           <Card.Body className="h-full pt-0">
-            <>
-              <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
-                <div>
-                  {chats.map((chat) => (
-                    <div key={chat.id} className="mt-2 text-left">
-                      <Link to={`/chats/${chat.id}`}>
-                        <Typography variant="sm">{chat.name}</Typography>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-                <NewChannelButton />
+            <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
+              <div className="flex flex-col gap-2 text-left">
+                {chats.map((chat) => (
+                  <Link
+                    key={chat.id}
+                    to={`/chats/${chat.id}`}
+                    state={{ id: chat.id }}
+                  >
+                    <Typography variant="sm">{chat.name}</Typography>
+                  </Link>
+                ))}
               </div>
-            </>
+
+              <NewChannelButton />
+            </div>
           </Card.Body>
         </Card>
       </div>
@@ -46,7 +47,7 @@ export default function Chats() {
 }
 
 function NewChannelButton() {
-  const [isNewChannelCardOpen, setIsNewChannelCardOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
@@ -54,15 +55,18 @@ function NewChannelButton() {
         className="flex items-center justify-center w-full"
         LeadingIcon={<FiPlus />}
         variant="info"
-        onClick={() => setIsNewChannelCardOpen(!isNewChannelCardOpen)}
+        onClick={() => setIsOpen(!isOpen)}
       >
         New channel
       </Button>
-      {isNewChannelCardOpen && (
-        <NewChannelCard onClose={() => setIsNewChannelCardOpen(false)} />
-      )}
+
+      {isOpen && <NewChannelCard onClose={() => setIsOpen(false)} />}
     </>
   );
+}
+
+function Overlay() {
+  return <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>;
 }
 
 function NewChannelCard({ onClose }) {
@@ -70,9 +74,27 @@ function NewChannelCard({ onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [password, setPassword] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [selectedUsersId, setSelectedUsersId] = useState<number[]>([]);
+
+  // Function to toggle user selection
+  const toggleUserSelection = (userId: number) => {
+    if (selectedUsersId.includes(userId)) {
+      setSelectedUsersId(selectedUsersId.filter((id) => id !== userId));
+    } else {
+      setSelectedUsersId([...selectedUsersId, userId]);
+    }
+  };
+
+  // Close dialog, clear search and selected users on submit
+  const handleNewChannelSubmit = () => {
+    onClose();
+    setSearchTerm("");
+    setSelectedUsersId([]);
+    setHasPassword(false);
+    setPassword("");
+  };
 
   // Fetch users when component mounts
   useEffect(() => {
@@ -94,15 +116,6 @@ function NewChannelCard({ onClose }) {
     );
   }, [searchTerm, users]);
 
-  // Function to toggle user selection
-  const toggleUserSelection = (userId: number) => {
-    if (selectedUsers.includes(userId)) {
-      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
-    } else {
-      setSelectedUsers([...selectedUsers, userId]);
-    }
-  };
-
   // Add event listener to close create channel card when clicking outside of it
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -110,120 +123,114 @@ function NewChannelCard({ onClose }) {
         onClose();
       }
     };
+
     document.addEventListener("mousedown", handleOutsideClick);
+
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [onClose]);
 
-  // Close dialog, clear search and selected users on submit
-  const handleNewChannelSubmit = () => {
-    onClose();
-    setSearchTerm("");
-    setSelectedUsers([]);
-    setHasPassword(false);
-    setPassword("");
-  };
-
   return (
     <>
-      <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>
-      <div
-        id="create-channel-card"
-        className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-      >
-        <Card className="dark:bg-gray-900">
-          <Card.Title>
-            <div className="flex items-center justify-between gap-5">
-              <Typography variant="md">Select friends to chat with</Typography>
-            </div>
-          </Card.Title>
-          <Card.Body>
-            <div>
-              <Input
-                type="text"
-                placeholder="Search users"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      <Overlay />
 
-              <div className="my-3 overflow-y-auto">
+      <Card
+        id="create-channel-card"
+        className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
+      >
+        <Card.Title hr={false}>
+          <div className="flex items-center justify-between gap-5">
+            <Typography variant="h6" customWeight="bold" className="text-left">
+              Select friends to chat with
+            </Typography>
+            <Button
+              variant="info"
+              size="sm"
+              IconOnly={<FiX />}
+              onClick={onClose}
+            />
+          </div>
+        </Card.Title>
+        <Card.Body>
+          <Form
+            method="POST"
+            action="/channels"
+            onSubmit={handleNewChannelSubmit}
+          >
+            <Input
+              type="text"
+              placeholder="Search users"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <div className="my-3 overflow-y-auto min-h-[15rem]">
+              {filteredUsers.length > 1 ? (
                 <ul className="flex flex-col items-start">
                   {filteredUsers.map((user) => {
                     if (user.id === currentUser.id) return null;
+
                     return (
                       <li key={user.id}>
                         <input
                           className="mr-1"
                           type="checkbox"
-                          checked={selectedUsers.includes(user.id)}
+                          value={user.id}
+                          name="users[]"
+                          checked={selectedUsersId.includes(user.id)}
                           onChange={() => toggleUserSelection(user.id)}
                         />
-                        <Typography variant="sm" as="label">
+                        <Typography variant="md" as="label">
                           {user.nickname}
                         </Typography>
                       </li>
                     );
                   })}
                 </ul>
-              </div>
-
-              <Form
-                method="POST"
-                action="/channels"
-                onSubmit={handleNewChannelSubmit}
-              >
-                {selectedUsers.map((userId, index) => (
-                  <input
-                    type="hidden"
-                    name="users[]"
-                    value={userId}
-                    key={index}
-                  />
-                ))}
-                <input type="hidden" name="users[]" value={currentUser.id} />
-
-                <Hr className="my-3"></Hr>
-
-                <div className="text-left">
-                  <input
-                    type="checkbox"
-                    name="hasPassword"
-                    id="hasPassword"
-                    className="mr-1 mb-3"
-                    onChange={() => setHasPassword(!hasPassword)}
-                  />
-                  <Typography variant="sm" as="label">
-                    Protect with password
-                  </Typography>
-                </div>
-
-                {hasPassword && (
-                  <div className="mb-3">
-                    <Input
-                      type="password"
-                      placeholder="Insert password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    ></Input>
-                  </div>
-                )}
-
-                {hasPassword && (
-                  <input type="hidden" name="password" value={password} />
-                )}
-
-                <Button
-                  className="justify-center w-full"
-                  type="submit"
-                  variant="info"
-                  disabled={hasPassword && password.length === 0}
-                >
-                  Create Channel
-                </Button>
-              </Form>
+              ) : (
+                <Typography variant="md" customColor="text-gray-500">
+                  No friends found :(
+                </Typography>
+              )}
             </div>
-          </Card.Body>
-        </Card>
-      </div>
+
+            <Hr className="my-3"></Hr>
+
+            <div className="text-left">
+              <input
+                type="checkbox"
+                name="hasPassword"
+                id="hasPassword"
+                className="mr-1 mb-3"
+                onChange={() => setHasPassword(!hasPassword)}
+              />
+              <Typography variant="md" as="label">
+                Protect with password
+              </Typography>
+            </div>
+
+            {hasPassword && (
+              <div className="mb-3">
+                <Input
+                  name="password"
+                  type="password"
+                  placeholder="Insert password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                ></Input>
+              </div>
+            )}
+
+            <Button
+              className="justify-center w-full font-bold"
+              type="submit"
+              variant="info"
+              disabled={hasPassword && password.length === 0}
+            >
+              Create Channel
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
     </>
   );
 }
