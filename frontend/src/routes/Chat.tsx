@@ -1,13 +1,14 @@
 import { socket } from "../socket";
-import {
-  Form,
-  Link,
-  useLoaderData,
-  useRouteLoaderData,
-  useRevalidator,
-} from "react-router-dom";
+import { Form, Link, useLoaderData, useRevalidator } from "react-router-dom";
 import { Chat, Message, User } from "../types/types";
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Avatar } from "../components/Avatar";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
@@ -18,6 +19,7 @@ import { FiX, FiLock, FiUnlock } from "react-icons/fi";
 import { Hr } from "../components/Hr";
 import { blockUser, unblockUser } from "../actions/blockUser";
 import { Alert } from "../components/Alert";
+import { AuthContext } from "../contexts";
 
 export default function Chat() {
   const revalidator = useRevalidator();
@@ -35,7 +37,7 @@ export default function Chat() {
 
   let lastUser: User | null = null;
 
-  const userMe = useRouteLoaderData("root") as User;
+  const { currentUser } = useContext(AuthContext);
 
   const chat = useLoaderData() as Chat;
   const [userRole, setUserRole] = useState(null);
@@ -46,17 +48,18 @@ export default function Chat() {
   const members = chat.users.map((user) => user.id);
   const isBlockedForOthers: boolean =
     chat.type === "direct" &&
-    userMe.blockedBy.find((user) => members.includes(user)) !== undefined;
+    currentUser.blockedBy.find((user) => members.includes(user)) !== undefined;
 
   const isBlockedByMe =
-    userMe.blockedUsers.find((user) => members.includes(user)) !== undefined;
+    currentUser.blockedUsers.find((user) => members.includes(user)) !==
+    undefined;
 
   const handleSubmitNewMessage = () => {
     setNewMessage("");
   };
 
   const checkUserIsBlocked = (userBlockedId: number) => {
-    return userMe.blockedUsers.includes(userBlockedId);
+    return currentUser.blockedUsers.includes(userBlockedId);
   };
 
   const unsetErrorAndSuccess = () => {
@@ -114,7 +117,7 @@ export default function Chat() {
         ? "Password changed successfully"
         : currentPassword
         ? "Password removed successfully"
-        : "Password set successfully",
+        : "Password set successfully"
     );
 
     revalidator.revalidate();
@@ -127,7 +130,7 @@ export default function Chat() {
           `http://localhost:3001/chats/${chatId}/role`,
           {
             credentials: "include",
-          },
+          }
         );
         const data = await response.json();
         setUserRole(data.role);
@@ -137,7 +140,7 @@ export default function Chat() {
     };
 
     fetchChannelRole(chatId).catch((error) =>
-      console.error("Error setting channel role:", error),
+      console.error("Error setting channel role:", error)
     );
   }, [chatId]);
 
@@ -242,7 +245,7 @@ export default function Chat() {
                         </Link>
                       </Typography>
 
-                      {userMe.id != user?.id &&
+                      {currentUser.id != user?.id &&
                         chat.type == "direct" &&
                         (!checkUserIsBlocked(user?.id) ? (
                           <Button

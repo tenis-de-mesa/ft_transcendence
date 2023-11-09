@@ -70,18 +70,13 @@ const router = createBrowserRouter(
               ]);
               return await Promise.all([chatList.json(), userList.json()]);
             }}
+            action={createChannel}
           />
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"
             element={<Chats />}
-            loader={async () => {
-              const [chats, users] = await Promise.all([
-                loadChatList(),
-                loadUsersList(),
-              ]);
-              return await Promise.all([chats.json(), users.json()]);
-            }}
+            loader={loadChatList}
             action={createChat}
           >
             <Route path="with/:userId" loader={redirectToChat} />
