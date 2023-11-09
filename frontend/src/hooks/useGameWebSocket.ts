@@ -20,6 +20,8 @@ const useGameWebSocket = () => {
       }));
     });
 
+    // ... Other events
+
     // Leave the game room and unsubscribe from the changes
     return () => {
       socket.emit("leave_game", game.id);

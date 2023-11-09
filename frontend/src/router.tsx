@@ -25,6 +25,7 @@ import {
 } from "./actions";
 
 import { RequireAuth } from "./contexts";
+import { GameContextProvider } from "./contexts/providers";
 
 import {
   Root,
@@ -101,7 +102,14 @@ const router = createBrowserRouter(
             loader={loadUserById}
           />
           <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="games/:gameId" element={<Game />} />
+          <Route
+            path="games/:gameId"
+            element={
+              <GameContextProvider>
+                <Game />
+              </GameContextProvider>
+            }
+          />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
