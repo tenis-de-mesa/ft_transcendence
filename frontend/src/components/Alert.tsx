@@ -92,7 +92,7 @@ export const Alert: FC<AlertProps> = ({
         "alert-base",
         className,
         AlertSizeClasses[size],
-        AlertVariantClassName
+        AlertVariantClassName,
       )}
     >
       {LeadingIcon ? (

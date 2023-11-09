@@ -9,17 +9,24 @@ import {
   Patch,
   HttpCode,
   HttpStatus,
+  Delete,
 } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
-import { ChatEntity, ChatMemberRole, UserEntity } from '../core/entities';
+import {
+  ChatEntity,
+  ChatMemberEntity,
+  ChatMemberRole,
+  UserEntity,
+} from '../core/entities';
 import {
   CreateChatDto,
   ChatWithName,
   UpdateChatDto,
   ChangePasswordDto,
 } from './dto';
+import { DeleteResult } from 'typeorm';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
@@ -30,6 +37,11 @@ export class ChatsController {
   async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
     const chats = await this.chatsService.findAll(user);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
+  }
+
+  @Get('all')
+  async findAllChats(): Promise<ChatEntity[]> {
+    return await this.chatsService.listAllChats();
   }
 
   @Get('with/:userId')
@@ -80,6 +92,22 @@ export class ChatsController {
   @Get(':id')
   async show(@Param('id', ParseIntPipe) id: number): Promise<ChatEntity> {
     return await this.chatsService.findOne(id);
+  }
+
+  @Post(':id/join')
+  async joinChat(
+    @Param('id', ParseIntPipe) chatId: number,
+    @User() user: UserEntity,
+  ): Promise<ChatMemberEntity> {
+    return await this.chatsService.joinChat(chatId, user);
+  }
+
+  @Delete(':id/leave')
+  async leaveChat(
+    @Param('id', ParseIntPipe) chatId: number,
+    @User() user: UserEntity,
+  ): Promise<DeleteResult> {
+    return await this.chatsService.leaveChat(chatId, user);
   }
 
   @Get(':id/role')
