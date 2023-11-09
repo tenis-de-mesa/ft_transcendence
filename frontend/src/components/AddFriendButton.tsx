@@ -1,11 +1,11 @@
 import { FiPlus, FiX } from "react-icons/fi";
 import { Button } from "./Button";
 import { User } from "../types/types";
-import { RootUser } from "../routes/Root";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../contexts";
 
 export const AddFriendButton = ({ user }: { user: User }) => {
-  const currentUser = RootUser();
+  const { currentUser } = useContext(AuthContext);
   const [isFriend, setIsFriend] = useState(
     user.friends.some((friend) => friend.id === currentUser.id)
   );

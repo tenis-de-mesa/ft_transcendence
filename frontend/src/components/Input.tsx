@@ -104,7 +104,7 @@ export const Input: FC<InputProps> = ({
         />
       </div>
 
-      {(error && typeof error === "string") ? (
+      {error && typeof error === "string" ? (
         <div className="mt-1.5 text-error-500 text-sm">{error}</div>
       ) : null}
 

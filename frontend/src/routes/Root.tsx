@@ -1,21 +1,19 @@
-import { Outlet, useLoaderData, useOutletContext } from "react-router-dom";
-
 import classNames from "classnames";
+import { Outlet } from "react-router-dom";
 import { Sidebar } from "../components/nav/Sidebar";
 import { navitems as navitemsTemplate } from "../data";
-
-import { User } from "../types/types";
-import Login from "./Login";
+import { useContext } from "react";
+import { AuthContext } from "../contexts";
 
 export const isDark = true;
 
 export default function Root() {
-  const user: User = useLoaderData() as User;
+  const { currentUser } = useContext(AuthContext);
 
   // On the navitem with label profile, append the user id to the path
   const navitems = navitemsTemplate.map((navitem) => {
     if (navitem.label === "Profile") {
-      return { ...navitem, path: `${navitem.path}/${user?.id}` };
+      return { ...navitem, path: `${navitem.path}/${currentUser.id}` };
     }
     return navitem;
   });
@@ -26,24 +24,14 @@ export default function Root() {
         dark: isDark,
       })}
     >
-      {!user ? (
-        <div className={classNames("center", "bg-white dark:bg-gray-700")}>
-          <Login />
+      <div className="flex w-full h-full bg-white dark:bg-gray-700">
+        <div className="">
+          <Sidebar darkMode={isDark} options={navitems} user={currentUser} />
         </div>
-      ) : (
-        <div className="flex w-full h-full bg-white dark:bg-gray-700">
-          <div className="">
-            <Sidebar darkMode={isDark} options={navitems} user={user} />
-          </div>
-          <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
-            <Outlet context={user} />
-          </div>
+        <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
+          <Outlet />
         </div>
-      )}
+      </div>
     </div>
   );
-}
-
-export function RootUser(): User {
-  return useOutletContext();
 }

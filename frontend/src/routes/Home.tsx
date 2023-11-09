@@ -1,12 +1,13 @@
+import { useContext } from "react";
 import { Typography } from "../components/Typography";
-import { RootUser } from "./Root";
+import { AuthContext } from "../contexts";
 
 export default function Home() {
-  const user = RootUser();
+  const { currentUser } = useContext(AuthContext);
 
   return (
     <div className="flex justify-start h-full p-5">
-      <Typography variant="h5">Welcome, {user.nickname} !</Typography>
+      <Typography variant="h5">Welcome, {currentUser.nickname} !</Typography>
     </div>
   );
 }

@@ -92,7 +92,7 @@ export const Button: FC<ButtonProps> = ({
         [classNames(
           ButtonVariantClassName.default,
           ButtonVariantClassName.hover,
-          ButtonVariantClassName.focus
+          ButtonVariantClassName.focus,
         )]: !disabled,
         [classNames(ButtonVariantClassName.disabled, "cursor-not-allowed")]:
           disabled,
@@ -107,7 +107,7 @@ export const Button: FC<ButtonProps> = ({
               "mr-2": size !== "2xl",
               "mr-3": size === "2xl",
             },
-            LeadingIcon.props.className
+            LeadingIcon.props.className,
           )}
         />
       ) : null}
