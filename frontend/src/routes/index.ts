@@ -6,6 +6,7 @@ export { default as Chat } from "./Chat";
 export { default as Home } from "./Home";
 export { default as ChatNew } from "./ChatNew";
 export { default as Leaderboard } from "./Leaderboard";
+export { default as Game } from "./Game";
 export { default as Games } from "./Games";
 export { default as Settings } from "./Settings";
 export { default as ErrorBoundary } from "./ErrorBoundary";

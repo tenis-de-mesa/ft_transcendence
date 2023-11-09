@@ -35,7 +35,7 @@ import {
   Home,
   ChatNew,
   Leaderboard,
-  Games,
+  Game,
   Settings,
   ErrorBoundary,
   Channels,
@@ -101,7 +101,7 @@ const router = createBrowserRouter(
             loader={loadUserById}
           />
           <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="games" element={<Games />} />
+          <Route path="games/:gameId" element={<Game />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
