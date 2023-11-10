@@ -1,26 +1,23 @@
 import { useContext, useEffect, useState } from "react";
-import { Form, useLoaderData, useRevalidator } from "react-router-dom";
+import { Form, useLoaderData } from "react-router-dom";
 import { FiLock, FiUnlock } from "react-icons/fi";
-import { socket } from "../../socket";
-import { Chat, Message, User } from "../../types";
-import { AuthContext } from "../../contexts";
+import { Chat, User } from "../../types";
+import { AuthContext, ChatContext } from "../../contexts";
 import { Card, Typography, Button, Input } from "../../components";
+
 import ChatProfileCard from "./ChatProfileCard";
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
-import ChatContext from "../../contexts/ChatContext";
 
 export default function Chat() {
+  const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { currentChat, setCurrentChat } = useContext(ChatContext);
+  const { setCurrentChat } = useContext(ChatContext);
 
   // When a new chat is selected, update the current chat
-  const loaderData = useLoaderData() as Chat;
   useEffect(() => {
-    setCurrentChat(loaderData);
-  }, [loaderData, setCurrentChat]);
-
-  const revalidator = useRevalidator();
+    setCurrentChat(chat);
+  }, [chat, setCurrentChat]);
 
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
@@ -29,11 +26,11 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState("");
 
   const isAdmin = userRole === "owner" || userRole === "admin";
-  const chatId = currentChat.id;
-  const members = currentChat.users.map((user) => user.id);
+  const chatId = chat.id;
+  const members = chat.users.map((user) => user.id);
 
   const isBlockedForOthers =
-    currentChat.type === "direct" &&
+    chat.type === "direct" &&
     currentUser.blockedBy.find((user) => members.includes(user)) !== undefined;
 
   const isBlockedByMe =
@@ -61,18 +58,6 @@ export default function Chat() {
     );
   }, [chatId]);
 
-  useEffect(() => {
-    socket.on(`newMessage`, (data: Message) => {
-      // If the message is not from the current chat, ignore it
-      if (data.chat!.id != chatId) return;
-
-      if (!currentChat.messages.find((message) => message.id == data.id)) {
-        currentChat.messages.push(data);
-        revalidator.revalidate();
-      }
-    });
-  }, [currentChat.messages, chatId, revalidator]);
-
   return (
     <Card className="w-full h-full">
       <Card.Title
@@ -81,13 +66,11 @@ export default function Chat() {
       >
         {/* TODO: Make it so button does not dislocate chat name */}
         <Typography className="flex-1" variant="h6">
-          Chat {currentChat.id}
+          Chat {chat.id}
         </Typography>
-        {isAdmin && currentChat.access !== "private" && (
+        {isAdmin && chat.access !== "private" && (
           <Button
-            IconOnly={
-              currentChat.access === "public" ? <FiUnlock /> : <FiLock />
-            }
+            IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
             size="sm"
             variant="info"
             onClick={() => setIsChangePassCardOpen(!isChangePassCardOpen)}

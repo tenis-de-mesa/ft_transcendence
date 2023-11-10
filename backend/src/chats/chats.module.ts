@@ -3,7 +3,7 @@ import { ChatsService } from './chats.service';
 import { ChatsController } from './chats.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatsGateway } from './chats.gateway';
-import { SessionsService } from '../users/sessions/sessions.service';
+
 import {
   UserEntity,
   ChatEntity,
@@ -11,6 +11,7 @@ import {
   SessionEntity,
   ChatMemberEntity,
 } from '../core/entities';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -21,8 +22,9 @@ import {
       SessionEntity,
       ChatMemberEntity,
     ]),
+    UsersModule,
   ],
   controllers: [ChatsController],
-  providers: [ChatsService, ChatsGateway, SessionsService],
+  providers: [ChatsService, ChatsGateway],
 })
 export class ChatsModule {}

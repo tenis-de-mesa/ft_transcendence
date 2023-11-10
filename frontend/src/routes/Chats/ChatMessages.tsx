@@ -1,7 +1,8 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Message, User } from "../../types";
 import { Avatar, Typography } from "../../components";
-import ChatContext from "../../contexts/ChatContext";
+import { ChatContext } from "../../contexts";
+import { useWebSocket } from "../../hooks";
 
 type ChatMessagesProps = {
   handleClick: (user: User) => void;
@@ -9,7 +10,25 @@ type ChatMessagesProps = {
 
 export default function ChatMessages({ handleClick }: ChatMessagesProps) {
   const { currentChat } = useContext(ChatContext);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const socket = useWebSocket();
   const refMessages = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (currentChat) {
+      setMessages(currentChat.messages);
+    }
+  }, [currentChat]);
+
+  useEffect(() => {
+    socket.on("newMessage", (data: Message) => {
+      setMessages((messages) => [...messages, data]);
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, [socket]);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;
@@ -62,7 +81,7 @@ export default function ChatMessages({ handleClick }: ChatMessagesProps) {
       ref={refMessages}
       className="h-full mb-4 overflow-scroll break-words no-scrollbar"
     >
-      {currentChat.messages.map(mapMessages)}
+      {messages.map(mapMessages)}
     </div>
   );
 }

@@ -1,11 +1,11 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router-dom";
 import { Card, Typography } from "../../components";
+import { Chat } from "../../types";
+
 import NewChannelButton from "./NewChannelButton";
-import { useContext } from "react";
-import ChatContext from "../../contexts/ChatContext";
 
 export default function Chats() {
-  const { chatList } = useContext(ChatContext);
+  const chatList = useLoaderData() as Chat[];
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">

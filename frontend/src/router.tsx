@@ -24,8 +24,7 @@ import {
   changeChatPassword,
 } from "./actions";
 
-import { RequireAuth } from "./contexts";
-import { ChatContextProvider } from "./contexts/providers";
+import { RequireAuth, ChatContextProvider } from "./contexts";
 
 import {
   Root,

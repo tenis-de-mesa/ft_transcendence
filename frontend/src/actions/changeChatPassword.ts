@@ -1,44 +1,52 @@
-import { ActionFunctionArgs, redirect } from "react-router-dom";
+import { ActionFunctionArgs } from "react-router-dom";
+import { makeRequest } from "../api";
 
 export async function changeChatPassword({
   request,
   params,
 }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const currentPassword: string = formData.get("currentPassword") as string;
-  const newPassword: string = formData.get("newPassword") as string;
-  const confirmPassword: string = formData.get("confirmPassword") as string;
-  const chatId = params.id;
+  const { id } = params;
+  const { method } = request;
 
   const body = {
-    currentPassword,
-    newPassword,
-    confirmPassword,
+    currentPassword: formData.get("currentPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
   };
 
-  if (!chatId) {
-    return console.error("Missing Chat ID");
+  const conditions = [
+    [!id, "Missing chat ID"],
+    [!method, "Missing form method"],
+    [!body.currentPassword, "Missing current password"],
+    [!body.newPassword, "Missing new password"],
+    [!body.confirmPassword, "Missing password confirmation"],
+    [body.newPassword !== body.confirmPassword, "Passwords do not match"],
+  ];
+
+  const fail = conditions.find(([condition]) => condition);
+
+  if (fail) {
+    return {
+      status: "error",
+      message: fail[1] as string,
+    };
   }
 
-  const url = `http://localhost:3001/chats/${chatId}/change-password`;
+  const { error } = await makeRequest(`/chats/${id}/change-password`, {
+    method,
+    body: JSON.stringify(body),
+  });
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const { statusCode, error, message } = await response.json();
-      console.error(`${statusCode} ${error}: ${message}`);
-    }
-  } catch (error) {
-    console.error(error);
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
   }
 
-  return redirect(`/chats/${chatId}`);
+  return {
+    status: "success",
+    message: "Password changed successfully",
+  };
 }
