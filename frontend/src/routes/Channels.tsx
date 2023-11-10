@@ -1,6 +1,6 @@
 import { Form, Link, useLoaderData } from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Chat, User } from "../types/types";
+import { Chat, User } from "../types";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 

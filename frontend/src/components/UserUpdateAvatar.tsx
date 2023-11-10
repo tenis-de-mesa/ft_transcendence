@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { User } from "../types/types";
+import { User } from "../types";
 import { Avatar } from "./Avatar";
 import { FaPencilAlt } from "react-icons/fa";
 
@@ -12,7 +12,7 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) {

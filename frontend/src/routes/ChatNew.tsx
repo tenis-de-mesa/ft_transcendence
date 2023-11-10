@@ -1,5 +1,5 @@
 import { Form, useLoaderData } from "react-router-dom";
-import { User } from "../types/types";
+import { User } from "../types";
 import { Card } from "../components/Card";
 import { Typography } from "../components/Typography";
 import { Input } from "../components/Input";

@@ -1,75 +1,11 @@
-import { Chat, User } from "../types/types";
-import { Form, Link, Outlet, useLoaderData } from "react-router-dom";
-import { Card } from "../components/Card";
-import { Typography } from "../components/Typography";
-import { Button } from "../components/Button";
 import { useContext, useEffect, useState } from "react";
-import { FiPlus, FiX } from "react-icons/fi";
-import { Input } from "../components/Input";
-import { Hr } from "../components/Hr";
-import { AuthContext } from "../contexts";
+import { FiX } from "react-icons/fi";
+import { Form } from "react-router-dom";
+import { User } from "../../types";
+import { AuthContext } from "../../contexts";
+import { Button, Card, Hr, Input, Overlay, Typography } from "../../components";
 
-export default function Chats() {
-  const chats: Chat[] = useLoaderData() as Chat[];
-
-  return (
-    <div className="flex flex-row justify-between h-full gap-3">
-      <div className="w-1/4">
-        <Card className="h-full">
-          <Card.Title>
-            <Typography variant="h6">Chats</Typography>
-          </Card.Title>
-          <Card.Body className="h-full pt-0">
-            <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
-              <div className="flex flex-col gap-2 text-left">
-                {chats.map((chat) => (
-                  <Link
-                    key={chat.id}
-                    to={`/chats/${chat.id}`}
-                    state={{ id: chat.id }}
-                  >
-                    <Typography variant="sm">{chat.name}</Typography>
-                  </Link>
-                ))}
-              </div>
-
-              <NewChannelButton />
-            </div>
-          </Card.Body>
-        </Card>
-      </div>
-
-      <div className="w-3/4 h-full">
-        <Outlet />
-      </div>
-    </div>
-  );
-}
-
-function NewChannelButton() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      <Button
-        className="flex items-center justify-center w-full"
-        LeadingIcon={<FiPlus />}
-        variant="info"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        New channel
-      </Button>
-
-      {isOpen && <NewChannelCard onClose={() => setIsOpen(false)} />}
-    </>
-  );
-}
-
-function Overlay() {
-  return <div className="fixed inset-0 z-[1000] bg-gray-900/50"></div>;
-}
-
-function NewChannelCard({ onClose }) {
+export default function NewChannelCard({ onClose }) {
   const { currentUser } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [password, setPassword] = useState("");

@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router-dom";
-import { User } from "../types/types";
+import { User } from "../types";
 import UserForm from "../components/UserForm";
 
 import "./Profile.css";
