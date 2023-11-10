@@ -14,6 +14,7 @@ export type User = {
   blockedBy: number[];
   blockedUsers: number[];
   friends: User[];
+  deletedAt?: Date;
 };
 
 export type Message = {

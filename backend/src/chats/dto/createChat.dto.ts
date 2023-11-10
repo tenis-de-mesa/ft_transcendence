@@ -1,5 +1,4 @@
 import {
-  ArrayMinSize,
   IsArray,
   IsEnum,
   IsNotEmpty,
@@ -11,8 +10,6 @@ import { ChatType } from '../../core/entities';
 
 export class CreateChatDto {
   @IsArray()
-  @ArrayMinSize(1)
-  @IsNotEmpty()
   @IsNumber({}, { each: true })
   userIds: number[];
 

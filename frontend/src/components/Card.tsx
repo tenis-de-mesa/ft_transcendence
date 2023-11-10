@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { Hr } from "./Hr";
 
 interface CardWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+  children: React.ReactNode | React.ReactNode[];
   className?: string;
 }
 
@@ -14,7 +14,7 @@ const CardWrapper: FC<CardWrapperProps> = ({
 }: CardProps) => (
   <div
     className={classNames(
-      "block text-center rounded-xl",
+      "rounded-xl",
       "bg-white dark:bg-gray-800",
       "shadow-xl",
       className
@@ -26,7 +26,7 @@ const CardWrapper: FC<CardWrapperProps> = ({
 );
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: string | React.ReactElement;
+  children: string | React.ReactElement | React.ReactElement[];
   position?: "left" | "center" | "right";
   className?: string;
   hr?: boolean;
@@ -38,10 +38,12 @@ const CardTitle = ({
   hr = true,
   className,
 }: CardProps) => (
-  <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
-    {children}
+  <>
+    <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
+      {children}
+    </div>
     {hr && <Hr />}
-  </div>
+  </>
 );
 
 const CardBody = ({ children, position = "center", className }: CardProps) => (
@@ -56,10 +58,12 @@ const CardFooter = ({
   hr = true,
   className,
 }: CardProps) => (
-  <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
+  <>
     {hr && <Hr />}
-    {children}
-  </div>
+    <div className={classNames(`text-${position}`, "px-6 py-3", className)}>
+      {children}
+    </div>
+  </>
 );
 
 export const Card = Object.assign(CardWrapper, {
