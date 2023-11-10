@@ -1,13 +1,14 @@
-import { useEffect, useRef } from "react";
-import { Chat, Message, User } from "../../types";
+import { useContext, useEffect, useRef } from "react";
+import { Message, User } from "../../types";
 import { Avatar, Typography } from "../../components";
+import ChatContext from "../../contexts/ChatContext";
 
 type ChatMessagesProps = {
-  chat: Chat;
   handleClick: (user: User) => void;
 };
 
-export default function ChatMessages({ chat, handleClick }: ChatMessagesProps) {
+export default function ChatMessages({ handleClick }: ChatMessagesProps) {
+  const { currentChat } = useContext(ChatContext);
   const refMessages = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function ChatMessages({ chat, handleClick }: ChatMessagesProps) {
       ref={refMessages}
       className="h-full mb-4 overflow-scroll break-words no-scrollbar"
     >
-      {chat.messages.map(mapMessages)}
+      {currentChat.messages.map(mapMessages)}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { Form, useRevalidator } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { Chat } from "../../types";
@@ -12,6 +12,7 @@ import {
   Alert,
   Overlay,
 } from "../../components";
+import ChatContext from "../../contexts/ChatContext";
 
 type AlertHiddenState = {
   status: "hidden";
@@ -30,14 +31,14 @@ type AlertSuccessState = {
 type AlertState = AlertHiddenState | AlertErrorState | AlertSuccessState;
 
 type ChatChangePasswordCardProps = {
-  chat: Chat;
   handleClose: () => void;
 };
 
 export default function ChatChangePasswordCard({
-  chat,
   handleClose,
 }: ChatChangePasswordCardProps) {
+  const { currentChat } = useContext(ChatContext);
+
   // TODO: Remove
   const revalidator = useRevalidator();
 
@@ -57,7 +58,7 @@ export default function ChatChangePasswordCard({
     newPassword.length === 0 ||
     confirmPassword.length === 0 ||
     newPassword !== confirmPassword ||
-    (currentPassword.length === 0 && chat.access === "protected");
+    (currentPassword.length === 0 && currentChat.access === "protected");
 
   const disableRemove = currentPassword.length === 0;
 
@@ -80,10 +81,13 @@ export default function ChatChangePasswordCard({
   ) => {
     e.preventDefault();
 
-    const { error } = await makeRequest(`/chats/${chat.id}/change-password`, {
-      method: "POST",
-      body,
-    });
+    const { error } = await makeRequest(
+      `/chats/${currentChat.id}/change-password`,
+      {
+        method: "POST",
+        body,
+      }
+    );
 
     if (error) {
       return setAlert({
@@ -178,7 +182,7 @@ export default function ChatChangePasswordCard({
         </Card.Title>
         <Card.Body>
           <Form className="flex flex-col gap-3 text-left">
-            {chat.access === "protected" && (
+            {currentChat.access === "protected" && (
               <>
                 <Input
                   label="Current password"
@@ -225,7 +229,7 @@ export default function ChatChangePasswordCard({
               Change password
             </Button>
 
-            {chat.access === "protected" && (
+            {currentChat.access === "protected" && (
               <>
                 <Hr text="Or" />
 

@@ -25,6 +25,7 @@ import {
 } from "./actions";
 
 import { RequireAuth } from "./contexts";
+import { ChatContextProvider } from "./contexts/providers";
 
 import {
   Root,
@@ -75,7 +76,11 @@ const router = createBrowserRouter(
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"
-            element={<Chats />}
+            element={
+              <ChatContextProvider>
+                <Chats />
+              </ChatContextProvider>
+            }
             loader={loadChatList}
             action={createChat}
           >

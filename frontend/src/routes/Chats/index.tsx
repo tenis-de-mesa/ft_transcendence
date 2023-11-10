@@ -1,10 +1,11 @@
-import { Link, Outlet, useLoaderData } from "react-router-dom";
-import { Chat } from "../../types";
+import { Link, Outlet } from "react-router-dom";
 import { Card, Typography } from "../../components";
 import NewChannelButton from "./NewChannelButton";
+import { useContext } from "react";
+import ChatContext from "../../contexts/ChatContext";
 
 export default function Chats() {
-  const chats: Chat[] = useLoaderData() as Chat[];
+  const { chatList } = useContext(ChatContext);
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
@@ -16,7 +17,7 @@ export default function Chats() {
           <Card.Body className="h-full pt-0">
             <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
               <div className="flex flex-col gap-2 text-left">
-                {chats.map((chat) => (
+                {chatList.map((chat) => (
                   <Link
                     key={chat.id}
                     to={`/chats/${chat.id}`}
@@ -26,7 +27,6 @@ export default function Chats() {
                   </Link>
                 ))}
               </div>
-
               <NewChannelButton />
             </div>
           </Card.Body>
