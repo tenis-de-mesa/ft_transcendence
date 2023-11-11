@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto';
 import { AuthProvider, UserEntity } from '../core/entities';
@@ -9,13 +9,17 @@ export class AuthService {
   constructor(private readonly usersService: UsersService) {}
 
   async loginAsIntra(dto: CreateUserDto): Promise<UserEntity> {
-    let user = await this.usersService.getUserByIntraId(dto.intraId);
+    const { intraId } = dto;
 
-    if (!user) {
-      user = await this.usersService.createUser(dto);
+    try {
+      return await this.usersService.getUserByIntraId(intraId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return await this.usersService.createUser(dto);
+      }
+
+      throw error;
     }
-
-    return user;
   }
 
   async logout(req: Request, res: Response): Promise<void> {
