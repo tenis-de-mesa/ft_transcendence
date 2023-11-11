@@ -62,19 +62,19 @@ export default function Chat() {
     <Card className="w-full h-full">
       <Card.Title
         hr={false}
-        className="flex justify-between items-center min-h-[60px] shadow-[0px_10px_5px_-5px] shadow-gray-900/50"
+        className="relative px-4 min-h-[60px] shadow-[0px_10px_5px_-5px] shadow-gray-900/50"
       >
-        {/* TODO: Make it so button does not dislocate chat name */}
-        <Typography className="flex-1" variant="h6">
+        <Typography className="absolute left-1/2 -translate-x-1/2" variant="h6">
           Chat {chat.id}
         </Typography>
+
         {isAdmin && chat.access !== "private" && (
           <Button
+            className="absolute right-[16px]"
             IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
             size="sm"
             variant="info"
             onClick={() => setIsChangePassCardOpen(!isChangePassCardOpen)}
-            className=""
           ></Button>
         )}
       </Card.Title>
