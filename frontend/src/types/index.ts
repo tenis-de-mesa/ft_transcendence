@@ -24,10 +24,19 @@ export type Message = {
   sender?: User;
 };
 
+export type ChatMember = {
+  user: User;
+  userId: number;
+  chat: Chat;
+  chatId: number;
+  role: "owner" | "admin" | "member";
+  status: "active" | "banned" | "muted";
+};
+
 export type Chat = {
   id: number;
   name: string;
-  users: User[];
+  users: ChatMember[];
   messages: Message[];
   newMessage: string;
   access: "public" | "protected" | "private";

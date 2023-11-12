@@ -65,17 +65,11 @@ const router = createBrowserRouter(
           <Route
             path="channels"
             element={<Channels />}
-            loader={async () => {
-              const [chatList, userList] = await Promise.all([
-                loadAllChats(),
-                loadUsersList(),
-              ]);
-              return await Promise.all([chatList.json(), userList.json()]);
-            }}
+            loader={loadAllChats}
             action={createChannel}
           >
             <Route path=":id/join" action={joinChannel} />
-            <Route path=":id/leave" action={leaveChannel}/>
+            <Route path=":id/leave" action={leaveChannel} />
           </Route>
           <Route path="newChannel" action={createChannel} />
           <Route

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Alert, Button, Card, Overlay, Typography } from "../../components";
-import { Form, useActionData } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 
 type LeaveChannelCardProps = {
@@ -12,7 +12,7 @@ export default function LeaveChannelCard({
   id,
   handleClose,
 }: LeaveChannelCardProps) {
-  const error = useActionData() as { message: string };
+  const { Form, state, data: error } = useFetcher();
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -62,11 +62,11 @@ export default function LeaveChannelCard({
               type="submit"
               variant="error"
             >
-              Leave channel
+              {state === "loading" ? "Loading..." : "Leave"}
             </Button>
           </Form>
 
-          {error?.message && (
+          {error?.message && state === "idle" && (
             <Alert severity="error" className="w-full">
               {error.message}
             </Alert>

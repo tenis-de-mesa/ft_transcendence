@@ -27,7 +27,7 @@ export default function Chat() {
 
   const isAdmin = userRole === "owner" || userRole === "admin";
   const chatId = chat.id;
-  const members = chat.users.map((user) => user.id);
+  const members = chat.users.map((user) => user.userId);
 
   const isBlockedForOthers =
     chat.type === "direct" &&

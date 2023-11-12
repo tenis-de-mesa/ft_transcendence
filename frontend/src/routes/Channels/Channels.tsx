@@ -1,7 +1,7 @@
 import { useContext, useMemo } from "react";
 import { useLoaderData } from "react-router-dom";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { Chat, User } from "../../types";
+import { Chat } from "../../types";
 
 import Table from "../../components/Table";
 import { Typography } from "../../components";
@@ -14,22 +14,19 @@ const columnHelper = createColumnHelper<Chat>();
 
 export default function Channels() {
   const { currentUser } = useContext(AuthContext);
-  const [allChats, userList] = useLoaderData() as [Chat[], User[]];
-
-  const chats = allChats.filter((chat) => chat.type !== "direct");
+  const chats = useLoaderData() as Chat[];
+  const channels = chats.filter((chat) => chat.type !== "direct");
 
   const columns = useMemo<ColumnDef<Chat>[]>(
     () => [
       columnHelper.accessor("createdByUser", {
         header: "Owner",
         cell: (props) => {
-          let usr = "";
-          userList.forEach((user) => {
-            if (user.id == props.getValue()) {
-              usr = user.login;
-            }
-          });
-          return <span>{usr}</span>;
+          const member = props.row.original.users.find(
+            (user) => user.userId === props.getValue()
+          );
+
+          return <span>{member.user.nickname ?? "Deleted user"}</span>;
         },
       }),
       columnHelper.accessor("access", {
@@ -56,7 +53,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser.id, userList]
+    [currentUser.id]
   );
 
   return (
@@ -65,7 +62,7 @@ export default function Channels() {
       <div className="mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
-          data={chats as unknown as Data[]}
+          data={channels as unknown as Data[]}
         />
       </div>
     </>

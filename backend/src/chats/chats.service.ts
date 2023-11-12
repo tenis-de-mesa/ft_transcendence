@@ -230,7 +230,14 @@ export class ChatsService {
   }
 
   async listAllChats(): Promise<ChatEntity[]> {
-    return await this.chatRepository.find({ relations: { users: true } });
+    return await this.chatRepository.find({
+      relations: {
+        users: {
+          user: true,
+        },
+      },
+      withDeleted: true,
+    });
   }
 
   async findDirectChat(

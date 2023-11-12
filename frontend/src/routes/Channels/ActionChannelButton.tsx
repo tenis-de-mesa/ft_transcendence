@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Form, Link } from "react-router-dom";
+import { Link, useFetcher } from "react-router-dom";
 import { FiLock } from "react-icons/fi";
-import { Badge, Button } from "../../components";
+import { Alert, Badge, Button } from "../../components";
 
 import JoinChannelCard from "./JoinChannelCard";
 import LeaveChannelCard from "./LeaveChannelCard";
@@ -19,6 +19,7 @@ export default function ActionChannelButton({
   isOwner,
   isMember,
 }: ActionChannelButtonProps) {
+  const { Form, state, data: error } = useFetcher();
   const [isJoinCardOpen, setIsJoinCardOpen] = useState(false);
   const [isLeaveCardOpen, setIsLeaveCardOpen] = useState(false);
 
@@ -50,7 +51,7 @@ export default function ActionChannelButton({
       ) : access == "public" ? (
         <Form action={`${id}/join`} method="POST">
           <Button variant="info" size="sm" type="submit">
-            Join
+            {state === "loading" ? "Joining..." : "Join"}
           </Button>
         </Form>
       ) : (
@@ -71,6 +72,12 @@ export default function ActionChannelButton({
             />
           )}
         </>
+      )}
+
+      {error?.message && state === "idle" && (
+        <Alert severity="error" className="w-full">
+          {error.message}
+        </Alert>
       )}
     </>
   );
