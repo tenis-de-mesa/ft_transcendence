@@ -22,6 +22,8 @@ import {
   updateChat,
   sendChatMessage,
   changeChatPassword,
+  joinChannel,
+  leaveChannel,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -71,7 +73,10 @@ const router = createBrowserRouter(
               return await Promise.all([chatList.json(), userList.json()]);
             }}
             action={createChannel}
-          />
+          >
+            <Route path=":id/join" action={joinChannel} />
+            <Route path=":id/leave" action={leaveChannel}/>
+          </Route>
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"

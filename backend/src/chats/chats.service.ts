@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   UserEntity,
   ChatEntity,
@@ -24,6 +24,8 @@ import {
   CreateMessageDto,
   UpdateChatDto,
   ChangePasswordDto,
+  JoinChannelDto,
+  LeaveChannelDto,
 } from './dto';
 
 @Injectable()
@@ -279,32 +281,61 @@ export class ChatsService {
       .getOne();
   }
 
-  async joinChat(chatId: number, user: UserEntity): Promise<ChatMemberEntity> {
-    const chat = this.findOne(chatId);
-    if (!chat) {
-      throw new NotFoundException('Chat not found');
+  async joinChat(
+    chatId: number,
+    userId: number,
+    { password }: JoinChannelDto,
+  ): Promise<void> {
+    const chat = await this.findOne(chatId);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
     }
 
-    return await this.chatMemberRepository.save({
-      chatId,
-      userId: user.id,
-    });
+    if (chat.access === ChatAccess.PROTECTED) {
+      if (!password) {
+        throw new BadRequestException('Password is required');
+      }
+
+      const isPasswordValid = await argon2.verify(chat.password, password);
+
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid channel password');
+      }
+    }
+
+    await this.chatMemberRepository.save({ userId, chatId });
   }
 
-  async leaveChat(chatId: number, user: UserEntity): Promise<DeleteResult> {
-    const chat = this.findOne(chatId);
-    if (!chat) {
-      throw new NotFoundException('Chat not found');
+  async leaveChat(
+    chatId: number,
+    userId: number,
+    { newOwnerId }: LeaveChannelDto,
+  ): Promise<void> {
+    const chat = await this.findOne(chatId);
+
+    if (chat.type === ChatType.DIRECT) {
+      throw new BadRequestException('Cannot leave direct chats');
     }
 
-    const query = this.chatMemberRepository
-      .createQueryBuilder()
-      .delete()
-      .from(ChatMemberEntity)
-      .where('userId = :userId', { userId: user.id })
-      .andWhere('chatId = :chatId', { chatId });
+    const member = await this.getMember(chatId, userId);
 
-    return await query.execute();
+    if (member.role === ChatMemberRole.OWNER) {
+      if (chat.users.length === 1) {
+        await this.chatRepository.remove(chat);
+        return;
+      }
+
+      if (!newOwnerId) {
+        throw new BadRequestException('A new owner must be nominated');
+      }
+
+      const newOwner = await this.getMember(chatId, newOwnerId);
+      newOwner.role = ChatMemberRole.OWNER;
+      await this.chatMemberRepository.save(newOwner);
+    }
+
+    await this.chatMemberRepository.remove(member);
   }
 
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {

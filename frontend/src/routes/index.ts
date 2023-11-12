@@ -9,6 +9,6 @@ export { default as Leaderboard } from "./Leaderboard";
 export { default as Games } from "./Games";
 export { default as Settings } from "./Settings";
 export { default as ErrorBoundary } from "./ErrorBoundary";
-export { default as Channels } from "./Channels";
+export { default as Channels } from "./Channels/Channels";
 export { default as Friends } from "./Friends";
 export { default as Login } from "./Login";

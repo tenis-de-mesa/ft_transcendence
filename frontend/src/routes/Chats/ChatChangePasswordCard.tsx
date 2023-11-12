@@ -1,7 +1,6 @@
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { Form, useRevalidator } from "react-router-dom";
 import { FiX } from "react-icons/fi";
-import { Chat } from "../../types";
 import { makeRequest } from "../../api";
 import {
   Card,
