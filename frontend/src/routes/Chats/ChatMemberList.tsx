@@ -10,11 +10,15 @@ type ChatMemberListProps = {
 };
 
 export default function ChatMemberList({ members }: ChatMemberListProps) {
-  const nonDeletedUsers = members
-    .filter((member) => !member.user.deletedAt)
-    .map((member) => member.user);
+  const [users, setUsers] = useState<User[]>([]);
 
-  const [users, setUsers] = useState<User[]>(nonDeletedUsers);
+  useEffect(() => {
+    const nonDeletedUsers = members
+      .filter((member) => !member.user.deletedAt)
+      .map((member) => member.user);
+
+    setUsers(nonDeletedUsers);
+  }, [members]);
 
   useEffect(() => {
     socket.on("userJoined", (user: User) => {
