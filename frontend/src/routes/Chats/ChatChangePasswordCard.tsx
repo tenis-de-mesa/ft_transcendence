@@ -1,7 +1,7 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
-import { Form, useRevalidator } from "react-router-dom";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
-import { makeRequest } from "../../api";
+
 import {
   Card,
   Typography,
@@ -13,21 +13,11 @@ import {
 } from "../../components";
 import ChatContext from "../../contexts/ChatContext";
 
-type AlertHiddenState = {
-  status: "hidden";
+const emptyForm = {
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
 };
-
-type AlertErrorState = {
-  status: "error";
-  message: string;
-};
-
-type AlertSuccessState = {
-  status: "success";
-  message: string;
-};
-
-type AlertState = AlertHiddenState | AlertErrorState | AlertSuccessState;
 
 type ChatChangePasswordCardProps = {
   handleClose: () => void;
@@ -37,19 +27,9 @@ export default function ChatChangePasswordCard({
   handleClose,
 }: ChatChangePasswordCardProps) {
   const { currentChat } = useContext(ChatContext);
+  const { Form, data: result, state } = useFetcher();
 
-  // TODO: Remove
-  const revalidator = useRevalidator();
-
-  const [alert, setAlert] = useState<AlertState>({
-    status: "hidden",
-  });
-
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  const [passwordForm, setPasswordForm] = useState(emptyForm);
 
   const { currentPassword, newPassword, confirmPassword } = passwordForm;
 
@@ -61,6 +41,10 @@ export default function ChatChangePasswordCard({
 
   const disableRemove = currentPassword.length === 0;
 
+  const handleFormSubmit = () => {
+    setPasswordForm(emptyForm);
+  };
+
   const handleFormChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
 
@@ -68,71 +52,6 @@ export default function ChatChangePasswordCard({
       ...passwordForm,
       [name]: value,
     });
-
-    setAlert({
-      status: "hidden",
-    });
-  };
-
-  const handleSubmit = async (
-    e: FormEvent<HTMLButtonElement>,
-    body: string
-  ) => {
-    e.preventDefault();
-
-    const { error } = await makeRequest(
-      `/chats/${currentChat.id}/change-password`,
-      {
-        method: "POST",
-        body,
-      }
-    );
-
-    if (error) {
-      return setAlert({
-        status: "error",
-        message: error.message,
-      });
-    }
-
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-
-    setAlert({
-      status: "success",
-      message:
-        currentPassword && newPassword && confirmPassword
-          ? "Password changed successfully"
-          : currentPassword
-          ? "Password removed successfully"
-          : "Password set successfully",
-    });
-
-    // TODO: Find better solution
-    revalidator.revalidate();
-  };
-
-  const handleRemovePassword = async (e: FormEvent<HTMLButtonElement>) => {
-    handleSubmit(
-      e,
-      JSON.stringify({
-        currentPassword,
-      })
-    );
-  };
-
-  const handleChangePassword = async (e: FormEvent<HTMLButtonElement>) => {
-    handleSubmit(
-      e,
-      JSON.stringify({
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      })
-    );
   };
 
   // Add event listener to close change password dialog when clicking outside of it
@@ -141,16 +60,7 @@ export default function ChatChangePasswordCard({
       const target = e.target as Element;
 
       if (!target.closest("#change-password-card")) {
-        setPasswordForm({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-
-        setAlert({
-          status: "hidden",
-        });
-
+        setPasswordForm(emptyForm);
         handleClose();
       }
     };
@@ -180,7 +90,11 @@ export default function ChatChangePasswordCard({
           />
         </Card.Title>
         <Card.Body>
-          <Form className="flex flex-col gap-3 text-left">
+          <Form
+            className="flex flex-col gap-3 text-left"
+            method="POST"
+            onSubmit={handleFormSubmit}
+          >
             {currentChat.access === "protected" && (
               <>
                 <Input
@@ -223,9 +137,17 @@ export default function ChatChangePasswordCard({
               variant="info"
               type="submit"
               disabled={disableChange}
-              onClick={handleChangePassword}
+              formAction={
+                currentChat.access === "protected"
+                  ? "change-password"
+                  : "set-password"
+              }
             >
-              Change password
+              {state !== "idle"
+                ? "Loading..."
+                : currentChat.access === "protected"
+                ? "Change password"
+                : "Set password"}
             </Button>
 
             {currentChat.access === "protected" && (
@@ -237,20 +159,22 @@ export default function ChatChangePasswordCard({
                   variant="error"
                   type="submit"
                   disabled={disableRemove}
-                  onClick={handleRemovePassword}
+                  formAction={"remove-password"}
                 >
-                  Remove password (make channel public)
+                  {state !== "idle"
+                    ? "Loading..."
+                    : "Remove password (make channel public)"}
                 </Button>
               </>
             )}
 
-            {alert.status !== "hidden" && (
+            {result && state === "idle" && (
               <Alert
                 className="w-full"
-                severity={alert.status}
+                severity={result?.status}
                 variant="filled"
               >
-                {alert.message}
+                {result?.message}
               </Alert>
             )}
           </Form>

@@ -1,16 +1,12 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { makeRequest } from "../api";
 
-export async function changeChatPassword({
-  request,
-  params,
-}: ActionFunctionArgs) {
+export async function setChannelPassword({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
   const { id } = params;
   const { method } = request;
 
   const body = {
-    currentPassword: formData.get("currentPassword"),
     newPassword: formData.get("newPassword"),
     confirmPassword: formData.get("confirmPassword"),
   };
@@ -18,7 +14,6 @@ export async function changeChatPassword({
   const conditions = [
     [!id, "Missing chat ID"],
     [!method, "Missing form method"],
-    [!body.currentPassword, "Missing current password"],
     [!body.newPassword, "Missing new password"],
     [!body.confirmPassword, "Missing password confirmation"],
     [body.newPassword !== body.confirmPassword, "Passwords do not match"],

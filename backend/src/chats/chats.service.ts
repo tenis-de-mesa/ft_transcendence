@@ -195,10 +195,10 @@ export class ChatsService {
       throw new BadRequestException('Passwords do not match');
     }
 
-    chat.password = newPassword ? await argon2.hash(newPassword) : null;
-    chat.access = newPassword ? ChatAccess.PROTECTED : ChatAccess.PUBLIC;
-
-    await this.chatRepository.save(chat);
+    await this.chatRepository.update(id, {
+      password: newPassword ? await argon2.hash(newPassword) : null,
+      access: newPassword ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
+    });
   }
 
   async verifyPassword(id: number, password: string): Promise<void> {

@@ -21,7 +21,9 @@ import {
   createChat,
   updateChat,
   sendChatMessage,
-  changeChatPassword,
+  setChannelPassword,
+  changeChannelPassword,
+  removeChannelPassword,
   joinChannel,
   leaveChannel,
 } from "./actions";
@@ -91,7 +93,9 @@ const router = createBrowserRouter(
               action={sendChatMessage}
             />
             <Route path="update/:id" action={updateChat} />
-            <Route path=":id/change-password" action={changeChatPassword} />
+            <Route path=":id/set-password" action={setChannelPassword} />
+            <Route path=":id/change-password" action={changeChannelPassword} />
+            <Route path=":id/remove-password" action={removeChannelPassword} />
           </Route>
           <Route
             path="profile/:id"
