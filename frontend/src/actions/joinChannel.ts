@@ -1,5 +1,6 @@
 import { ActionFunctionArgs, redirect } from "react-router-dom";
 import { makeRequest } from "../api";
+import { socket } from "../socket";
 
 export async function joinChannel({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -34,5 +35,6 @@ export async function joinChannel({ request, params }: ActionFunctionArgs) {
     };
   }
 
+  socket.emit("joinChannel", id);
   return redirect(`/chats/${id}`);
 }

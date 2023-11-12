@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Card, Typography } from "../../components";
-import { ChatMember } from "../../types";
+import { ChatMember, User } from "../../types";
+import { socket } from "../../socket";
 
 import ChatMemberItem from "./ChatMemberItem";
 
@@ -8,9 +10,26 @@ type ChatMemberListProps = {
 };
 
 export default function ChatMemberList({ members }: ChatMemberListProps) {
-  const users = members
+  const nonDeletedUsers = members
     .filter((member) => !member.user.deletedAt)
     .map((member) => member.user);
+
+  const [users, setUsers] = useState<User[]>(nonDeletedUsers);
+
+  useEffect(() => {
+    socket.on("userJoined", (user: User) => {
+      setUsers((users) => [...users, user]);
+    });
+
+    socket.on("userLeft", (user: User) => {
+      setUsers((users) => users.filter((u) => u.id !== user.id));
+    });
+
+    return () => {
+      socket.off("userJoined");
+      socket.off("userLeft");
+    };
+  }, []);
 
   return (
     <Card className="w-1/4">
