@@ -5,6 +5,8 @@ import {
   WebSocketServer,
   OnGatewayInit,
   WsException,
+  ConnectedSocket,
+  OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
@@ -26,7 +28,7 @@ interface NewChatMessage {
   },
   cookie: true,
 })
-export class ChatsGateway implements OnGatewayInit {
+export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -41,16 +43,19 @@ export class ChatsGateway implements OnGatewayInit {
       this.validate(socket)
         .then((user) => {
           socket.handshake.auth['user'] = user;
-
-          // TODO: Remove
-          console.log(
-            `User [${user.nickname}] connected to socket [${socket.id}]`,
-          );
-
           next();
         })
         .catch((error) => next(error));
     });
+  }
+
+  async handleConnection(client: Socket) {
+    const user: UserEntity = client.handshake.auth['user'];
+    const chats = await this.chatService.findAll(user);
+
+    for (const chat of chats) {
+      client.join(`chat:${chat.id}`);
+    }
   }
 
   // When the client sends a message to the server
@@ -67,6 +72,26 @@ export class ChatsGateway implements OnGatewayInit {
 
     // Send the new message back to all clients
     this.server.emit('newMessage', newMessage);
+  }
+
+  @SubscribeMessage('joinChannel')
+  async handleJoinChannel(
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+    @MessageBody() chatId: number,
+  ) {
+    client.join(`chat:${chatId}`);
+    this.server.to(`chat:${chatId}`).emit('userJoined', user);
+  }
+
+  @SubscribeMessage('leaveChannel')
+  async handleLeaveChannel(
+    @ConnectedSocket() client: Socket,
+    @User() user: UserEntity,
+    @MessageBody() chatId: number,
+  ) {
+    client.leave(`chat:${chatId}`);
+    this.server.to(`chat:${chatId}`).emit('userLeft', user);
   }
 
   private async validate(client: Socket) {

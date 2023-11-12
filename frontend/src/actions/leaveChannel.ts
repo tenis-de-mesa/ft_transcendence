@@ -1,5 +1,6 @@
 import { ActionFunctionArgs, redirect } from "react-router-dom";
 import { makeRequest } from "../api";
+import { socket } from "../socket";
 
 export async function leaveChannel({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -34,6 +35,6 @@ export async function leaveChannel({ request, params }: ActionFunctionArgs) {
     };
   }
 
-  // TODO: Maybe use fetcher so redirect is not necessar
+  socket.emit("leaveChannel", id);
   return redirect(`/channels`);
 }
