@@ -6,7 +6,6 @@ import {
   OnGatewayInit,
   WsException,
   ConnectedSocket,
-  OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
@@ -28,7 +27,7 @@ interface NewChatMessage {
   },
   cookie: true,
 })
-export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
+export class ChatsGateway implements OnGatewayInit {
   @WebSocketServer()
   server: Server;
 
@@ -49,16 +48,6 @@ export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
     });
   }
 
-  async handleConnection(client: Socket) {
-    const user: UserEntity = client.handshake.auth['user'];
-    const chats = await this.chatService.findAll(user);
-
-    for (const chat of chats) {
-      client.join(`chat:${chat.id}`);
-    }
-  }
-
-  // When the client sends a message to the server
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
     @User() user: UserEntity,
@@ -70,28 +59,27 @@ export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
       chatId: data.chatId,
     });
 
-    // Send the new message back to all clients
-    this.server.emit('newMessage', newMessage);
+    this.server.to(`chat:${data.chatId}`).emit('newMessage', newMessage);
   }
 
-  @SubscribeMessage('joinChannel')
-  async handleJoinChannel(
+  @SubscribeMessage('joinChat')
+  async handleJoinChat(
     @ConnectedSocket() client: Socket,
     @User() user: UserEntity,
     @MessageBody() chatId: number,
   ) {
     client.join(`chat:${chatId}`);
-    this.server.to(`chat:${chatId}`).emit('userJoined', user);
+    client.to(`chat:${chatId}`).emit('userJoined', user);
   }
 
-  @SubscribeMessage('leaveChannel')
-  async handleLeaveChannel(
+  @SubscribeMessage('leaveChat')
+  async handleLeaveChat(
     @ConnectedSocket() client: Socket,
     @User() user: UserEntity,
     @MessageBody() chatId: number,
   ) {
     client.leave(`chat:${chatId}`);
-    this.server.to(`chat:${chatId}`).emit('userLeft', user);
+    client.to(`chat:${chatId}`).emit('userLeft', user);
   }
 
   private async validate(client: Socket) {

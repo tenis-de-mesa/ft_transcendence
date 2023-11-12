@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Message, User } from "../../types";
 import { Avatar, Typography } from "../../components";
 import { ChatContext } from "../../contexts";
-import { useWebSocket } from "../../hooks";
+import { socket } from "../../socket";
 
 type ChatMessagesProps = {
   handleClick: (user: User) => void;
@@ -11,7 +11,6 @@ type ChatMessagesProps = {
 export default function ChatMessages({ handleClick }: ChatMessagesProps) {
   const { currentChat } = useContext(ChatContext);
   const [messages, setMessages] = useState<Message[]>([]);
-  const socket = useWebSocket();
   const refMessages = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function ChatMessages({ handleClick }: ChatMessagesProps) {
     return () => {
       socket.off("newMessage");
     };
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
     const scrollHeight = refMessages.current.scrollHeight;

@@ -9,6 +9,7 @@ import ChatProfileCard from "./ChatProfileCard";
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
+import { socket } from "../../socket";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
@@ -19,6 +20,14 @@ export default function Chat() {
   useEffect(() => {
     setCurrentChat(chat);
   }, [chat, setCurrentChat]);
+
+  useEffect(() => {
+    socket.emit("joinChat", chat.id);
+
+    return () => {
+      socket.emit("leaveChat", chat.id);
+    };
+  }, [chat.id]);
 
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
