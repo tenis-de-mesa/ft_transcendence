@@ -1,15 +1,16 @@
 import { useContext, useEffect, useState } from "react";
-import { Form, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { FiLock, FiUnlock } from "react-icons/fi";
 import { Chat, User } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
-import { Card, Typography, Button, Input } from "../../components";
+import { Card, Typography, Button } from "../../components";
+import { socket } from "../../socket";
 
 import ChatProfileCard from "./ChatProfileCard";
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
-import { socket } from "../../socket";
+import ChatMessageInput from "./ChatMessageInput";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
@@ -33,14 +34,12 @@ export default function Chat() {
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
   const [user, setUser] = useState<User>(null);
   const [userRole, setUserRole] = useState(null);
-  const [newMessage, setNewMessage] = useState("");
 
   const isAdmin = userRole === "owner" || userRole === "admin";
   const chatId = chat.id;
   const members = chat.users.map((user) => user.userId);
 
   const isBlockedForOthers =
-    chat.type === "direct" &&
     currentUser.blockedBy.find((user) => members.includes(user)) !== undefined;
 
   const isBlockedByMe =
@@ -113,22 +112,11 @@ export default function Chat() {
             }}
           />
 
-          <Form method="POST" onSubmit={() => setNewMessage("")}>
-            <Input
-              type="text"
-              value={newMessage}
-              name="message"
-              placeholder={
-                isBlockedForOthers
-                  ? "You have been blocked"
-                  : isBlockedByMe
-                  ? "You blocked this user"
-                  : "Enter your message"
-              }
-              onChange={(e) => setNewMessage(e.target.value)}
-              disabled={isBlockedForOthers || isBlockedByMe}
-            />
-          </Form>
+          <ChatMessageInput
+            isBlocked={
+              (isBlockedByMe || isBlockedForOthers) && chat.type === "direct"
+            }
+          />
         </Card.Body>
       </Card>
 

@@ -21,17 +21,17 @@ export default function ChatMemberList({ members }: ChatMemberListProps) {
   }, [members]);
 
   useEffect(() => {
-    socket.on("userJoined", (user: User) => {
+    socket.on("userAdded", (user: User) => {
       setUsers((users) => [...users, user]);
     });
 
-    socket.on("userLeft", (user: User) => {
+    socket.on("userRemoved", (user: User) => {
       setUsers((users) => users.filter((u) => u.id !== user.id));
     });
 
     return () => {
-      socket.off("userJoined");
-      socket.off("userLeft");
+      socket.off("userAdded");
+      socket.off("userRemoved");
     };
   }, []);
 
