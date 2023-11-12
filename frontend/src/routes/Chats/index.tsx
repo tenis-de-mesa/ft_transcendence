@@ -9,12 +9,12 @@ export default function Chats() {
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
-      <div className="w-1/4">
+      <div className="w-1/6">
         <Card className="h-full">
           <Card.Title>
             <Typography variant="h6">Chats</Typography>
           </Card.Title>
-          <Card.Body className="h-full pt-0">
+          <Card.Body className="h-full">
             <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
               <div className="flex flex-col gap-2 text-left">
                 {chatList.map((chat) => (
@@ -33,7 +33,7 @@ export default function Chats() {
         </Card>
       </div>
 
-      <div className="w-3/4 h-full">
+      <div className="w-5/6 h-full">
         <Outlet />
       </div>
     </div>

@@ -120,9 +120,16 @@ export class ChatsService {
     // TODO: filter all data user from only userid
 
     const chat = await this.chatRepository.findOne({
-      relations: { users: true, messages: { sender: true } },
-      where: { id },
-      order: { messages: { createdAt: 'ASC' } },
+      where: {
+        id,
+      },
+      relations: {
+        users: { user: true },
+        messages: { sender: true },
+      },
+      order: {
+        messages: { createdAt: 'ASC' },
+      },
       withDeleted: true,
     });
 
