@@ -27,13 +27,6 @@ export default function UserForm({ user }: UserFormProps) {
   return (
     <Form>
       <Input
-        disabled
-        label="Login"
-        value={user.login}
-        placeholder=""
-        type="text"
-      />
-      <Input
         label="Nickname"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}

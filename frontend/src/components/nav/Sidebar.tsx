@@ -1,5 +1,5 @@
-import { FC, useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { FC, useCallback, useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import { motion } from "framer-motion";
 
@@ -12,20 +12,18 @@ import { INavitem } from "../../@interfaces";
 import classNames from "classnames";
 import { LuLogOut } from "react-icons/lu";
 import { Navitem } from "./Navitem";
-import { User } from "../../types";
 import { Avatar } from "../Avatar";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { AuthContext } from "../../contexts";
 
 export interface ISidebarProps {
   options: INavitem[];
-  user: User;
   darkMode?: boolean;
   className?: string;
 }
 
 export const Sidebar: FC<ISidebarProps> = ({
   options,
-  user,
   className,
   darkMode,
 }) => {
@@ -34,7 +32,7 @@ export const Sidebar: FC<ISidebarProps> = ({
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeNavitem, setActiveNavitem] = useState<string>("");
-
+  const { currentUser } = useContext(AuthContext);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -184,7 +182,8 @@ export const Sidebar: FC<ISidebarProps> = ({
             <div className="w-full duration-100 ease-in transform">
               <Avatar
                 size="sm"
-                src={images.demoAvatar}
+                seed={currentUser.login}
+                src={currentUser.avatarUrl}
                 className="fixed w-0 h-0 transition duration-150 ease-out opacity-0 bottom-1"
               />
               <div className="flex items-center justify-between py-1">
@@ -194,7 +193,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                   customColor="text-gray-700 dark:text-white"
                   className="transition ease-in delay-150 opacity-100"
                 >
-                  {user.nickname}
+                  {currentUser.nickname}
                 </Typography>
                 <LuLogOut
                   size={20}
@@ -207,14 +206,15 @@ export const Sidebar: FC<ISidebarProps> = ({
                 customColor="text-gray-500 dark:text-gray-400"
                 className="transition ease-in delay-300 opacity-100 whitespace-nowrap"
               >
-                {"frosa-ma@student.42sp.org.br"}
+                {currentUser.email}
               </Typography>
             </div>
           ) : (
             <div>
               <Avatar
                 size="sm"
-                src={images.demoAvatar}
+                seed={currentUser.login}
+                src={currentUser.avatarUrl}
                 className="fixed transition ease-in delay-300 opacity-100 cursor-pointer select-none bottom-4"
               />
               <div className="flex items-center justify-between">
@@ -224,7 +224,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                   customColor="text-gray-700 dark:text-white"
                   className="opacity-0"
                 >
-                  {user.nickname}
+                  {currentUser.nickname}
                 </Typography>
                 <LuLogOut
                   size={20}
@@ -236,7 +236,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                 customColor="text-gray-500"
                 className="opacity-0 whitespace-nowrap"
               >
-                {user.nickname}
+                {currentUser.nickname}
               </Typography>
             </div>
           )}

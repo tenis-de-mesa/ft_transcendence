@@ -32,22 +32,35 @@ export default function Profile() {
           <Card className="card front">
             <Card.Title>
               <>
-                <Avatar
-                  seed={profileUser.login}
-                  src={profileUser.avatarUrl}
-                  className="inline"
-                />
-                <Typography customWeight="regular" variant="h4">
-                  {profileUser.nickname}
-                </Typography>
-                {isViewingOwnProfile && (
-                  <Button
-                    variant="info"
-                    onClick={flipCard}
-                    className="absolute top-0 right-0 p-2 shadow-none"
-                  >
-                    Editar
-                  </Button>
+                {isViewingOwnProfile ? (
+                  <>
+                    <Avatar
+                      seed={currentUser.login}
+                      src={currentUser.avatarUrl}
+                      className="inline"
+                    />
+                    <Typography customWeight="regular" variant="h4">
+                      {currentUser.nickname}
+                    </Typography>
+                    <Button
+                      variant="info"
+                      onClick={flipCard}
+                      className="absolute top-0 right-0 p-2 shadow-none"
+                    >
+                      Editar
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Avatar
+                      seed={profileUser.login}
+                      src={profileUser.avatarUrl}
+                      className="inline"
+                    />
+                    <Typography customWeight="regular" variant="h4">
+                      {profileUser.nickname}
+                    </Typography>
+                  </>
                 )}
               </>
             </Card.Title>

@@ -8,6 +8,7 @@ export type User = {
   id: number;
   tfaEnabled: boolean;
   login?: string;
+  email?: string;
   status: string;
   nickname?: string;
   avatarUrl: string;

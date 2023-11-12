@@ -26,7 +26,7 @@ export default function Root() {
     >
       <div className="flex w-full h-full bg-white dark:bg-gray-700">
         <div className="">
-          <Sidebar darkMode={isDark} options={navitems} user={currentUser} />
+          <Sidebar darkMode={isDark} options={navitems} />
         </div>
         <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
           <Outlet />
