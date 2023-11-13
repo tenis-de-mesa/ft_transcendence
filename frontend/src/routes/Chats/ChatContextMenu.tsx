@@ -1,14 +1,23 @@
 import { useContext } from "react";
 import { ChatMember } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
+import { useNavigate } from "react-router-dom";
 
 function Separator() {
   return <hr className="my-2 bg-gray-600 border-gray-600" />;
 }
 
-function ChatContextMenuItem({ children }) {
+interface ChatContextMenuItemProps
+  extends React.HTMLAttributes<HTMLSpanElement> {
+  children: string | string[] | React.ReactElement | React.ReactElement[];
+}
+
+function ChatContextMenuItem({ children, ...props }: ChatContextMenuItemProps) {
   return (
-    <span className="p-2 cursor-pointer rounded text-left break-keep whitespace-nowrap hover:bg-gray-700">
+    <span
+      className="p-2 cursor-pointer rounded text-left break-keep whitespace-nowrap hover:bg-gray-700"
+      {...props}
+    >
       {children}
     </span>
   );
@@ -30,6 +39,7 @@ export default function ChatContextMenu({
   const { currentUser } = useContext(AuthContext);
   const { userRole } = useContext(ChatContext);
   const { role, user } = member;
+  const navigate = useNavigate();
 
   return (
     <menu
@@ -39,8 +49,17 @@ export default function ChatContextMenu({
       ${isOpen ? "flex" : "hidden"}`}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
     >
-      <ChatContextMenuItem>Go to profile</ChatContextMenuItem>
-      <ChatContextMenuItem>Send message</ChatContextMenuItem>
+      <ChatContextMenuItem
+        onClick={() => navigate(`/profile/${member.userId}`)}
+      >
+        Go to profile
+      </ChatContextMenuItem>
+
+      <ChatContextMenuItem
+        onClick={() => navigate(`/chats/with/${member.userId}`)}
+      >
+        Send message
+      </ChatContextMenuItem>
 
       {user?.id !== currentUser?.id && userRole !== "member" && (
         <>
