@@ -1,18 +1,20 @@
-import { useRef, useState } from "react";
-import { User } from "../types/types";
+import { useContext, useRef, useState } from "react";
+import { User } from "../types";
 import { Avatar } from "./Avatar";
 import { FaPencilAlt } from "react-icons/fa";
+import { AuthContext } from "../contexts";
 
 interface UserFormProps {
   user: User;
 }
 
 export default function UserUpdateAvatar({ user }: UserFormProps) {
+  const { setCurrentUser } = useContext(AuthContext);
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -32,6 +34,7 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
     }
     const data = await response.json();
     setAvatarUrl(data.avatarUrl);
+    setCurrentUser((prevUser) => ({ ...prevUser, avatarUrl: data.avatarUrl }));
   };
 
   const handleButtonClick = () => {

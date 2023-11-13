@@ -1,6 +1,6 @@
 import { FiPlus, FiX } from "react-icons/fi";
 import { Button } from "./Button";
-import { User } from "../types/types";
+import { User } from "../types";
 import { useContext, useState } from "react";
 import { AuthContext } from "../contexts";
 

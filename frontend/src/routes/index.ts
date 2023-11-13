@@ -2,7 +2,7 @@ export { default as Root } from "./Root";
 export { default as Users } from "./Users";
 export { default as Profile } from "./Profile";
 export { default as Chats } from "./Chats";
-export { default as Chat } from "./Chat";
+export { default as Chat } from "./Chats/Chat";
 export { default as Home } from "./Home";
 export { default as ChatNew } from "./ChatNew";
 export { default as Leaderboard } from "./Leaderboard";

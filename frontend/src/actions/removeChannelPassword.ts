@@ -1,40 +1,47 @@
-import { ActionFunctionArgs, redirect } from "react-router-dom";
+import { ActionFunctionArgs } from "react-router-dom";
 import { makeRequest } from "../api";
-import { socket } from "../socket";
 
-export async function joinChannel({ request, params }: ActionFunctionArgs) {
+export async function removeChannelPassword({
+  request,
+  params,
+}: ActionFunctionArgs) {
   const formData = await request.formData();
-
   const { id } = params;
   const { method } = request;
+
   const body = {
-    password: formData.get("password"),
+    currentPassword: formData.get("currentPassword"),
   };
 
   const conditions = [
     [!id, "Missing chat ID"],
     [!method, "Missing form method"],
+    [!body.currentPassword, "Missing current password"],
   ];
 
   const fail = conditions.find(([condition]) => condition);
 
   if (fail) {
     return {
+      status: "error",
       message: fail[1] as string,
     };
   }
 
-  const { error } = await makeRequest(`/chats/${id}/join`, {
+  const { error } = await makeRequest(`/chats/${id}/change-password`, {
     method,
     body: JSON.stringify(body),
   });
 
   if (error) {
     return {
+      status: "error",
       message: error.message,
     };
   }
 
-  socket.emit("addUserToChat", id);
-  return redirect(`/chats/${id}`);
+  return {
+    status: "success",
+    message: "Password removed successfully",
+  };
 }

@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  Column,
-  ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
 import { MessageEntity, ChatMemberEntity } from '.';
 
 export enum ChatAccess {

@@ -8,12 +8,14 @@ export type User = {
   id: number;
   tfaEnabled: boolean;
   login?: string;
+  email?: string;
   status: string;
   nickname?: string;
   avatarUrl: string;
   blockedBy: number[];
   blockedUsers: number[];
   friends: User[];
+  deletedAt?: Date;
 };
 
 export type Message = {
@@ -23,10 +25,19 @@ export type Message = {
   sender?: User;
 };
 
+export type ChatMember = {
+  user: User;
+  userId: number;
+  chat: Chat;
+  chatId: number;
+  role: "owner" | "admin" | "member";
+  status: "active" | "banned" | "muted";
+};
+
 export type Chat = {
   id: number;
   name: string;
-  users: User[];
+  users: ChatMember[];
   messages: Message[];
   newMessage: string;
   access: "public" | "protected" | "private";

@@ -5,7 +5,7 @@ import { navitems } from "../data/navItems";
 import { Sidebar, ISidebarProps } from "../components/nav/Sidebar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Typography } from "../components/Typography";
-import { User } from "../types/types";
+import { User } from "../types";
 
 const meta: Meta = {
   title: "Components/Sidebar",

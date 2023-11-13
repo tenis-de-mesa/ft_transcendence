@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Form, useNavigate } from "react-router-dom";
-import { User } from "../types/types";
+import { User } from "../types";
 import { Input } from "./Input";
 import { Button } from "./Button";
 
@@ -26,13 +26,6 @@ export default function UserForm({ user }: UserFormProps) {
   };
   return (
     <Form>
-      <Input
-        disabled
-        label="Login"
-        value={user.login}
-        placeholder=""
-        type="text"
-      />
       <Input
         label="Nickname"
         value={nickname}

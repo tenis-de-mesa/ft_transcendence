@@ -1,7 +1,7 @@
 import { Link, useLoaderData } from "react-router-dom";
 import { socket } from "../socket";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { User, UserStatus } from "../types/types";
+import { User, UserStatus } from "../types";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
