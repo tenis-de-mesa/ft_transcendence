@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ChatMember } from "../../types";
-import { AuthContext } from "../../contexts";
+import { AuthContext, ChatContext } from "../../contexts";
 
 function Separator() {
   return <hr className="my-2 bg-gray-600 border-gray-600" />;
@@ -17,7 +17,6 @@ function ChatContextMenuItem({ children }) {
 type ChatContextMenuProps = {
   member: ChatMember;
   isOpen: boolean;
-  myRole: "owner" | "admin" | "member";
   position: { top: number; left: number };
   contextMenuRef: React.RefObject<HTMLElement>;
 };
@@ -25,11 +24,11 @@ type ChatContextMenuProps = {
 export default function ChatContextMenu({
   member,
   isOpen,
-  myRole,
   position,
   contextMenuRef,
 }: ChatContextMenuProps) {
   const { currentUser } = useContext(AuthContext);
+  const { userRole } = useContext(ChatContext);
   const { role, user } = member;
 
   return (
@@ -43,27 +42,7 @@ export default function ChatContextMenu({
       <ChatContextMenuItem>Go to profile</ChatContextMenuItem>
       <ChatContextMenuItem>Send message</ChatContextMenuItem>
 
-      {user?.id !== currentUser?.id && myRole === "owner" && (
-        <>
-          <Separator />
-
-          <ChatContextMenuItem>Kick {user?.nickname}</ChatContextMenuItem>
-          <ChatContextMenuItem>Mute {user?.nickname}</ChatContextMenuItem>
-          <ChatContextMenuItem>Ban {user?.nickname}</ChatContextMenuItem>
-
-          <Separator />
-
-          {role === "admin" && (
-            <ChatContextMenuItem>Revoke admin privilege</ChatContextMenuItem>
-          )}
-
-          {role === "member" && (
-            <ChatContextMenuItem>Grant admin privilege</ChatContextMenuItem>
-          )}
-        </>
-      )}
-
-      {user?.id !== currentUser?.id && myRole === "admin" && (
+      {user?.id !== currentUser?.id && userRole !== "member" && (
         <>
           {role !== "owner" && (
             <>

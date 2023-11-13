@@ -76,11 +76,7 @@ const router = createBrowserRouter(
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"
-            element={
-              <ChatContextProvider>
-                <Chats />
-              </ChatContextProvider>
-            }
+            element={<ChatContextProvider children={<Chats />} />}
             loader={loadChatList}
             action={createChat}
           >

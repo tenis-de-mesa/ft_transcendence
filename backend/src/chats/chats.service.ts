@@ -221,6 +221,7 @@ export class ChatsService {
   async getMember(chatId: number, userId: number): Promise<ChatMemberEntity> {
     const member = await this.chatMemberRepository.findOne({
       where: { userId, chatId },
+      relations: { user: true },
     });
 
     if (!member) {

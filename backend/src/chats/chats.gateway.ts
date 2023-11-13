@@ -80,18 +80,20 @@ export class ChatsGateway implements OnGatewayInit {
 
   @SubscribeMessage('addUserToChat')
   async handleAddUserToChat(
-    @User() user: UserEntity,
+    @User('id') userId: number,
     @MessageBody() chatId: number,
   ) {
-    this.server.to(`chat:${chatId}`).emit('userAdded', user);
+    const member = await this.chatService.getMember(chatId, userId);
+
+    this.server.to(`chat:${chatId}`).emit('userAdded', member);
   }
 
   @SubscribeMessage('removeUserFromChat')
   async handleRemoveUserFromChat(
-    @User() user: UserEntity,
+    @User('id') userId: number,
     @MessageBody() chatId: number,
   ) {
-    this.server.to(`chat:${chatId}`).emit('userRemoved', user);
+    this.server.to(`chat:${chatId}`).emit('userRemoved', userId);
   }
 
   private async validate(client: Socket) {

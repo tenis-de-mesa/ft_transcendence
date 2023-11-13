@@ -1,11 +1,10 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, Typography } from "../../components";
 import { ChatMember, User } from "../../types";
 import { socket } from "../../socket";
 
 import ChatMemberItem from "./ChatMemberItem";
 import ChatContextMenu from "./ChatContextMenu";
-import { AuthContext } from "../../contexts";
 
 const defaultProps = {
   member: {} as ChatMember,
@@ -14,12 +13,14 @@ const defaultProps = {
 };
 
 type ChatMemberListProps = {
-  members: ChatMember[];
+  initialMembers: ChatMember[];
 };
 
-export default function ChatMemberList({ members }: ChatMemberListProps) {
-  const { currentUser } = useContext(AuthContext);
+export default function ChatMemberList({
+  initialMembers,
+}: ChatMemberListProps) {
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const [members, setMembers] = useState<ChatMember[]>(initialMembers);
   const [users, setUsers] = useState<User[]>([]);
   const [props, setProps] = useState(defaultProps);
 
@@ -45,20 +46,20 @@ export default function ChatMemberList({ members }: ChatMemberListProps) {
 
   useEffect(() => {
     const nonDeletedUsers = members
-      .filter((member) => !member.user.deletedAt)
-      .map((member) => member.user);
+      .filter((member) => !member?.user.deletedAt)
+      .map((member) => member?.user);
 
     setUsers(nonDeletedUsers);
   }, [members]);
 
   useEffect(() => {
-    socket.on("userAdded", (user: User) => {
-      setUsers((users) => [...users, user]);
-    });
+    socket.on("userAdded", (member: ChatMember) =>
+      setMembers((members) => [...members, member])
+    );
 
-    socket.on("userRemoved", (user: User) => {
-      setUsers((users) => users.filter((u) => u.id !== user.id));
-    });
+    socket.on("userRemoved", (id: number) =>
+      setMembers((members) => members.filter((member) => member.userId !== id))
+    );
 
     return () => {
       socket.off("userAdded");
@@ -80,11 +81,11 @@ export default function ChatMemberList({ members }: ChatMemberListProps) {
   return (
     <Card className="w-1/4">
       <Card.Title>
-        <Typography variant="h6">Members - {users.length}</Typography>
+        <Typography variant="h6">Members - {users?.length}</Typography>
       </Card.Title>
       <Card.Body>
         <div className="flex flex-col">
-          {users.map((user) => (
+          {users?.map((user) => (
             <div
               key={user.id}
               onContextMenu={(e) => handleContextMenu(e, user)}
@@ -99,9 +100,6 @@ export default function ChatMemberList({ members }: ChatMemberListProps) {
           member={props.member}
           isOpen={props.isOpen}
           position={props.position}
-          myRole={
-            members.find((member) => member.userId === currentUser?.id)?.role
-          }
         />
       </Card.Body>
     </Card>
