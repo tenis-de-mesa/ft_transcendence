@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   Column,
-  OneToOne,
   ManyToOne,
 } from 'typeorm';
 import { MessageEntity, ChatMemberEntity, UserEntity } from '.';
