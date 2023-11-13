@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useLoaderData } from "react-router-dom";
+import { NavLink, Outlet, useLoaderData } from "react-router-dom";
 import { Card, Typography } from "../../components";
 import { Chat } from "../../types";
 
@@ -22,10 +22,6 @@ export default function Chats() {
                     key={chat.id}
                     to={`/chats/${chat.id}`}
                     state={{ id: chat.id }}
-                    // Make it bold if it's the current chat
-                    className={`${
-                      chat.id === chatList[0].id ? "font-bold" : ""
-                    }`}
                   >
                     <Typography variant="sm">{chat.name}</Typography>
                   </NavLink>

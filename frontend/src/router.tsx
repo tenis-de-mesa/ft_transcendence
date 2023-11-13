@@ -107,8 +107,8 @@ const router = createBrowserRouter(
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;

@@ -53,7 +53,7 @@ export default function Chat() {
           `http://localhost:3001/chats/${chatId}/role`,
           {
             credentials: "include",
-          }
+          },
         );
         const data = await response.json();
         setUserRole(data.role);
@@ -63,7 +63,7 @@ export default function Chat() {
     };
 
     fetchChannelRole(chatId).catch((error) =>
-      console.error("Error setting channel role:", error)
+      console.error("Error setting channel role:", error),
     );
   }, [chatId]);
 

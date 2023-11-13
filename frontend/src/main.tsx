@@ -14,5 +14,5 @@ ReactDOM.createRoot(rootElement!).render(
         <RouterProvider router={router} />
       </WebSocketContextProvider>
     </AuthContextProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
