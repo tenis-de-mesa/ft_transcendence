@@ -4,7 +4,7 @@ import { ChatMember, User } from "../../types";
 import { socket } from "../../socket";
 
 import ChatMemberItem from "./ChatMemberItem";
-import ChatContextMenu from "./ChatContextMenu";
+import ChatContextMenu from "./ChatContextMenu/ChatContextMenu";
 
 const defaultProps = {
   member: {} as ChatMember,

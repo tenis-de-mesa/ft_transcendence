@@ -1,27 +1,9 @@
 import { useContext } from "react";
-import { ChatMember } from "../../types";
-import { AuthContext, ChatContext } from "../../contexts";
 import { useNavigate } from "react-router-dom";
+import { ChatMember } from "../../../types";
+import { AuthContext, ChatContext } from "../../../contexts";
 
-function Separator() {
-  return <hr className="my-2 bg-gray-600 border-gray-600" />;
-}
-
-interface ChatContextMenuItemProps
-  extends React.HTMLAttributes<HTMLSpanElement> {
-  children: string | string[] | React.ReactElement | React.ReactElement[];
-}
-
-function ChatContextMenuItem({ children, ...props }: ChatContextMenuItemProps) {
-  return (
-    <span
-      className="p-2 cursor-pointer rounded text-left break-keep whitespace-nowrap hover:bg-gray-700"
-      {...props}
-    >
-      {children}
-    </span>
-  );
-}
+import ChatContextMenuItem from "./ChatContextMenuItem";
 
 type ChatContextMenuProps = {
   member: ChatMember;
@@ -65,25 +47,29 @@ export default function ChatContextMenu({
         <>
           {role !== "owner" && (
             <>
-              <Separator />
+              <ChatContextMenuItem separator={true}>
+                Kick {user?.nickname}
+              </ChatContextMenuItem>
 
-              <ChatContextMenuItem>Kick {user?.nickname}</ChatContextMenuItem>
               <ChatContextMenuItem>Mute {user?.nickname}</ChatContextMenuItem>
+
               <ChatContextMenuItem>Ban {user?.nickname}</ChatContextMenuItem>
             </>
           )}
 
           {role === "admin" && (
             <>
-              <Separator />
-              <ChatContextMenuItem>Revoke admin privilege</ChatContextMenuItem>
+              <ChatContextMenuItem separator={true}>
+                Revoke admin privilege
+              </ChatContextMenuItem>
             </>
           )}
 
           {role === "member" && (
             <>
-              <Separator />
-              <ChatContextMenuItem>Grant admin privilege</ChatContextMenuItem>
+              <ChatContextMenuItem separator={true}>
+                Grant admin privilege
+              </ChatContextMenuItem>
             </>
           )}
         </>
