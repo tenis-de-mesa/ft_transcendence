@@ -42,7 +42,7 @@ export type Chat = {
   newMessage: string;
   access: "public" | "protected" | "private";
   type: "direct" | "channel";
-  createdByUser: number;
+  createdBy: User;
 };
 
 export type NewChatMessage = {

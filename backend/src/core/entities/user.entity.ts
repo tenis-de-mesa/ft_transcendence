@@ -14,6 +14,7 @@ import {
   FriendRequestEntity,
   MessageEntity,
   ChatMemberEntity,
+  ChatEntity,
 } from '.';
 import { BlockListEntity } from './blockList.entity';
 
@@ -108,6 +109,9 @@ export class UserEntity {
 
   @OneToMany(() => ChatMemberEntity, (member) => member.user)
   chats: ChatMemberEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.createdBy)
+  createdChats: ChatEntity[];
 
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
