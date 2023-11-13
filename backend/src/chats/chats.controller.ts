@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
@@ -26,7 +27,10 @@ import {
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
 export class ChatsController {
-  constructor(private readonly chatsService: ChatsService) {}
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly chatsService: ChatsService,
+  ) {}
 
   @Get()
   async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
@@ -114,5 +118,21 @@ export class ChatsController {
   ): Promise<{ role: ChatMemberRole }> {
     const role = await this.chatsService.getMemberRole(id, userId);
     return { role };
+  }
+
+  @Post(':id/kick')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async kickMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body('kickUserId', ParseIntPipe) kickUserId: number,
+  ): Promise<void> {
+    await this.chatsService.kickMember(id, userId, kickUserId);
+
+    this.eventEmitter.emit('chat.kick', {
+      kickUserId,
+      chatId: id,
+    });
   }
 }

@@ -61,7 +61,7 @@ export default function ChatContextMenu({
 
               <ChatContextMenuItem
                 onClick={() =>
-                  setShowCard(<ChatKickMemberCard nickname={user?.nickname} />)
+                  setShowCard(<ChatKickMemberCard user={user} />)
                 }
               >
                 Kick {user?.nickname}

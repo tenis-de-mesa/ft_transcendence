@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, Typography } from "../../components";
 import { ChatMember, User } from "../../types";
+import { AuthContext } from "../../contexts";
 import { socket } from "../../socket";
 
 import ChatMemberItem from "./ChatMemberItem";
@@ -19,10 +21,12 @@ type ChatMemberListProps = {
 export default function ChatMemberList({
   initialMembers,
 }: ChatMemberListProps) {
+  const { currentUser } = useContext(AuthContext);
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const [members, setMembers] = useState<ChatMember[]>(initialMembers);
+  const [members, setMembers] = useState<ChatMember[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [props, setProps] = useState(defaultProps);
+  const navigate = useNavigate();
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -45,6 +49,10 @@ export default function ChatMemberList({
   };
 
   useEffect(() => {
+    setMembers(initialMembers);
+  }, [initialMembers]);
+
+  useEffect(() => {
     const nonDeletedUsers = members
       .filter((member) => !member?.user.deletedAt)
       .map((member) => member?.user);
@@ -57,15 +65,19 @@ export default function ChatMemberList({
       setMembers((members) => [...members, member])
     );
 
-    socket.on("userRemoved", (id: number) =>
-      setMembers((members) => members.filter((member) => member.userId !== id))
-    );
+    socket.on("userRemoved", (id: number) => {
+      if (id === currentUser?.id) {
+        return navigate("/chats");
+      }
+
+      setMembers((members) => members.filter((member) => member.userId !== id));
+    });
 
     return () => {
       socket.off("userAdded");
       socket.off("userRemoved");
     };
-  }, []);
+  }, [currentUser?.id, navigate]);
 
   useEffect(() => {
     const handleClick = () => setProps(defaultProps);

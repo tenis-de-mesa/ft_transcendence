@@ -398,6 +398,29 @@ export class ChatsService {
     });
   }
 
+  async kickMember(
+    chatId: number,
+    userId: number,
+    kickUserId: number,
+  ): Promise<ChatMemberEntity> {
+    const chat = await this.findOne(chatId);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
+    }
+
+    const [_, kickMember] = await Promise.all([
+      this.getMember(chatId, userId),
+      this.getMember(chatId, kickUserId),
+    ]);
+
+    if (kickMember.role === ChatMemberRole.OWNER) {
+      throw new BadRequestException('Owner cannot be kicked');
+    }
+
+    return await this.chatMemberRepository.remove(kickMember);
+  }
+
   mapChatsToChatsWithName(
     chats: ChatEntity[],
     currentUser: UserEntity,

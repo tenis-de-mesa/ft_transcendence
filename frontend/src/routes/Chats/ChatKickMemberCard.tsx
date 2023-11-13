@@ -1,16 +1,19 @@
 import { useContext, useEffect } from "react";
-import { Button, Card, Overlay, Typography } from "../../components";
+import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { ChatContext } from "../../contexts";
+import { User } from "../../types";
+import { Button, Card, Overlay, Typography } from "../../components";
 
 type ChatKickMemberCardProps = {
-  nickname?: string;
+  user: User;
 };
 
-export default function ChatKickMemberCard({
-  nickname = "Fizzbuzz",
-}: ChatKickMemberCardProps) {
+export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
   const { setShowCard } = useContext(ChatContext);
+  const { Form } = useFetcher();
+
+  const handleClose = () => setShowCard(null);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -38,23 +41,23 @@ export default function ChatKickMemberCard({
           className="flex justify-between items-center gap-3"
         >
           <Typography className="text-left" variant="h6" customWeight="bold">
-            Kick {nickname} from channel
+            Kick {user?.nickname} from channel
           </Typography>
           <Button
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={() => setShowCard(null)}
+            onClick={handleClose}
           ></Button>
         </Card.Title>
         <Card.Body>
           <Typography className="text-left" variant="md">
-            Are you sure you want to kick {nickname} from this channel? They can
-            join again through the channel list.
+            Are you sure you want to kick {user?.nickname} from this channel?
+            They can join again through the channel list.
           </Typography>
         </Card.Body>
         <Card.Footer className="flex justify-end items-center gap-3">
-          <div onClick={() => setShowCard(null)}>
+          <div onClick={handleClose}>
             <Typography
               variant="md"
               className="cursor-pointer select-none hover:decoration-solid hover:underline"
@@ -62,15 +65,14 @@ export default function ChatKickMemberCard({
               Cancel
             </Typography>
           </div>
-          <Button
-            variant="error"
-            // TODO: Kick user action
-            onClick={() => {}}
-          >
-            <Typography variant="md" customWeight="bold">
-              Kick {nickname}
-            </Typography>
-          </Button>
+          <Form action="kick" method="POST" onSubmit={handleClose}>
+            <input type="hidden" name="userId" value={user?.id} />
+            <Button variant="error">
+              <Typography variant="md" customWeight="bold">
+                Kick {user?.nickname}
+              </Typography>
+            </Button>
+          </Form>
         </Card.Footer>
       </Card>
     </>

@@ -14,6 +14,7 @@ import { User } from '../core/decorators';
 import { UserEntity } from '../core/entities';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 interface NewChatMessage {
   chatId: number;
@@ -94,6 +95,13 @@ export class ChatsGateway implements OnGatewayInit {
     @MessageBody() chatId: number,
   ) {
     this.server.to(`chat:${chatId}`).emit('userRemoved', userId);
+  }
+
+  @OnEvent('chat.kick')
+  handleKickEvent(payload: { kickUserId: number; chatId: number }) {
+    const { kickUserId, chatId } = payload;
+
+    this.server.to(`chat:${chatId}`).emit('userRemoved', kickUserId);
   }
 
   private async validate(client: Socket) {
