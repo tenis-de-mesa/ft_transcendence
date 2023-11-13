@@ -4,6 +4,9 @@ import { ChatMember } from "../../../types";
 import { AuthContext, ChatContext } from "../../../contexts";
 
 import ChatContextMenuItem from "./ChatContextMenuItem";
+import ChatBanMemberCard from "../ChatBanMemberCard";
+import ChatKickMemberCard from "../ChatKickMemberCard";
+import ChatMuteMemberCard from "../ChatMuteMemberCard";
 
 type ChatContextMenuProps = {
   member: ChatMember;
@@ -19,7 +22,7 @@ export default function ChatContextMenu({
   contextMenuRef,
 }: ChatContextMenuProps) {
   const { currentUser } = useContext(AuthContext);
-  const { userRole } = useContext(ChatContext);
+  const { userRole, setShowCard } = useContext(ChatContext);
   const { role, user } = member;
   const navigate = useNavigate();
 
@@ -47,13 +50,30 @@ export default function ChatContextMenu({
         <>
           {role !== "owner" && (
             <>
-              <ChatContextMenuItem separator={true}>
+              <ChatContextMenuItem
+                separator={true}
+                onClick={() =>
+                  setShowCard(<ChatMuteMemberCard nickname={user?.nickname} />)
+                }
+              >
+                Mute {user?.nickname}
+              </ChatContextMenuItem>
+
+              <ChatContextMenuItem
+                onClick={() =>
+                  setShowCard(<ChatKickMemberCard nickname={user?.nickname} />)
+                }
+              >
                 Kick {user?.nickname}
               </ChatContextMenuItem>
 
-              <ChatContextMenuItem>Mute {user?.nickname}</ChatContextMenuItem>
-
-              <ChatContextMenuItem>Ban {user?.nickname}</ChatContextMenuItem>
+              <ChatContextMenuItem
+                onClick={() =>
+                  setShowCard(<ChatBanMemberCard nickname={user?.nickname} />)
+                }
+              >
+                Ban {user?.nickname}
+              </ChatContextMenuItem>
             </>
           )}
 

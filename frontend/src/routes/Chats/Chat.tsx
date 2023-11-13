@@ -15,7 +15,7 @@ import ChatMessageInput from "./ChatMessageInput";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userRole } = useContext(ChatContext);
+  const { setCurrentChat, userRole, showCard } = useContext(ChatContext);
 
   useEffect(() => {
     setCurrentChat(chat);
@@ -99,6 +99,8 @@ export default function Chat() {
       {chat.type === "channel" && (
         <ChatMemberList initialMembers={chat.users} />
       )}
+
+      {showCard}
     </div>
   );
 }
