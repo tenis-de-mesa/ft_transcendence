@@ -6,6 +6,10 @@ export class CreateUserDto {
   @IsNumber()
   intraId?: number;
 
+  @IsOptional()
+  @IsString()
+  email?: string;
+
   @IsNotEmpty()
   @IsString()
   login: string;

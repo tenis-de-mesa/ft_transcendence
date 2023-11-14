@@ -37,6 +37,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, 'intra') {
 
     const user = await this.authService.loginAsIntra({
       intraId: response.data.id,
+      email: response.data.email,
       login: response.data.login,
       provider: AuthProvider.INTRA,
     });
