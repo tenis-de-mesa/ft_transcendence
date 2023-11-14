@@ -110,7 +110,7 @@ export default function NewChannelCard({ onClose }) {
             />
 
             <div className="my-3 overflow-y-auto min-h-[15rem]">
-              {filteredUsers.length > 1 ? (
+              {filteredUsers.length >= 1 ? (
                 <ul className="flex flex-col items-start">
                   {filteredUsers.map((user) => {
                     if (user.id === currentUser.id) return null;
