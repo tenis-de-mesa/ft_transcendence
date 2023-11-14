@@ -38,6 +38,9 @@ export class UserEntity {
   })
   intraId: number;
 
+  @Column({ nullable: true })
+  email: string;
+
   @Column({
     nullable: true,
     unique: true,
