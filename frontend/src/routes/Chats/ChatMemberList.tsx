@@ -67,7 +67,7 @@ export default function ChatMemberList({
 
     socket.on("userRemoved", (id: number) => {
       if (id === currentUser?.id) {
-        return navigate("/chats");
+        return navigate("/chats", { replace: true });
       }
 
       setMembers((members) => members.filter((member) => member.userId !== id));
