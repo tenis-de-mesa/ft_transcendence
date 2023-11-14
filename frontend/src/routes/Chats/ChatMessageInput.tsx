@@ -3,12 +3,15 @@ import { useFetcher, useParams } from "react-router-dom";
 import { Input } from "../../components";
 import { socket } from "../../socket";
 
-type ChatMessageInputProps = {
-  isBlocked: boolean;
-};
+interface ChatMessageInputProps
+  extends React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > {}
 
-export default function ChatMessageInput({ isBlocked }: ChatMessageInputProps) {
+export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
   const params = useParams();
+  // TODO: retrieve errors from action
   const { Form } = useFetcher();
   const [message, setMessage] = useState("");
 
@@ -30,10 +33,10 @@ export default function ChatMessageInput({ isBlocked }: ChatMessageInputProps) {
   return (
     <Form method="POST" onSubmit={handleSubmit}>
       <Input
+        {...props}
         type="text"
         value={message}
         placeholder="Enter your message"
-        disabled={isBlocked}
         onChange={(e) => setMessage(e.target.value)}
       />
     </Form>

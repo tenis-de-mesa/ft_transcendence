@@ -104,6 +104,30 @@ export class ChatsGateway implements OnGatewayInit {
     this.server.to(`chat:${chatId}`).emit('userRemoved', kickUserId);
   }
 
+  @OnEvent('chat.mute')
+  handleMuteEvent(payload: {
+    userId: number;
+    muteUserId: number;
+    muteDuration: number;
+    chatId: number;
+  }) {
+    const { userId, muteUserId, muteDuration, chatId } = payload;
+
+    this.server.to(`chat:${chatId}`).emit('userMuted', muteUserId);
+
+    setTimeout(() => {
+      this.chatService.unmuteMember(chatId, userId, muteUserId);
+      this.server.to(`chat:${chatId}`).emit('userUnmuted', muteUserId);
+    }, muteDuration);
+  }
+
+  @OnEvent('chat.unmute')
+  handleUnuteEvent(payload: { unmuteUserId: number; chatId: number }) {
+    const { unmuteUserId, chatId } = payload;
+
+    this.server.to(`chat:${chatId}`).emit('userUnmuted', unmuteUserId);
+  }
+
   private async validate(client: Socket) {
     const cookies = cookie.parse(client.handshake.headers.cookie);
     const sid = cookies['connect.sid'].split('.')[0].slice(2);

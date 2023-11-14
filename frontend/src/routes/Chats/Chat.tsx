@@ -15,19 +15,35 @@ import ChatMessageInput from "./ChatMessageInput";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userRole, showCard } = useContext(ChatContext);
+  const { setCurrentChat, userRole, userStatus, showCard } =
+    useContext(ChatContext);
+  const [isMuted, setIsMuted] = useState(false);
 
-  useEffect(() => {
-    setCurrentChat(chat);
-  }, [chat, setCurrentChat]);
+  useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
+
+  useEffect(() => setIsMuted(userStatus === "muted"), [userStatus]);
 
   useEffect(() => {
     socket.emit("joinChat", chat.id);
 
+    socket.on("userMuted", (muteUserId: number) => {
+      if (muteUserId === currentUser?.id) {
+        setIsMuted(true);
+      }
+    });
+
+    socket.on("userUnmuted", (unmuteUserId: number) => {
+      if (unmuteUserId === currentUser?.id) {
+        setIsMuted(false);
+      }
+    });
+
     return () => {
       socket.emit("leaveChat", chat.id);
+      socket.off("userMuted");
+      socket.off("userUnmuted");
     };
-  }, [chat.id]);
+  }, [chat, currentUser?.id]);
 
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
@@ -89,8 +105,9 @@ export default function Chat() {
           />
 
           <ChatMessageInput
-            isBlocked={
-              (isBlockedByMe || isBlockedForOthers) && chat.type === "direct"
+            disabled={
+              isMuted ||
+              ((isBlockedByMe || isBlockedForOthers) && chat.type === "direct")
             }
           />
         </Card.Body>

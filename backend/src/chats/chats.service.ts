@@ -17,6 +17,7 @@ import {
   ChatMemberRole,
   ChatType,
   ChatAccess,
+  ChatMemberStatus,
 } from '../core/entities';
 import {
   CreateChatDto,
@@ -419,6 +420,54 @@ export class ChatsService {
     }
 
     return await this.chatMemberRepository.remove(kickMember);
+  }
+
+  async muteMember(
+    chatId: number,
+    userId: number,
+    muteUserId: number,
+  ): Promise<ChatMemberEntity> {
+    const chat = await this.findOne(chatId);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
+    }
+
+    const [_, muteMember] = await Promise.all([
+      this.getMember(chatId, userId),
+      this.getMember(chatId, muteUserId),
+    ]);
+
+    if (muteMember.role === ChatMemberRole.OWNER) {
+      throw new BadRequestException('Owner cannot be muted');
+    }
+
+    muteMember.status = ChatMemberStatus.MUTED;
+    return await this.chatMemberRepository.save(muteMember);
+  }
+
+  async unmuteMember(
+    chatId: number,
+    userId: number,
+    unmuteUserId: number,
+  ): Promise<ChatMemberEntity> {
+    const chat = await this.findOne(chatId);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
+    }
+
+    const [_, unmuteMember] = await Promise.all([
+      this.getMember(chatId, userId),
+      this.getMember(chatId, unmuteUserId),
+    ]);
+
+    if (unmuteMember.role === ChatMemberRole.OWNER) {
+      throw new BadRequestException('Owner is never muted');
+    }
+
+    unmuteMember.status = ChatMemberStatus.ACTIVE;
+    return await this.chatMemberRepository.save(unmuteMember);
   }
 
   mapChatsToChatsWithName(

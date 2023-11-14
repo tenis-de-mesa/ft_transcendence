@@ -22,6 +22,9 @@ import {
   ChangePasswordDto,
   JoinChannelDto,
   LeaveChannelDto,
+  MuteMemberDto,
+  UnmuteMemberDto,
+  KickMemberDto,
 } from './dto';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
@@ -126,12 +129,52 @@ export class ChatsController {
   async kickMember(
     @User('id') userId: number,
     @Param('id', ParseIntPipe) id: number,
-    @Body('kickUserId', ParseIntPipe) kickUserId: number,
+    @Body() dto: KickMemberDto,
   ): Promise<void> {
+    const { kickUserId } = dto;
+
     await this.chatsService.kickMember(id, userId, kickUserId);
 
     this.eventEmitter.emit('chat.kick', {
       kickUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/mute')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async muteMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: MuteMemberDto,
+  ): Promise<void> {
+    const { muteUserId, muteDuration } = dto;
+
+    await this.chatsService.muteMember(id, userId, muteUserId);
+
+    this.eventEmitter.emit('chat.mute', {
+      userId,
+      muteUserId,
+      muteDuration,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/unmute')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async unmuteMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UnmuteMemberDto,
+  ): Promise<void> {
+    const { unmuteUserId } = dto;
+
+    await this.chatsService.unmuteMember(id, userId, unmuteUserId);
+
+    this.eventEmitter.emit('chat.unmute', {
+      unmuteUserId,
       chatId: id,
     });
   }

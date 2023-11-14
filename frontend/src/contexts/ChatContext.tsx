@@ -1,50 +1,46 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Chat } from "../types";
-import { makeRequest } from "../api";
+import { AuthContext } from ".";
+
+type ChatMemberRole = "owner" | "admin" | "member";
+type ChatMemberStatus = "active" | "muted" | "banned";
 
 type ChatContextType = {
   currentChat: Chat;
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat>>;
-  userRole: "owner" | "admin" | "member";
   showCard: JSX.Element;
   setShowCard: React.Dispatch<React.SetStateAction<JSX.Element>>;
+  userRole: ChatMemberRole;
+  userStatus: ChatMemberStatus;
 };
 
 export const ChatContext = createContext({} as ChatContextType);
 
 export const ChatContextProvider = ({ children }) => {
+  const { currentUser } = useContext(AuthContext);
   const [currentChat, setCurrentChat] = useState<Chat>(null);
-  const [userRole, setUserRole] = useState<"owner" | "admin" | "member">(null);
+  const [userRole, setUserRole] = useState<ChatMemberRole>(null);
+  const [userStatus, setUserStatus] = useState<ChatMemberStatus>(null);
   const [showCard, setShowCard] = useState<JSX.Element>(null);
 
   useEffect(() => {
-    const fetchUserRole = async (chatId: number) => {
-      const { data, error } = await makeRequest<{
-        role: "owner" | "admin" | "member";
-      }>(`/chats/${chatId}/role`, {
-        method: "GET",
-      });
+    const currentMember = currentChat?.users.find(
+      (user) => user.userId === currentUser.id
+    );
 
-      if (error) {
-        return console.error("Error fetching channel role: ", error);
-      }
-
-      setUserRole(data.role);
-    };
-
-    if (currentChat) {
-      fetchUserRole(currentChat.id);
-    }
-  }, [currentChat]);
+    setUserRole(currentMember?.role);
+    setUserStatus(currentMember?.status);
+  }, [currentChat, currentUser.id]);
 
   return (
     <ChatContext.Provider
       value={{
         currentChat,
         setCurrentChat,
-        userRole,
         showCard,
         setShowCard,
+        userRole,
+        userStatus,
       }}
     >
       {children}

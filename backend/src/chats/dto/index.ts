@@ -5,3 +5,6 @@ export * from './createMessage.dto';
 export * from './changePassword.dto';
 export * from './join-channel.dto';
 export * from './leave-channel.dto';
+export * from './kick-member.dto';
+export * from './mute-member.dto';
+export * from './unmute-member.dto';

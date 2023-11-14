@@ -1,18 +1,22 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { makeRequest } from "../api";
 
-export async function kickChatMember({ request, params }: ActionFunctionArgs) {
+export async function unmuteChatMember({
+  request,
+  params,
+}: ActionFunctionArgs) {
   const formData = await request.formData();
   const { id } = params;
   const { method } = request;
+
   const body = {
-    kickUserId: Number(formData.get("userId")),
+    unmuteUserId: Number(formData.get("unmuteUserId")),
   };
 
   const conditions = [
     [!id, "Missing chat ID"],
     [!method, "Missing form method"],
-    [!body.kickUserId, "Missing user ID"],
+    [!body.unmuteUserId, "Missing user ID"],
   ];
 
   const fail = conditions.find(([condition]) => condition);
@@ -24,7 +28,7 @@ export async function kickChatMember({ request, params }: ActionFunctionArgs) {
     };
   }
 
-  const { error } = await makeRequest(`/chats/${id}/kick`, {
+  const { error } = await makeRequest(`/chats/${id}/unmute`, {
     method,
     body: JSON.stringify(body),
   });
@@ -38,6 +42,6 @@ export async function kickChatMember({ request, params }: ActionFunctionArgs) {
 
   return {
     status: "success",
-    message: "User kicked successfully",
+    message: "User unmuted successfully",
   };
 }

@@ -11,6 +11,7 @@ type ChatKickMemberCardProps = {
 
 export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
   const { setShowCard } = useContext(ChatContext);
+  // TODO: retrieve errors from action
   const { Form } = useFetcher();
 
   const handleClose = () => setShowCard(null);

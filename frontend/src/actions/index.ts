@@ -8,3 +8,5 @@ export * from "./removeChannelPassword";
 export * from "./joinChannel";
 export * from "./leaveChannel";
 export * from "./kickChatMember";
+export * from "./muteChatMember";
+export * from "./unmuteChatMember";

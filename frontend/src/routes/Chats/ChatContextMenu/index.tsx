@@ -52,17 +52,13 @@ export default function ChatContextMenu({
             <>
               <ChatContextMenuItem
                 separator={true}
-                onClick={() =>
-                  setShowCard(<ChatMuteMemberCard nickname={user?.nickname} />)
-                }
+                onClick={() => setShowCard(<ChatMuteMemberCard user={user} />)}
               >
                 Mute {user?.nickname}
               </ChatContextMenuItem>
 
               <ChatContextMenuItem
-                onClick={() =>
-                  setShowCard(<ChatKickMemberCard user={user} />)
-                }
+                onClick={() => setShowCard(<ChatKickMemberCard user={user} />)}
               >
                 Kick {user?.nickname}
               </ChatContextMenuItem>

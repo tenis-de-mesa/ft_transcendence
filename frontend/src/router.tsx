@@ -27,6 +27,8 @@ import {
   joinChannel,
   leaveChannel,
   kickChatMember,
+  muteChatMember,
+  unmuteChatMember,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -94,6 +96,8 @@ const router = createBrowserRouter(
             <Route path=":id/change-password" action={changeChannelPassword} />
             <Route path=":id/remove-password" action={removeChannelPassword} />
             <Route path=":id/kick" action={kickChatMember} />
+            <Route path=":id/mute" action={muteChatMember} />
+            <Route path=":id/unmute" action={unmuteChatMember} />
           </Route>
           <Route
             path="profile/:id"

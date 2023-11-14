@@ -1,17 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import { Button, Card, Overlay, Typography } from "../../components";
+import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
+import { Button, Card, Overlay, Typography } from "../../components";
 import { ChatContext } from "../../contexts";
+import { User } from "../../types";
 
 type ChatMuteMemberCardProps = {
-  nickname?: string;
+  user: User;
 };
 
-export default function ChatMuteMemberCard({
-  nickname = "Fizzbuzz",
-}: ChatMuteMemberCardProps) {
+export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
   const { setShowCard } = useContext(ChatContext);
   const [selectedTime, setSelectedTime] = useState(60000);
+  // TODO: retrieve errors from action
+  const { Form } = useFetcher();
+
+  const handleClose = () => setShowCard(null);
 
   const getTimeBoxStyle = (time: number) => {
     return `bg-gray-700 px-2 py-1 rounded select-none
@@ -44,13 +48,13 @@ export default function ChatMuteMemberCard({
           className="flex justify-between items-center gap-3"
         >
           <Typography className="text-left" variant="h6" customWeight="bold">
-            Mute {nickname}
+            Mute {user?.nickname}
           </Typography>
           <Button
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={() => setShowCard(null)}
+            onClick={handleClose}
           ></Button>
         </Card.Title>
         <Card.Body className="space-y-4">
@@ -107,7 +111,7 @@ export default function ChatMuteMemberCard({
           </div>
         </Card.Body>
         <Card.Footer className="flex justify-end items-center gap-3">
-          <div onClick={() => setShowCard(null)}>
+          <div onClick={handleClose}>
             <Typography
               variant="md"
               className="cursor-pointer select-none hover:decoration-solid hover:underline"
@@ -115,15 +119,15 @@ export default function ChatMuteMemberCard({
               Cancel
             </Typography>
           </div>
-          <Button
-            variant="error"
-            // TODO: Mute user action
-            onClick={() => {}}
-          >
-            <Typography variant="md" customWeight="bold">
-              Mute {nickname}
-            </Typography>
-          </Button>
+          <Form action="mute" method="POST" onSubmit={handleClose}>
+            <input type="hidden" name="userId" value={user?.id} />
+            <input type="hidden" name="muteDuration" value={selectedTime} />
+            <Button variant="error">
+              <Typography variant="md" customWeight="bold">
+                Mute {user?.nickname}
+              </Typography>
+            </Button>
+          </Form>
         </Card.Footer>
       </Card>
     </>
