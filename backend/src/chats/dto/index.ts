@@ -8,3 +8,5 @@ export * from './leave-channel.dto';
 export * from './kick-member.dto';
 export * from './mute-member.dto';
 export * from './unmute-member.dto';
+export * from './ban-member.dto';
+export * from './unban-member.dto';

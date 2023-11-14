@@ -128,6 +128,20 @@ export class ChatsGateway implements OnGatewayInit {
     this.server.to(`chat:${chatId}`).emit('userUnmuted', unmuteUserId);
   }
 
+  @OnEvent('chat.ban')
+  handleBanEvent(payload: { banUserId: number; chatId: number }) {
+    const { banUserId, chatId } = payload;
+
+    this.server.to(`chat:${chatId}`).emit('userBanned', banUserId);
+  }
+
+  @OnEvent('chat.unban')
+  handleUnbanEvent(payload: { unbanUserId: number; chatId: number }) {
+    const { unbanUserId, chatId } = payload;
+
+    this.server.to(`chat:${chatId}`).emit('userUnbanned', unbanUserId);
+  }
+
   private async validate(client: Socket) {
     const cookies = cookie.parse(client.handshake.headers.cookie);
     const sid = cookies['connect.sid'].split('.')[0].slice(2);

@@ -25,6 +25,8 @@ import {
   MuteMemberDto,
   UnmuteMemberDto,
   KickMemberDto,
+  BanMemberDto,
+  UnbanMemberDto,
 } from './dto';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
@@ -37,13 +39,13 @@ export class ChatsController {
 
   @Get()
   async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
-    const chats = await this.chatsService.findAll(user);
+    const chats = await this.chatsService.findAll(user.id);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
 
   @Get('all')
-  async findAllChats(): Promise<ChatEntity[]> {
-    return await this.chatsService.listAllChats();
+  async findAllChats(@User('id') userId: number): Promise<ChatEntity[]> {
+    return await this.chatsService.listAllChats(userId);
   }
 
   @Get('with/:userId')
@@ -175,6 +177,42 @@ export class ChatsController {
 
     this.eventEmitter.emit('chat.unmute', {
       unmuteUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async banMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: BanMemberDto,
+  ): Promise<void> {
+    const { banUserId } = dto;
+
+    await this.chatsService.banMember(id, userId, banUserId);
+
+    this.eventEmitter.emit('chat.ban', {
+      banUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/unban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async unbanMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UnbanMemberDto,
+  ): Promise<void> {
+    const { unbanUserId } = dto;
+
+    await this.chatsService.unbanMember(id, userId, unbanUserId);
+
+    this.eventEmitter.emit('chat.unban', {
+      unbanUserId,
       chatId: id,
     });
   }

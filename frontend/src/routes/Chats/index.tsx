@@ -19,8 +19,15 @@ export default function Chats() {
 
   useEffect(() => {
     socket.on("userRemoved", (id: number) => {
-      if (id === currentUser?.id)
+      if (id === currentUser?.id) {
         setChatList(chatList.filter((chat) => chat.id !== currentChat?.id));
+      }
+    });
+
+    socket.on("userBanned", (id: number) => {
+      if (id === currentUser?.id) {
+        setChatList(chatList.filter((chat) => chat.id !== currentChat?.id));
+      }
     });
   }, [chatList, setChatList, currentChat?.id, currentUser?.id]);
 

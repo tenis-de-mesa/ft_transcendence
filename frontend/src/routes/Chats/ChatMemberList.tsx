@@ -54,7 +54,9 @@ export default function ChatMemberList({
 
   useEffect(() => {
     const nonDeletedUsers = members
-      .filter((member) => !member?.user.deletedAt)
+      .filter(
+        (member) => !member?.user.deletedAt && member?.status !== "banned"
+      )
       .map((member) => member?.user);
 
     setUsers(nonDeletedUsers);
@@ -73,9 +75,18 @@ export default function ChatMemberList({
       setMembers((members) => members.filter((member) => member.userId !== id));
     });
 
+    socket.on("userBanned", (id: number) => {
+      if (id === currentUser?.id) {
+        return navigate("/chats", { replace: true });
+      }
+
+      setMembers((members) => members.filter((member) => member.userId !== id));
+    });
+
     return () => {
       socket.off("userAdded");
       socket.off("userRemoved");
+      socket.off("userBanned");
     };
   }, [currentUser?.id, navigate]);
 

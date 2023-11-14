@@ -64,9 +64,7 @@ export default function ChatContextMenu({
               </ChatContextMenuItem>
 
               <ChatContextMenuItem
-                onClick={() =>
-                  setShowCard(<ChatBanMemberCard nickname={user?.nickname} />)
-                }
+                onClick={() => setShowCard(<ChatBanMemberCard user={user} />)}
               >
                 Ban {user?.nickname}
               </ChatContextMenuItem>

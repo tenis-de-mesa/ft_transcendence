@@ -29,6 +29,8 @@ import {
   kickChatMember,
   muteChatMember,
   unmuteChatMember,
+  banChatMember,
+  unbanChatMember,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -98,6 +100,8 @@ const router = createBrowserRouter(
             <Route path=":id/kick" action={kickChatMember} />
             <Route path=":id/mute" action={muteChatMember} />
             <Route path=":id/unmute" action={unmuteChatMember} />
+            <Route path=":id/ban" action={banChatMember} />
+            <Route path=":id/unban" action={unbanChatMember} />
           </Route>
           <Route
             path="profile/:id"

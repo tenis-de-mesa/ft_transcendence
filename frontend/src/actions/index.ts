@@ -10,3 +10,5 @@ export * from "./leaveChannel";
 export * from "./kickChatMember";
 export * from "./muteChatMember";
 export * from "./unmuteChatMember";
+export * from "./banChatMember";
+export * from "./unbanChatMember";
