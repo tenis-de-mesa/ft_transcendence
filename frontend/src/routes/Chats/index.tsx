@@ -22,10 +22,6 @@ export default function Chats() {
       if (id === currentUser?.id)
         setChatList(chatList.filter((chat) => chat.id !== currentChat?.id));
     });
-
-    return () => {
-      socket.off("userRemoved");
-    };
   }, [chatList, setChatList, currentChat?.id, currentUser?.id]);
 
   return (
