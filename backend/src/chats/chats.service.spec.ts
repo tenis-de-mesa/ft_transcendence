@@ -406,10 +406,16 @@ describe('ChatsService', () => {
     it('should return all chats for a given user', async () => {
       // Arrange
       const mockChats = [TEST_CHAT];
-      jest.spyOn(chatRepository, 'find').mockResolvedValue(mockChats);
+      jest.spyOn(chatRepository, 'createQueryBuilder').mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        withDeleted: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValueOnce(mockChats),
+      } as any);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER_1);
+      const result = await chatsService.findAll(TEST_USER_ID_1);
 
       // Assert
       expect(result).toEqual(mockChats);
@@ -417,10 +423,16 @@ describe('ChatsService', () => {
 
     it('should return an empty array if no chats found', async () => {
       // Arrange
-      jest.spyOn(chatRepository, 'find').mockResolvedValue([]);
+      jest.spyOn(chatRepository, 'createQueryBuilder').mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        withDeleted: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValueOnce([]),
+      } as any);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER_1);
+      const result = await chatsService.findAll(TEST_USER_ID_1);
 
       // Assert
       expect(result).toEqual([]);

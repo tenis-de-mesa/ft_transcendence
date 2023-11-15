@@ -11,6 +11,7 @@ import {
   UserEntity,
 } from '../../src/core/entities';
 import { UsersModule } from '../../src/users/users.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('Chats', () => {
   let app: INestApplication;
@@ -19,7 +20,12 @@ describe('Chats', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmConfigModule, ChatsModule, UsersModule],
+      imports: [
+        EventEmitterModule.forRoot(),
+        TypeOrmConfigModule,
+        ChatsModule,
+        UsersModule,
+      ],
     }).compile();
     app = moduleFixture.createNestApplication();
     usersService = app.get(UsersService);
