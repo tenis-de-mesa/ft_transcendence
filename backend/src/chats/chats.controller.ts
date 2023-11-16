@@ -27,6 +27,7 @@ import {
   KickMemberDto,
   BanMemberDto,
   UnbanMemberDto,
+  UpdateMemberRoleDto,
 } from './dto';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
@@ -219,7 +220,7 @@ export class ChatsController {
   async updateMemberRole(
     @User('id') userId: number,
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: { updateUserId: number; role: ChatMemberRole },
+    @Body() dto: UpdateMemberRoleDto,
   ): Promise<void> {
     const member = await this.chatsService.updateMemberRole(id, userId, dto);
 

@@ -32,6 +32,7 @@ import {
   UnmuteMemberDto,
   BanMemberDto,
   UnbanMemberDto,
+  UpdateMemberRoleDto,
 } from './dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -592,7 +593,7 @@ export class ChatsService {
   async updateMemberRole(
     chatId: number,
     userId: number,
-    dto: { updateUserId: number; role: ChatMemberRole },
+    dto: UpdateMemberRoleDto,
   ): Promise<ChatMemberEntity> {
     const { updateUserId, role } = dto;
 
