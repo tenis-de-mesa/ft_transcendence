@@ -488,6 +488,9 @@ export class ChatsService {
     if (muteMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner cannot be muted');
     }
+    if (muteMember.status === ChatMemberStatus.MUTED) {
+      throw new BadRequestException('User is already muted');
+    }
 
     await this.chatsQueue.add(
       'unmute',
@@ -520,6 +523,9 @@ export class ChatsService {
     if (unmuteMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner is never muted');
     }
+    if (unmuteMember.status === ChatMemberStatus.ACTIVE) {
+      throw new BadRequestException('User is not muted');
+    }
 
     unmuteMember.status = ChatMemberStatus.ACTIVE;
     return await this.chatMemberRepository.save(unmuteMember);
@@ -546,6 +552,9 @@ export class ChatsService {
     if (banMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner cannot be banned');
     }
+    if (banMember.status === ChatMemberStatus.BANNED) {
+      throw new BadRequestException('User is already banned');
+    }
 
     banMember.status = ChatMemberStatus.BANNED;
     return await this.chatMemberRepository.save(banMember);
@@ -571,6 +580,9 @@ export class ChatsService {
 
     if (unbanMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner is never banned');
+    }
+    if (unbanMember.status === ChatMemberStatus.ACTIVE) {
+      throw new BadRequestException('User is not banned');
     }
 
     unbanMember.status = ChatMemberStatus.ACTIVE;
