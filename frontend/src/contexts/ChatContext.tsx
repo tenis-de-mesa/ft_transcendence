@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Chat } from "../types";
+import { Chat, ChatMember } from "../types";
 import { AuthContext } from ".";
+import { socket } from "../socket";
 
 type ChatMemberRole = "owner" | "admin" | "member";
 type ChatMemberStatus = "active" | "muted" | "banned";
@@ -27,13 +28,33 @@ export const ChatContextProvider = ({ children }) => {
   const closeCard = () => setShowCard(null);
 
   useEffect(() => {
+    socket.on("userRoleUpdated", (member: ChatMember) => {
+      if (member.userId === currentUser?.id) {
+        setUserRole(member.role);
+      }
+    });
+
+    socket.on("userMuted", (muteUserId: number) => {
+      if (muteUserId === currentUser?.id) {
+        setUserStatus("muted");
+      }
+    });
+
+    socket.on("userUnmuted", (unmuteUserId: number) => {
+      if (unmuteUserId === currentUser?.id) {
+        setUserStatus("active");
+      }
+    });
+  }, [currentUser?.id]);
+
+  useEffect(() => {
     const currentMember = currentChat?.users.find(
-      (user) => user.userId === currentUser.id
+      (user) => user.userId === currentUser?.id
     );
 
     setUserRole(currentMember?.role);
     setUserStatus(currentMember?.status);
-  }, [currentChat, currentUser.id]);
+  }, [currentChat, currentUser?.id]);
 
   return (
     <ChatContext.Provider

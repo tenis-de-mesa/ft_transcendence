@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useFetcher, useNavigate } from "react-router-dom";
 import { ChatMember } from "../../../types";
 import { AuthContext, ChatContext } from "../../../contexts";
 
@@ -25,6 +25,7 @@ export default function ChatContextMenu({
   const { userRole, setShowCard } = useContext(ChatContext);
   const { role, user } = member;
   const navigate = useNavigate();
+  const { submit } = useFetcher();
 
   return (
     <menu
@@ -68,21 +69,24 @@ export default function ChatContextMenu({
               >
                 Ban {user?.nickname}
               </ChatContextMenuItem>
-            </>
-          )}
 
-          {role === "admin" && (
-            <>
-              <ChatContextMenuItem separator={true}>
-                Revoke admin privilege
-              </ChatContextMenuItem>
-            </>
-          )}
-
-          {role === "member" && (
-            <>
-              <ChatContextMenuItem separator={true}>
-                Grant admin privilege
+              <ChatContextMenuItem
+                separator={true}
+                role="button"
+                onClick={() =>
+                  submit(
+                    {
+                      updateUserId: user?.id,
+                      role: role === "admin" ? "member" : "admin",
+                    },
+                    {
+                      action: "update-member-role",
+                      method: "POST",
+                    }
+                  )
+                }
+              >
+                {role === "admin" ? "Revoke" : "Grant"} admin privilege
               </ChatContextMenuItem>
             </>
           )}

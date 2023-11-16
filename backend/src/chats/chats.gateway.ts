@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
 import { SessionsService } from '../users/sessions/sessions.service';
 import { User } from '../core/decorators';
-import { UserEntity } from '../core/entities';
+import { ChatMemberEntity, UserEntity } from '../core/entities';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -131,6 +131,11 @@ export class ChatsGateway implements OnGatewayInit {
     const { userId, chatId } = payload;
 
     this.server.to(`chat:${chatId}`).emit('userUnbanned', userId);
+  }
+
+  @OnEvent('chat.updateMemberRole')
+  handleUpdateMemberRoleEvent(member: ChatMemberEntity) {
+    this.server.to(`chat:${member.chatId}`).emit('userRoleUpdated', member);
   }
 
   private async validate(client: Socket) {

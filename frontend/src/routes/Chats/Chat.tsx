@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
 import { FaGear } from "react-icons/fa6";
 import { Chat } from "../../types";
@@ -16,31 +16,14 @@ export default function Chat() {
   const { currentUser } = useContext(AuthContext);
   const { setCurrentChat, userRole, userStatus, setShowCard } =
     useContext(ChatContext);
-  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
-
-  useEffect(() => setIsMuted(userStatus === "muted"), [userStatus]);
 
   useEffect(() => {
     socket.emit("joinChat", chat.id);
 
-    socket.on("userMuted", (muteUserId: number) => {
-      if (muteUserId === currentUser?.id) {
-        setIsMuted(true);
-      }
-    });
-
-    socket.on("userUnmuted", (unmuteUserId: number) => {
-      if (unmuteUserId === currentUser?.id) {
-        setIsMuted(false);
-      }
-    });
-
     return () => {
       socket.emit("leaveChat", chat.id);
-      socket.off("userMuted");
-      socket.off("userUnmuted");
     };
   }, [chat, currentUser?.id]);
 
@@ -84,7 +67,7 @@ export default function Chat() {
 
           <ChatMessageInput
             disabled={
-              isMuted ||
+              userStatus === "muted" ||
               ((isBlockedByMe || isBlockedForOthers) && chat.type === "direct")
             }
           />

@@ -11,3 +11,4 @@ export * from './unmute-member.dto';
 export * from './ban-member.dto';
 export * from './unban-member.dto';
 export * from './gateway-chat-event.dto';
+export * from './update-member-role.dto';

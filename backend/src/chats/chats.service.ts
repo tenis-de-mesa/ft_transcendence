@@ -32,6 +32,7 @@ import {
   UnmuteMemberDto,
   BanMemberDto,
   UnbanMemberDto,
+  UpdateMemberRoleDto,
 } from './dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -587,6 +588,32 @@ export class ChatsService {
 
     unbanMember.status = ChatMemberStatus.ACTIVE;
     return await this.chatMemberRepository.save(unbanMember);
+  }
+
+  async updateMemberRole(
+    chatId: number,
+    userId: number,
+    dto: UpdateMemberRoleDto,
+  ): Promise<ChatMemberEntity> {
+    const { updateUserId, role } = dto;
+
+    const chat = await this.findOne(chatId);
+
+    if (chat.type !== ChatType.CHANNEL) {
+      throw new BadRequestException('Chat is not a channel');
+    }
+
+    const [_, updateMember] = await Promise.all([
+      this.getMember(chatId, userId),
+      this.getMember(chatId, updateUserId),
+    ]);
+
+    if (updateMember.role === ChatMemberRole.OWNER) {
+      throw new BadRequestException('Owner cannot be updated');
+    }
+
+    updateMember.role = role;
+    return await this.chatMemberRepository.save(updateMember);
   }
 
   mapChatsToChatsWithName(
