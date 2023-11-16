@@ -14,11 +14,11 @@ export class ChatsProcessor {
   async handleUnmute(job: Job) {
     const { chatId, userId, unmuteUserId } = job.data;
 
-    await this.chatsService.unmuteMember(chatId, userId, unmuteUserId);
+    await this.chatsService.unmuteMember(chatId, userId, { unmuteUserId });
 
     this.eventEmitter.emit('chat.unmute', {
       chatId,
-      unmuteUserId,
+      userId: unmuteUserId,
     });
   }
 }

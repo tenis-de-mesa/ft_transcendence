@@ -10,3 +10,4 @@ export * from './mute-member.dto';
 export * from './unmute-member.dto';
 export * from './ban-member.dto';
 export * from './unban-member.dto';
+export * from './gateway-chat-event.dto';

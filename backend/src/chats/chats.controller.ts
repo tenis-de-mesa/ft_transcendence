@@ -135,10 +135,10 @@ export class ChatsController {
   ): Promise<void> {
     const { kickUserId } = dto;
 
-    await this.chatsService.kickMember(id, userId, kickUserId);
+    await this.chatsService.kickMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.kick', {
-      kickUserId,
+      userId: kickUserId,
       chatId: id,
     });
   }
@@ -154,7 +154,7 @@ export class ChatsController {
     await this.chatsService.muteMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.mute', {
-      ...dto,
+      userId: dto.muteUserId,
       chatId: id,
     });
   }
@@ -169,10 +169,10 @@ export class ChatsController {
   ): Promise<void> {
     const { unmuteUserId } = dto;
 
-    await this.chatsService.unmuteMember(id, userId, unmuteUserId);
+    await this.chatsService.unmuteMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.unmute', {
-      unmuteUserId,
+      userId: unmuteUserId,
       chatId: id,
     });
   }
@@ -187,10 +187,10 @@ export class ChatsController {
   ): Promise<void> {
     const { banUserId } = dto;
 
-    await this.chatsService.banMember(id, userId, banUserId);
+    await this.chatsService.banMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.ban', {
-      banUserId,
+      userId: banUserId,
       chatId: id,
     });
   }
@@ -205,10 +205,10 @@ export class ChatsController {
   ): Promise<void> {
     const { unbanUserId } = dto;
 
-    await this.chatsService.unbanMember(id, userId, unbanUserId);
+    await this.chatsService.unbanMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.unban', {
-      unbanUserId,
+      userId: unbanUserId,
       chatId: id,
     });
   }

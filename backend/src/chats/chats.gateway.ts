@@ -15,6 +15,7 @@ import { UserEntity } from '../core/entities';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
 import { OnEvent } from '@nestjs/event-emitter';
+import { GatewayChatEventDto } from './dto';
 
 interface NewChatMessage {
   chatId: number;
@@ -98,38 +99,38 @@ export class ChatsGateway implements OnGatewayInit {
   }
 
   @OnEvent('chat.kick')
-  handleKickEvent(payload: { kickUserId: number; chatId: number }) {
-    const { kickUserId, chatId } = payload;
+  handleKickEvent(payload: GatewayChatEventDto) {
+    const { userId, chatId } = payload;
 
-    this.server.to(`chat:${chatId}`).emit('userRemoved', kickUserId);
+    this.server.to(`chat:${chatId}`).emit('userRemoved', userId);
   }
 
   @OnEvent('chat.mute')
-  handleMuteEvent(payload: { muteUserId: number; chatId: number }) {
-    const { muteUserId, chatId } = payload;
+  handleMuteEvent(payload: GatewayChatEventDto) {
+    const { userId, chatId } = payload;
 
-    this.server.to(`chat:${chatId}`).emit('userMuted', muteUserId);
+    this.server.to(`chat:${chatId}`).emit('userMuted', userId);
   }
 
   @OnEvent('chat.unmute')
-  handleUnmuteEvent(payload: { unmuteUserId: number; chatId: number }) {
-    const { unmuteUserId, chatId } = payload;
+  handleUnmuteEvent(payload: GatewayChatEventDto) {
+    const { userId, chatId } = payload;
 
-    this.server.to(`chat:${chatId}`).emit('userUnmuted', unmuteUserId);
+    this.server.to(`chat:${chatId}`).emit('userUnmuted', userId);
   }
 
   @OnEvent('chat.ban')
-  handleBanEvent(payload: { banUserId: number; chatId: number }) {
-    const { banUserId, chatId } = payload;
+  handleBanEvent(payload: GatewayChatEventDto) {
+    const { userId, chatId } = payload;
 
-    this.server.to(`chat:${chatId}`).emit('userBanned', banUserId);
+    this.server.to(`chat:${chatId}`).emit('userBanned', userId);
   }
 
   @OnEvent('chat.unban')
-  handleUnbanEvent(payload: { unbanUserId: number; chatId: number }) {
-    const { unbanUserId, chatId } = payload;
+  handleUnbanEvent(payload: GatewayChatEventDto) {
+    const { userId, chatId } = payload;
 
-    this.server.to(`chat:${chatId}`).emit('userUnbanned', unbanUserId);
+    this.server.to(`chat:${chatId}`).emit('userUnbanned', userId);
   }
 
   private async validate(client: Socket) {

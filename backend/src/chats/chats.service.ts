@@ -28,6 +28,10 @@ import {
   JoinChannelDto,
   LeaveChannelDto,
   MuteMemberDto,
+  KickMemberDto,
+  UnmuteMemberDto,
+  BanMemberDto,
+  UnbanMemberDto,
 } from './dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -441,8 +445,10 @@ export class ChatsService {
   async kickMember(
     chatId: number,
     userId: number,
-    kickUserId: number,
+    dto: KickMemberDto,
   ): Promise<ChatMemberEntity> {
+    const { kickUserId } = dto;
+
     const chat = await this.findOne(chatId);
 
     if (chat.type !== ChatType.CHANNEL) {
@@ -496,8 +502,10 @@ export class ChatsService {
   async unmuteMember(
     chatId: number,
     userId: number,
-    unmuteUserId: number,
+    dto: UnmuteMemberDto,
   ): Promise<ChatMemberEntity> {
+    const { unmuteUserId } = dto;
+
     const chat = await this.findOne(chatId);
 
     if (chat.type !== ChatType.CHANNEL) {
@@ -520,8 +528,10 @@ export class ChatsService {
   async banMember(
     chatId: number,
     userId: number,
-    banUserId: number,
+    dto: BanMemberDto,
   ): Promise<ChatMemberEntity> {
+    const { banUserId } = dto;
+
     const chat = await this.findOne(chatId);
 
     if (chat.type !== ChatType.CHANNEL) {
@@ -544,8 +554,10 @@ export class ChatsService {
   async unbanMember(
     chatId: number,
     userId: number,
-    unbanUserId: number,
+    dto: UnbanMemberDto,
   ): Promise<ChatMemberEntity> {
+    const { unbanUserId } = dto;
+
     const chat = await this.findOne(chatId);
 
     if (chat.type !== ChatType.CHANNEL) {
