@@ -17,31 +17,14 @@ export default function Chat() {
   const { currentUser } = useContext(AuthContext);
   const { setCurrentChat, userRole, userStatus, showCard } =
     useContext(ChatContext);
-  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
-
-  useEffect(() => setIsMuted(userStatus === "muted"), [userStatus]);
 
   useEffect(() => {
     socket.emit("joinChat", chat.id);
 
-    socket.on("userMuted", (muteUserId: number) => {
-      if (muteUserId === currentUser?.id) {
-        setIsMuted(true);
-      }
-    });
-
-    socket.on("userUnmuted", (unmuteUserId: number) => {
-      if (unmuteUserId === currentUser?.id) {
-        setIsMuted(false);
-      }
-    });
-
     return () => {
       socket.emit("leaveChat", chat.id);
-      socket.off("userMuted");
-      socket.off("userUnmuted");
     };
   }, [chat, currentUser?.id]);
 
@@ -106,7 +89,7 @@ export default function Chat() {
 
           <ChatMessageInput
             disabled={
-              isMuted ||
+              userStatus === "muted" ||
               ((isBlockedByMe || isBlockedForOthers) && chat.type === "direct")
             }
           />

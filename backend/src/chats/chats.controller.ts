@@ -212,4 +212,17 @@ export class ChatsController {
       chatId: id,
     });
   }
+
+  @Post(':id/update-member-role')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async updateMemberRole(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: { updateUserId: number; role: ChatMemberRole },
+  ): Promise<void> {
+    const member = await this.chatsService.updateMemberRole(id, userId, dto);
+
+    this.eventEmitter.emit('chat.updateMemberRole', member);
+  }
 }

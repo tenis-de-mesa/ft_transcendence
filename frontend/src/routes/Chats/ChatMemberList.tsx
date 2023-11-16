@@ -83,10 +83,21 @@ export default function ChatMemberList({
       setMembers((members) => members.filter((member) => member.userId !== id));
     });
 
+    socket.on("userRoleUpdated", (member: ChatMember) => {
+      setMembers((members) => {
+        const index = members.findIndex((m) => m.userId === member.userId);
+
+        members[index] = member;
+
+        return [...members];
+      });
+    });
+
     return () => {
       socket.off("userAdded");
       socket.off("userRemoved");
       socket.off("userBanned");
+      socket.off("userRoleUpdated");
     };
   }, [currentUser?.id, navigate]);
 

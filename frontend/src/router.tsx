@@ -31,6 +31,7 @@ import {
   unmuteChatMember,
   banChatMember,
   unbanChatMember,
+  updateChatMemberRole,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -102,6 +103,10 @@ const router = createBrowserRouter(
             <Route path=":id/unmute" action={unmuteChatMember} />
             <Route path=":id/ban" action={banChatMember} />
             <Route path=":id/unban" action={unbanChatMember} />
+            <Route
+              path=":id/update-member-role"
+              action={updateChatMemberRole}
+            />
           </Route>
           <Route
             path="profile/:id"
