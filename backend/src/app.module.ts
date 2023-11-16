@@ -24,8 +24,8 @@ import { BullModule } from '@nestjs/bull';
     ScheduleModule.forRoot(),
     BullModule.forRoot({
       redis: {
-        host: 'redis',
-        port: 6379,
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
       },
     }),
     AppConfigModule,
