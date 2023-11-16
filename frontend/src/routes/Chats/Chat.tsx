@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useLoaderData } from "react-router-dom";
-import { FiLock, FiUnlock } from "react-icons/fi";
+import { FaGear } from "react-icons/fa6";
 import { Chat } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
 import { Card, Typography, Button } from "../../components";
 import { socket } from "../../socket";
 
-import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
 import ChatMessageInput from "./ChatMessageInput";
+import ChatSettingsCard from "./ChatSettingsCard";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
@@ -71,10 +71,11 @@ export default function Chat() {
           {isAdmin && chat.access !== "private" && (
             <Button
               className="absolute right-[16px]"
-              IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
+              IconOnly={<FaGear />}
+              title="Settings"
               size="sm"
               variant="info"
-              onClick={() => setShowCard(<ChatChangePasswordCard />)}
+              onClick={() => setShowCard(<ChatSettingsCard />)}
             ></Button>
           )}
         </Card.Title>
