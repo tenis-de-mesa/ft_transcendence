@@ -151,14 +151,10 @@ export class ChatsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: MuteMemberDto,
   ): Promise<void> {
-    const { muteUserId, muteDuration } = dto;
-
-    await this.chatsService.muteMember(id, userId, muteUserId);
+    await this.chatsService.muteMember(id, userId, dto);
 
     this.eventEmitter.emit('chat.mute', {
-      userId,
-      muteUserId,
-      muteDuration,
+      ...dto,
       chatId: id,
     });
   }

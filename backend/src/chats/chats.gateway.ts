@@ -105,24 +105,14 @@ export class ChatsGateway implements OnGatewayInit {
   }
 
   @OnEvent('chat.mute')
-  handleMuteEvent(payload: {
-    userId: number;
-    muteUserId: number;
-    muteDuration: number;
-    chatId: number;
-  }) {
-    const { userId, muteUserId, muteDuration, chatId } = payload;
+  handleMuteEvent(payload: { muteUserId: number; chatId: number }) {
+    const { muteUserId, chatId } = payload;
 
     this.server.to(`chat:${chatId}`).emit('userMuted', muteUserId);
-
-    setTimeout(() => {
-      this.chatService.unmuteMember(chatId, userId, muteUserId);
-      this.server.to(`chat:${chatId}`).emit('userUnmuted', muteUserId);
-    }, muteDuration);
   }
 
   @OnEvent('chat.unmute')
-  handleUnuteEvent(payload: { unmuteUserId: number; chatId: number }) {
+  handleUnmuteEvent(payload: { unmuteUserId: number; chatId: number }) {
     const { unmuteUserId, chatId } = payload;
 
     this.server.to(`chat:${chatId}`).emit('userUnmuted', unmuteUserId);

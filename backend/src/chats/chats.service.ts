@@ -27,7 +27,10 @@ import {
   ChangePasswordDto,
   JoinChannelDto,
   LeaveChannelDto,
+  MuteMemberDto,
 } from './dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class ChatsService {
@@ -43,6 +46,9 @@ export class ChatsService {
 
     @InjectRepository(ChatMemberEntity)
     private readonly chatMemberRepository: Repository<ChatMemberEntity>,
+
+    @InjectQueue('chats')
+    private readonly chatsQueue: Queue,
   ) {}
 
   async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
@@ -162,7 +168,7 @@ export class ChatsService {
       })
       .withDeleted();
 
-    return query.getMany();
+    return await query.getMany();
   }
 
   /**
@@ -196,7 +202,7 @@ export class ChatsService {
       .setParameter('banned', ChatMemberStatus.BANNED)
       .withDeleted();
 
-    return query.getMany();
+    return await query.getMany();
   }
 
   async update(id: number, dto: UpdateChatDto): Promise<void> {
@@ -458,8 +464,10 @@ export class ChatsService {
   async muteMember(
     chatId: number,
     userId: number,
-    muteUserId: number,
+    dto: MuteMemberDto,
   ): Promise<ChatMemberEntity> {
+    const { muteUserId, muteDuration } = dto;
+
     const chat = await this.findOne(chatId);
 
     if (chat.type !== ChatType.CHANNEL) {
@@ -474,6 +482,12 @@ export class ChatsService {
     if (muteMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner cannot be muted');
     }
+
+    await this.chatsQueue.add(
+      'unmute',
+      { chatId, userId, unmuteUserId: muteUserId },
+      { delay: muteDuration },
+    );
 
     muteMember.status = ChatMemberStatus.MUTED;
     return await this.chatMemberRepository.save(muteMember);
