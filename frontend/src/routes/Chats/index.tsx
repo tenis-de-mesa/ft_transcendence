@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useLoaderData } from "react-router-dom";
-import { Card, Typography } from "../../components";
+import { Card, Overlay, Typography } from "../../components";
 import { Chat } from "../../types";
 import { socket } from "../../socket";
 import { AuthContext, ChatContext } from "../../contexts";
@@ -10,7 +10,7 @@ import NewChannelButton from "./NewChannelButton";
 export default function Chats() {
   const chats = useLoaderData() as Chat[];
   const { currentUser } = useContext(AuthContext);
-  const { currentChat } = useContext(ChatContext);
+  const { currentChat, showCard } = useContext(ChatContext);
   const [chatList, setChatList] = useState<Chat[]>([]);
 
   useEffect(() => {
@@ -60,6 +60,13 @@ export default function Chats() {
       <div className="w-5/6 h-full">
         <Outlet />
       </div>
+
+      {showCard && (
+        <>
+          <Overlay />
+          {showCard}
+        </>
+      )}
     </div>
   );
 }

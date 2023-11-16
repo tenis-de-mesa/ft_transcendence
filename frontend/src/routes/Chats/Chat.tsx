@@ -1,12 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { FiLock, FiUnlock } from "react-icons/fi";
-import { Chat, User } from "../../types";
+import { Chat } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
 import { Card, Typography, Button } from "../../components";
 import { socket } from "../../socket";
 
-import ChatProfileCard from "./ChatProfileCard";
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
@@ -15,7 +14,7 @@ import ChatMessageInput from "./ChatMessageInput";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userRole, userStatus, showCard } =
+  const { setCurrentChat, userRole, userStatus, setShowCard } =
     useContext(ChatContext);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -44,10 +43,6 @@ export default function Chat() {
       socket.off("userUnmuted");
     };
   }, [chat, currentUser?.id]);
-
-  const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
-  const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
-  const [user, setUser] = useState<User>(null);
 
   const isAdmin = userRole === "owner" || userRole === "admin";
   const members = chat.users.map((user) => user.userId);
@@ -79,30 +74,12 @@ export default function Chat() {
               IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
               size="sm"
               variant="info"
-              onClick={() => setIsChangePassCardOpen(!isChangePassCardOpen)}
+              onClick={() => setShowCard(<ChatChangePasswordCard />)}
             ></Button>
           )}
         </Card.Title>
         <Card.Body position="left" className="pt-0 h-5/6">
-          {isProfileCardOpen && (
-            <ChatProfileCard
-              user={user}
-              handleClose={() => setIsProfileCardOpen(false)}
-            />
-          )}
-
-          {isChangePassCardOpen && (
-            <ChatChangePasswordCard
-              handleClose={() => setIsChangePassCardOpen(false)}
-            />
-          )}
-
-          <ChatMessages
-            handleClick={(user) => {
-              setUser(user);
-              setIsProfileCardOpen(true);
-            }}
-          />
+          <ChatMessages />
 
           <ChatMessageInput
             disabled={
@@ -116,8 +93,6 @@ export default function Chat() {
       {chat.type === "channel" && (
         <ChatMemberList initialMembers={chat.users} />
       )}
-
-      {showCard}
     </div>
   );
 }

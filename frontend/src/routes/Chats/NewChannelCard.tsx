@@ -2,11 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { Form } from "react-router-dom";
 import { User } from "../../types";
-import { AuthContext } from "../../contexts";
-import { Button, Card, Hr, Input, Overlay, Typography } from "../../components";
+import { AuthContext, ChatContext } from "../../contexts";
+import { Button, Card, Hr, Input, Typography } from "../../components";
 
-export default function NewChannelCard({ onClose }) {
+export default function NewChannelCard() {
   const { currentUser } = useContext(AuthContext);
+  const { closeCard } = useContext(ChatContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [password, setPassword] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
@@ -25,7 +26,7 @@ export default function NewChannelCard({ onClose }) {
 
   // Close dialog, clear search and selected users on submit
   const handleNewChannelSubmit = () => {
-    onClose();
+    closeCard();
     setSearchTerm("");
     setSelectedUsersId([]);
     setHasPassword(false);
@@ -52,23 +53,8 @@ export default function NewChannelCard({ onClose }) {
     );
   }, [searchTerm, users]);
 
-  // Add event listener to close create channel card when clicking outside of it
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (!(e.target as Element).closest("#create-channel-card")) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [onClose]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="create-channel-card"
         className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
@@ -82,7 +68,7 @@ export default function NewChannelCard({ onClose }) {
               variant="info"
               size="sm"
               IconOnly={<FiX />}
-              onClick={onClose}
+              onClick={closeCard}
             />
           </div>
         </Card.Title>

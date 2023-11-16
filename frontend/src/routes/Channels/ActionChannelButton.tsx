@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { Link, useFetcher } from "react-router-dom";
 import { FiLock } from "react-icons/fi";
 import { Alert, Badge, Button } from "../../components";
+import { ChatContext } from "../../contexts";
 
 import JoinChannelCard from "./JoinChannelCard";
 import LeaveChannelCard from "./LeaveChannelCard";
@@ -19,9 +20,8 @@ export default function ActionChannelButton({
   isOwner,
   isMember,
 }: ActionChannelButtonProps) {
+  const { setShowCard } = useContext(ChatContext);
   const { Form, state, data: error } = useFetcher();
-  const [isJoinCardOpen, setIsJoinCardOpen] = useState(false);
-  const [isLeaveCardOpen, setIsLeaveCardOpen] = useState(false);
 
   return (
     <>
@@ -36,17 +36,10 @@ export default function ActionChannelButton({
           <Button
             variant="error"
             size="sm"
-            onClick={() => setIsLeaveCardOpen(true)}
+            onClick={() => setShowCard(<LeaveChannelCard id={id} />)}
           >
             Leave
           </Button>
-
-          {isLeaveCardOpen && (
-            <LeaveChannelCard
-              id={id}
-              handleClose={() => setIsLeaveCardOpen(false)}
-            />
-          )}
         </>
       ) : access == "public" ? (
         <Form action={`${id}/join`} method="POST">
@@ -60,17 +53,10 @@ export default function ActionChannelButton({
             variant="info"
             size="sm"
             TrailingIcon={<FiLock />}
-            onClick={() => setIsJoinCardOpen(true)}
+            onClick={() => setShowCard(<JoinChannelCard id={id} />)}
           >
             Join
           </Button>
-
-          {isJoinCardOpen && (
-            <JoinChannelCard
-              id={id}
-              handleClose={() => setIsJoinCardOpen(false)}
-            />
-          )}
         </>
       )}
 

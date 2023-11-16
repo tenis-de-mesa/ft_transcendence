@@ -1,37 +1,19 @@
-import { useEffect } from "react";
-import { Alert, Button, Card, Overlay, Typography } from "../../components";
+import { useContext } from "react";
+import { Alert, Button, Card, Typography } from "../../components";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
+import { ChatContext } from "../../contexts";
 
 type LeaveChannelCardProps = {
   id: number;
-  handleClose: () => void;
 };
 
-export default function LeaveChannelCard({
-  id,
-  handleClose,
-}: LeaveChannelCardProps) {
+export default function LeaveChannelCard({ id }: LeaveChannelCardProps) {
+  const { closeCard } = useContext(ChatContext);
   const { Form, state, data: error } = useFetcher();
-
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#leave-channel-card")) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [handleClose]);
 
   return (
     <>
-      <Overlay />
-
       <Card
         id="leave-channel-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 z-[1001] min-w-[27rem]"
@@ -47,7 +29,7 @@ export default function LeaveChannelCard({
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={handleClose}
+            onClick={closeCard}
           ></Button>
         </Card.Title>
         <Card.Body position="left">

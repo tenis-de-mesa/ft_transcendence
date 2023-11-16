@@ -1,17 +1,8 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
-
-import {
-  Card,
-  Typography,
-  Button,
-  Input,
-  Hr,
-  Alert,
-  Overlay,
-} from "../../components";
-import ChatContext from "../../contexts/ChatContext";
+import { ChatContext } from "../../contexts/";
+import { Card, Typography, Button, Input, Hr, Alert } from "../../components";
 
 const emptyForm = {
   currentPassword: "",
@@ -19,14 +10,8 @@ const emptyForm = {
   confirmPassword: "",
 };
 
-type ChatChangePasswordCardProps = {
-  handleClose: () => void;
-};
-
-export default function ChatChangePasswordCard({
-  handleClose,
-}: ChatChangePasswordCardProps) {
-  const { currentChat } = useContext(ChatContext);
+export default function ChatChangePasswordCard() {
+  const { currentChat, closeCard } = useContext(ChatContext);
   const { Form, data: result, state } = useFetcher();
 
   const [passwordForm, setPasswordForm] = useState(emptyForm);
@@ -54,26 +39,8 @@ export default function ChatChangePasswordCard({
     });
   };
 
-  // Add event listener to close change password dialog when clicking outside of it
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#change-password-card")) {
-        setPasswordForm(emptyForm);
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [handleClose]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="change-password-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2 z-[1001] min-w-[27rem] dark:bg-gray-900"
@@ -86,7 +53,7 @@ export default function ChatChangePasswordCard({
             IconOnly={<FiX />}
             size="md"
             variant="info"
-            onClick={handleClose}
+            onClick={closeCard}
           />
         </Card.Title>
         <Card.Body>

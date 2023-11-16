@@ -1,8 +1,8 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { ChatContext } from "../../contexts";
-import { Button, Card, Overlay, Typography } from "../../components";
+import { Button, Card, Typography } from "../../components";
 import { User } from "../../types";
 
 type ChatBanMemberCardProps = {
@@ -10,29 +10,12 @@ type ChatBanMemberCardProps = {
 };
 
 export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
-  const { setShowCard } = useContext(ChatContext);
+  const { closeCard } = useContext(ChatContext);
   // TODO: Retrieve errors
   const { Form } = useFetcher();
 
-  const handleClose = () => setShowCard(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#ban-member-card")) {
-        setShowCard(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [setShowCard]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="ban-member-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2 z-[1001] max-w-[27rem] dark:bg-gray-900"
@@ -48,7 +31,7 @@ export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={handleClose}
+            onClick={closeCard}
           ></Button>
         </Card.Title>
         <Card.Body className="space-y-4">
@@ -59,7 +42,7 @@ export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
           </Typography>
         </Card.Body>
         <Card.Footer className="flex justify-end items-center gap-3">
-          <div onClick={handleClose}>
+          <div onClick={closeCard}>
             <Typography
               variant="md"
               className="cursor-pointer select-none hover:decoration-solid hover:underline"
@@ -67,7 +50,7 @@ export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="ban" method="POST" onSubmit={handleClose}>
+          <Form action="ban" method="POST" onSubmit={closeCard}>
             <input type="hidden" name="banUserId" value={user?.id} />
             <Button variant="error">
               <Typography variant="md" customWeight="bold">
