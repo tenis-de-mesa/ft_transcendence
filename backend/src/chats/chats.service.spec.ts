@@ -14,6 +14,7 @@ import {
 } from '../core/entities';
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bull';
 
 describe('ChatsService', () => {
   let module: TestingModule;
@@ -30,6 +31,10 @@ describe('ChatsService', () => {
   const TEST_USER_2 = new UserEntity({ id: TEST_USER_ID_2 } as UserEntity);
   const TEST_CHAT = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
   const TEST_MESSAGE_CONTENT = 'Hello World';
+
+  const mockQueue = {
+    add: jest.fn(),
+  };
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -50,6 +55,10 @@ describe('ChatsService', () => {
         {
           provide: getRepositoryToken(ChatMemberEntity),
           useClass: Repository,
+        },
+        {
+          provide: getQueueToken('chats'),
+          useValue: mockQueue,
         },
       ],
     }).compile();

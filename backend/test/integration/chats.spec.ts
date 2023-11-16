@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { ChatsModule } from '../../src/chats/chats.module';
@@ -12,33 +11,44 @@ import {
 } from '../../src/core/entities';
 import { UsersModule } from '../../src/users/users.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule, getQueueToken } from '@nestjs/bull';
 
 describe('Chats', () => {
-  let app: INestApplication;
+  let moduleRef: TestingModule;
   let usersService: UsersService;
   let chatsService: ChatsService;
 
+  const mockQueue = {
+    add: jest.fn(),
+  };
+
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    jest.resetAllMocks();
+    moduleRef = await Test.createTestingModule({
       imports: [
         EventEmitterModule.forRoot(),
+        BullModule.registerQueue({
+          name: 'chats',
+        }),
         TypeOrmConfigModule,
         ChatsModule,
         UsersModule,
       ],
-    }).compile();
-    app = moduleFixture.createNestApplication();
-    usersService = app.get(UsersService);
-    chatsService = app.get(ChatsService);
-    await app.init();
+    })
+      .overrideProvider(getQueueToken('chats'))
+      .useValue(mockQueue)
+      .compile();
+
+    usersService = moduleRef.get(UsersService);
+    chatsService = moduleRef.get(ChatsService);
   });
 
   afterEach(async () => {
-    await app.close();
+    await moduleRef.close();
   });
 
   it('should be defined', async () => {
-    expect(app).toBeDefined();
+    expect(moduleRef).toBeDefined();
     expect(usersService).toBeDefined();
     expect(chatsService).toBeDefined();
   });
