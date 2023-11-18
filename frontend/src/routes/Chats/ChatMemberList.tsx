@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { Card, Typography } from "../../components";
+import { Card, Typography, UserWithStatus } from "../../components";
 import { ChatMember, User } from "../../types";
 import { socket } from "../../socket";
-
-import ChatMemberItem from "./ChatMemberItem";
 
 type ChatMemberListProps = {
   members: ChatMember[];
@@ -43,7 +41,7 @@ export default function ChatMemberList({ members }: ChatMemberListProps) {
       <Card.Body>
         <div className="flex flex-col gap-2">
           {users.map((user) => (
-            <ChatMemberItem key={user.id} user={user} />
+            <UserWithStatus key={user.id} user={user} />
           ))}
         </div>
       </Card.Body>
