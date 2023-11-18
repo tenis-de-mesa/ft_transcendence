@@ -12,7 +12,6 @@ describe('AppController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-
       .overrideGuard(AuthenticatedGuard)
       .useValue(mock_Guard)
       .overrideGuard(IntraAuthGuard)

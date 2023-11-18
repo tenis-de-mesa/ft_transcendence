@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
@@ -21,22 +22,31 @@ import {
   ChangePasswordDto,
   JoinChannelDto,
   LeaveChannelDto,
+  MuteMemberDto,
+  UnmuteMemberDto,
+  KickMemberDto,
+  BanMemberDto,
+  UnbanMemberDto,
+  UpdateMemberRoleDto,
 } from './dto';
 
 @UseGuards(AuthenticatedGuard, ChannelRoleGuard)
 @Controller('chats')
 export class ChatsController {
-  constructor(private readonly chatsService: ChatsService) {}
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly chatsService: ChatsService,
+  ) {}
 
   @Get()
   async findAll(@User() user: UserEntity): Promise<ChatWithName[]> {
-    const chats = await this.chatsService.findAll(user);
+    const chats = await this.chatsService.findAll(user.id);
     return this.chatsService.mapChatsToChatsWithName(chats, user);
   }
 
   @Get('all')
-  async findAllChats(): Promise<ChatEntity[]> {
-    return await this.chatsService.listAllChats();
+  async findAllChats(@User('id') userId: number): Promise<ChatEntity[]> {
+    return await this.chatsService.listAllChats(userId);
   }
 
   @Get('with/:userId')
@@ -114,5 +124,106 @@ export class ChatsController {
   ): Promise<{ role: ChatMemberRole }> {
     const role = await this.chatsService.getMemberRole(id, userId);
     return { role };
+  }
+
+  @Post(':id/kick')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async kickMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: KickMemberDto,
+  ): Promise<void> {
+    const { kickUserId } = dto;
+
+    await this.chatsService.kickMember(id, userId, dto);
+
+    this.eventEmitter.emit('chat.kick', {
+      userId: kickUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/mute')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async muteMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: MuteMemberDto,
+  ): Promise<void> {
+    await this.chatsService.muteMember(id, userId, dto);
+
+    this.eventEmitter.emit('chat.mute', {
+      userId: dto.muteUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/unmute')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async unmuteMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UnmuteMemberDto,
+  ): Promise<void> {
+    const { unmuteUserId } = dto;
+
+    await this.chatsService.unmuteMember(id, userId, dto);
+
+    this.eventEmitter.emit('chat.unmute', {
+      userId: unmuteUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async banMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: BanMemberDto,
+  ): Promise<void> {
+    const { banUserId } = dto;
+
+    await this.chatsService.banMember(id, userId, dto);
+
+    this.eventEmitter.emit('chat.ban', {
+      userId: banUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/unban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async unbanMember(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UnbanMemberDto,
+  ): Promise<void> {
+    const { unbanUserId } = dto;
+
+    await this.chatsService.unbanMember(id, userId, dto);
+
+    this.eventEmitter.emit('chat.unban', {
+      userId: unbanUserId,
+      chatId: id,
+    });
+  }
+
+  @Post(':id/update-member-role')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async updateMemberRole(
+    @User('id') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateMemberRoleDto,
+  ): Promise<void> {
+    const member = await this.chatsService.updateMemberRole(id, userId, dto);
+
+    this.eventEmitter.emit('chat.updateMemberRole', member);
   }
 }

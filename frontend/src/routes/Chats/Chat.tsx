@@ -15,12 +15,10 @@ import ChatMessageInput from "./ChatMessageInput";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat } = useContext(ChatContext);
+  const { setCurrentChat, userRole, userStatus, showCard } =
+    useContext(ChatContext);
 
-  // When a new chat is selected, update the current chat
-  useEffect(() => {
-    setCurrentChat(chat);
-  }, [chat, setCurrentChat]);
+  useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
 
   useEffect(() => {
     socket.emit("joinChat", chat.id);
@@ -28,15 +26,13 @@ export default function Chat() {
     return () => {
       socket.emit("leaveChat", chat.id);
     };
-  }, [chat.id]);
+  }, [chat, currentUser?.id]);
 
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
   const [user, setUser] = useState<User>(null);
-  const [userRole, setUserRole] = useState(null);
 
   const isAdmin = userRole === "owner" || userRole === "admin";
-  const chatId = chat.id;
   const members = chat.users.map((user) => user.userId);
 
   const isBlockedForOthers =
@@ -45,27 +41,6 @@ export default function Chat() {
   const isBlockedByMe =
     currentUser.blockedUsers.find((user) => members.includes(user)) !==
     undefined;
-
-  useEffect(() => {
-    const fetchChannelRole = async (chatId: number) => {
-      try {
-        const response = await fetch(
-          `http://localhost:3001/chats/${chatId}/role`,
-          {
-            credentials: "include",
-          }
-        );
-        const data = await response.json();
-        setUserRole(data.role);
-      } catch (error) {
-        console.error("Error fetching channel role: ", error);
-      }
-    };
-
-    fetchChannelRole(chatId).catch((error) =>
-      console.error("Error setting channel role:", error)
-    );
-  }, [chatId]);
 
   return (
     <div className="flex h-full gap-3">
@@ -113,14 +88,19 @@ export default function Chat() {
           />
 
           <ChatMessageInput
-            isBlocked={
-              (isBlockedByMe || isBlockedForOthers) && chat.type === "direct"
+            disabled={
+              userStatus === "muted" ||
+              ((isBlockedByMe || isBlockedForOthers) && chat.type === "direct")
             }
           />
         </Card.Body>
       </Card>
 
-      {chat.type === "channel" && <ChatMemberList members={chat.users} />}
+      {chat.type === "channel" && (
+        <ChatMemberList initialMembers={chat.users} />
+      )}
+
+      {showCard}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from '../core/entities';
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bull';
 
 describe('ChatsService', () => {
   let module: TestingModule;
@@ -30,6 +31,10 @@ describe('ChatsService', () => {
   const TEST_USER_2 = new UserEntity({ id: TEST_USER_ID_2 } as UserEntity);
   const TEST_CHAT = new ChatEntity({ id: TEST_CHAT_ID } as ChatEntity);
   const TEST_MESSAGE_CONTENT = 'Hello World';
+
+  const mockQueue = {
+    add: jest.fn(),
+  };
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -50,6 +55,10 @@ describe('ChatsService', () => {
         {
           provide: getRepositoryToken(ChatMemberEntity),
           useClass: Repository,
+        },
+        {
+          provide: getQueueToken('chats'),
+          useValue: mockQueue,
         },
       ],
     }).compile();
@@ -406,10 +415,16 @@ describe('ChatsService', () => {
     it('should return all chats for a given user', async () => {
       // Arrange
       const mockChats = [TEST_CHAT];
-      jest.spyOn(chatRepository, 'find').mockResolvedValue(mockChats);
+      jest.spyOn(chatRepository, 'createQueryBuilder').mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        withDeleted: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValueOnce(mockChats),
+      } as any);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER_1);
+      const result = await chatsService.findAll(TEST_USER_ID_1);
 
       // Assert
       expect(result).toEqual(mockChats);
@@ -417,10 +432,16 @@ describe('ChatsService', () => {
 
     it('should return an empty array if no chats found', async () => {
       // Arrange
-      jest.spyOn(chatRepository, 'find').mockResolvedValue([]);
+      jest.spyOn(chatRepository, 'createQueryBuilder').mockReturnValue({
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        withDeleted: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValueOnce([]),
+      } as any);
 
       // Act
-      const result = await chatsService.findAll(TEST_USER_1);
+      const result = await chatsService.findAll(TEST_USER_ID_1);
 
       // Assert
       expect(result).toEqual([]);
