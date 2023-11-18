@@ -2,7 +2,11 @@ import React, { FC, InputHTMLAttributes } from "react";
 import classNames from "classnames";
 import { Typography } from "./Typography";
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.DetailedHTMLProps<
+    InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > {
   type: "text" | "email" | "password";
   value: string;
   label?: string;
@@ -12,7 +16,6 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   LeadingIcon?: React.ReactElement;
   TrailingIcon?: React.ReactElement;
-  disabled?: boolean;
 }
 
 export const Input: FC<InputProps> = ({
@@ -25,7 +28,6 @@ export const Input: FC<InputProps> = ({
   helperText,
   LeadingIcon,
   TrailingIcon,
-  disabled,
   ...props
 }) => {
   return (
@@ -68,9 +70,9 @@ export const Input: FC<InputProps> = ({
             className={classNames(
               "flex items-center h-11 text-lg text-gray-500 pl-3.5 pr-3 border border-r-0 rounded-l-lg border-gray-300 dark:border-gray-500",
               {
-                "bg-gray-50 dark:bg-gray-700": disabled,
-                "dark:bg-gray-800": !disabled,
-              },
+                "bg-gray-50 dark:bg-gray-700": props.disabled,
+                "dark:bg-gray-800": !props.disabled,
+              }
             )}
           >
             {leadingText}
@@ -96,11 +98,10 @@ export const Input: FC<InputProps> = ({
                 !error,
               "border-error-400 focus:ring-2 focus:border-error-400 focus:ring-error-500":
                 error,
-              "bg-white dark:bg-gray-800": !disabled,
-              "bg-gray-50 dark:bg-gray-700": disabled,
-            },
+              "bg-white dark:bg-gray-800": !props.disabled,
+              "bg-gray-50 dark:bg-gray-700": props.disabled,
+            }
           )}
-          disabled={disabled}
         />
       </div>
 

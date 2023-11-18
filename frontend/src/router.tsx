@@ -26,6 +26,12 @@ import {
   removeChannelPassword,
   joinChannel,
   leaveChannel,
+  kickChatMember,
+  muteChatMember,
+  unmuteChatMember,
+  banChatMember,
+  unbanChatMember,
+  updateChatMemberRole,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -76,11 +82,7 @@ const router = createBrowserRouter(
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"
-            element={
-              <ChatContextProvider>
-                <Chats />
-              </ChatContextProvider>
-            }
+            element={<ChatContextProvider children={<Chats />} />}
             loader={loadChatList}
             action={createChat}
           >
@@ -96,6 +98,15 @@ const router = createBrowserRouter(
             <Route path=":id/set-password" action={setChannelPassword} />
             <Route path=":id/change-password" action={changeChannelPassword} />
             <Route path=":id/remove-password" action={removeChannelPassword} />
+            <Route path=":id/kick" action={kickChatMember} />
+            <Route path=":id/mute" action={muteChatMember} />
+            <Route path=":id/unmute" action={unmuteChatMember} />
+            <Route path=":id/ban" action={banChatMember} />
+            <Route path=":id/unban" action={unbanChatMember} />
+            <Route
+              path=":id/update-member-role"
+              action={updateChatMemberRole}
+            />
           </Route>
           <Route
             path="profile/:id"
