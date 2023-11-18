@@ -1,108 +1,125 @@
 import { Typography } from "../components/Typography";
-import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import useMovement from "../hooks/useMovement";
-
-const URL = "http://localhost:3001/games";
-const socket = io(URL, {
-  withCredentials: true,
-  autoConnect: true,
-});
-
-socket.on("connect", () => {
-  console.log("connected");
-});
-
-const animate = {
-  render(canvasRef, users, ball) {
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-
-    // background
-    context.fillStyle = "black";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // players
-    context.fillStyle = "white";
-
-    Object.keys(users).forEach((id, index) => {
-      const user = users[id];
-      if (index === 0) {
-        context.fillRect(10, 20 + user.y, 20, 100);
-      } else if (index === 1) {
-        context.fillRect(canvas.width - 30 + user.x, 20 + user.y, 20, 100);
-      }
-    });
-
-    // context.fillRect(10, 20, 20, 100);
-    // context.fillRect(canvas.width - 30, 20, 20, 100);
-
-    // ball
-    context.beginPath();
-    context.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
-    context.fill();
-
-    // tracejado
-    context.fillStyle = "white";
-    let i = 10;
-    while (i < canvas.height) {
-      context.fillRect(canvas.width / 2 - 2.5, i, 5, 15);
-      i += 30;
-    }
-  },
-};
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import rough from "roughjs";
+import useWebSocket from "../hooks/useWebSocket";
 
 const Games = () => {
   const canvasRef = useRef(null);
 
-  const [users, setUsers] = useState({});
-  const [ball, setBall] = useState({ x: 0, y: 0 });
+  const socket = useWebSocket("http://localhost:3001/games");
 
-  useMovement({ timeInterval: 1, defaultMovement: 10 }, (move) => {
-    socket.emit("ON_PLAYER_MOVE", { id: socket.id, move });
-  });
+  const [totalPlayers, setTotalPlayers] = useState(null);
+  const [ballPosition, setBallPosition] = useState(null);
+  // const [playerId, setPlayerId] = useState<string | undefined>(undefined);
 
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const rc = rough.canvas(canvas);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (totalPlayers) {
+      Object.keys(totalPlayers).forEach((id, index) => {
+        const player = totalPlayers[id];
+        if (index === 0) {
+          rc.rectangle(10, player.y, 10, 100, { stroke: "white", fill: "white" });
+        } else if (index === 1) {
+          rc.rectangle(canvas.width - 20, player.y, 10, 100, { stroke: "white", fill: "white" });
+        }
+      });
+    }
+  
+    if (ballPosition) {
+      rc.circle(ballPosition.x, ballPosition.y, 16, { stroke: "white", fill: "white" });
+    }
+  }, [totalPlayers, ballPosition]);
+
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case 'w':
+        socket.emit("movePlayer", { up: true });
+        break;
+      case 's':
+        socket.emit("movePlayer", { down: true });
+        break;
+      case 'ArrowUp':
+        socket.emit("movePlayer", { up: true });
+        break;
+      case 'ArrowDown':
+        socket.emit("movePlayer", { down: true });
+        break;
+    }
+  };
   useEffect(() => {
-    socket.on("pong", () => {
-      console.log("pong", socket);
-    });
-
-    socket.on("ON_PLAYERS_UPDATE", (players) => {
-      setUsers(players);
-    });
-
-    socket.on("ON_BALL_UPDATE", (ball) => {
-      setBall(ball);
-    });
-
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      socket.off("ON_PLAYERS_UPDATE");
-      socket.off("ON_BALL_UPDATE");
-      socket.off("pong");
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
-    animate.render(canvasRef, users, ball);
-  }, [users, ball]);
+    if (socket) {
+      socket.on('connect', () => {
+        console.log('Conectado ao servidor');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Desconectado do servidor');
+      });
+
+      socket.on("socketConnection", (totalPlayers) => {
+        setTotalPlayers(totalPlayers)
+      });
+
+      socket.on("socketDisconnection", (totalPlayers) => {
+        setTotalPlayers(totalPlayers)
+      });
+
+      // socket.on("playerConnection", (playerConnectionId) => {
+      //   setPlayerId(playerConnectionId)
+      // });
+
+      // socket.on("playerDisconnection", (playerConnectionId) => {
+      //   setPlayerId(playerConnectionId)
+      // });
+
+      socket.on("updatePlayerPosition", ({ playerId, position }) => {
+        setTotalPlayers((prevPlayers) => ({
+          ...prevPlayers,
+          [playerId]: position,
+        }));
+      });
+
+      socket.on('updateBallPosition', ({ x, y }) => {
+        setBallPosition({ x, y });
+      });
+
+      return () => {
+        socket.off("connect");
+        socket.off("disconnect");
+        socket.off("socketConnection");
+        socket.off("socketDisconnection");
+        // socket.off("playerConnection");
+        // socket.off("playerDisconnection");
+        socket.off("updatePlayerPosition");
+        socket.off("updateBallPosition");
+      };
+    }
+  }, [socket]);
 
   return (
     <>
       <Typography variant="h5">
-        <button
-          className="mt-3 text-success-25"
-          onClick={() => socket.emit("ping")}
-        >
-          Games
-        </button>
+        Games
       </Typography>
 
-      <div className="mt-10 flex justify-center">
+      <div className="flex justify-center mt-10">
         <canvas
           ref={canvasRef}
-          style={{ backgroundColor: "black" }}
           width={700}
           height={600}
+          className="dark:bg-gray-900"
         />
       </div>
     </>
