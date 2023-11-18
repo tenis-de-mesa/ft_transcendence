@@ -10,9 +10,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../users/sessions/sessions.service';
-// import { GetSessionId } from '../core/decorators/get-sessionid.decorator';
-import { GameService } from './game.service';
-import { Position2D } from './interfaces';
 
 type Player = {
   id: string;
@@ -54,8 +51,7 @@ interface Score {
 export class GameGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer()
-  server: Server;
+  @WebSocketServer() server: Server;
 
   gameRooms: GameRoom[];
   serverTotalRooms: number;
@@ -69,10 +65,7 @@ export class GameGateway
   ball: Ball;
   score: Score;
 
-  vecDirX = 1;
-  vecDirY = 1;
-
-  interval;
+  interval: NodeJS.Timeout;
 
   constructor(private readonly sessionService: SessionsService) {
     this.interval = setInterval(() => {
@@ -200,7 +193,7 @@ export class GameGateway
         if (player.playerType === 'left') {
           playerX = 10;
         } else if (player.playerType === 'right') {
-          playerX = this.windowWidth - 20 - 10;
+          playerX = this.windowWidth - 20;
         }
         const playerY = player.y;
 
@@ -216,7 +209,6 @@ export class GameGateway
           this.ball.y - this.ball.radius < playerY + playerHeight;
 
         if (ballInXRange && ballInYRange) {
-          // randomize the colission response?
           this.ball.speedX = -this.ball.speedX;
         }
       }
