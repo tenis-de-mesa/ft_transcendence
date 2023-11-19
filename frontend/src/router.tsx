@@ -21,10 +21,20 @@ import {
   createChat,
   updateChat,
   sendChatMessage,
-  changeChatPassword,
+  setChannelPassword,
+  changeChannelPassword,
+  removeChannelPassword,
+  joinChannel,
+  leaveChannel,
+  kickChatMember,
+  muteChatMember,
+  unmuteChatMember,
+  banChatMember,
+  unbanChatMember,
+  updateChatMemberRole,
 } from "./actions";
 
-import { RequireAuth } from "./contexts";
+import { RequireAuth, ChatContextProvider } from "./contexts";
 
 import {
   Root,
@@ -63,25 +73,17 @@ const router = createBrowserRouter(
           <Route
             path="channels"
             element={<Channels />}
-            loader={async () => {
-              const [chatList, userList] = await Promise.all([
-                loadAllChats(),
-                loadUsersList(),
-              ]);
-              return await Promise.all([chatList.json(), userList.json()]);
-            }}
-          />
+            loader={loadAllChats}
+            action={createChannel}
+          >
+            <Route path=":id/join" action={joinChannel} />
+            <Route path=":id/leave" action={leaveChannel} />
+          </Route>
           <Route path="newChannel" action={createChannel} />
           <Route
             path="chats"
-            element={<Chats />}
-            loader={async () => {
-              const [chats, users] = await Promise.all([
-                loadChatList(),
-                loadUsersList(),
-              ]);
-              return await Promise.all([chats.json(), users.json()]);
-            }}
+            element={<ChatContextProvider children={<Chats />} />}
+            loader={loadChatList}
             action={createChat}
           >
             <Route path="with/:userId" loader={redirectToChat} />
@@ -93,7 +95,18 @@ const router = createBrowserRouter(
               action={sendChatMessage}
             />
             <Route path="update/:id" action={updateChat} />
-            <Route path=":id/change-password" action={changeChatPassword} />
+            <Route path=":id/set-password" action={setChannelPassword} />
+            <Route path=":id/change-password" action={changeChannelPassword} />
+            <Route path=":id/remove-password" action={removeChannelPassword} />
+            <Route path=":id/kick" action={kickChatMember} />
+            <Route path=":id/mute" action={muteChatMember} />
+            <Route path=":id/unmute" action={unmuteChatMember} />
+            <Route path=":id/ban" action={banChatMember} />
+            <Route path=":id/unban" action={unbanChatMember} />
+            <Route
+              path=":id/update-member-role"
+              action={updateChatMemberRole}
+            />
           </Route>
           <Route
             path="profile/:id"

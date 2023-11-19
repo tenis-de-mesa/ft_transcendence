@@ -1,6 +1,6 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { socket } from "../socket";
-import { NewChatMessage } from "../types/types";
+import { NewChatMessage } from "../types";
 
 export async function sendChatMessage({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();

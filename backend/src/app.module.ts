@@ -16,10 +16,19 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './users/status/status.module';
 import { ChatsModule } from './chats/chats.module';
 import { GameModule } from './game/game.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+      },
+    }),
     AppConfigModule,
     TypeOrmConfigModule,
     UsersModule,

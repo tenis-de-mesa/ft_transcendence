@@ -127,7 +127,7 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ intraId: id });
 
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return user;

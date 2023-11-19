@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatsService } from './chats.service';
 import { ChatsController } from './chats.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatsGateway } from './chats.gateway';
-import { SessionsService } from '../users/sessions/sessions.service';
+import { UsersModule } from '../users/users.module';
+
 import {
   UserEntity,
   ChatEntity,
@@ -11,6 +12,8 @@ import {
   SessionEntity,
   ChatMemberEntity,
 } from '../core/entities';
+import { BullModule } from '@nestjs/bull';
+import { ChatsProcessor } from './chats.processor';
 
 @Module({
   imports: [
@@ -21,8 +24,12 @@ import {
       SessionEntity,
       ChatMemberEntity,
     ]),
+    BullModule.registerQueue({
+      name: 'chats',
+    }),
+    UsersModule,
   ],
   controllers: [ChatsController],
-  providers: [ChatsService, ChatsGateway, SessionsService],
+  providers: [ChatsService, ChatsGateway, ChatsProcessor],
 })
 export class ChatsModule {}

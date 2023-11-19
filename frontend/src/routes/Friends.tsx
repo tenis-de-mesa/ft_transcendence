@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router-dom";
-import { User } from "../types/types";
+import { User } from "../types";
 import { Avatar } from "../components/Avatar";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";

@@ -1,37 +1,40 @@
-export const joinChannel = async (chatId: number, password: string = undefined): Promise<boolean> => {
-  let url: string;
+import { ActionFunctionArgs, redirect } from "react-router-dom";
+import { makeRequest } from "../api";
+import { socket } from "../socket";
 
-  if (password) {
-    url = `http://localhost:3001/chats/${chatId}/verify`;
+export async function joinChannel({ request, params }: ActionFunctionArgs) {
+  const formData = await request.formData();
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ password: password }),
-      });
-      
-      if (!response.ok) {
-        return Promise.resolve(false);
-      }
-    } catch (error) {
-      console.log(error);
-      return Promise.resolve(false)
-    }
+  const { id } = params;
+  const { method } = request;
+  const body = {
+    password: formData.get("password"),
+  };
+
+  const conditions = [
+    [!id, "Missing chat ID"],
+    [!method, "Missing form method"],
+  ];
+
+  const fail = conditions.find(([condition]) => condition);
+
+  if (fail) {
+    return {
+      message: fail[1] as string,
+    };
   }
 
-  url = `http://localhost:3001/chats/${chatId}/join`;
-
-  await fetch(url, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    }
+  const { error } = await makeRequest(`/chats/${id}/join`, {
+    method,
+    body: JSON.stringify(body),
   });
 
-  return Promise.resolve(true)
-};
+  if (error) {
+    return {
+      message: error.message,
+    };
+  }
+
+  socket.emit("addUserToChat", id);
+  return redirect(`/chats/${id}`);
+}
