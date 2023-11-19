@@ -7,9 +7,14 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   ConnectedSocket,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../users/sessions/sessions.service';
+import { UserEntity } from '../core/entities';
+import { User } from '../core/decorators';
+import * as cookie from 'cookie';
+import { UsersService } from '../users/users.service';
 
 type Player = {
   id: string;
@@ -49,9 +54,17 @@ interface Score {
   cookie: true,
 })
 export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
+
+  queues: {
+    // all: []
+    invites: {
+      user: UserEntity,
+      guest: UserEntity
+    }[]
+    // open: []
+  }
 
   gameRooms: GameRoom[];
   serverTotalRooms: number;
@@ -67,13 +80,26 @@ export class GameGateway
 
   interval: NodeJS.Timeout;
 
-  constructor(private readonly sessionService: SessionsService) {
-    this.interval = setInterval(() => {
-      this.gameLoop();
-    }, 16);
+  constructor(
+    private readonly sessionService: SessionsService,
+    private readonly userService: UsersService
+  ) {
+    // this.interval = setInterval(() => {
+    //   this.gameLoop();
+    // }, 16);
   }
 
   afterInit(server: Server) {
+    console.log(this.queues)
+    this.server.use((socket, next) => {
+      this.validate(socket)
+        .then((user) => {
+          socket.handshake.auth['user'] = user;
+          next();
+        })
+        .catch((error) => next(error));
+    });
+
     this.gameRooms = [];
     this.serverTotalRooms = 0;
 
@@ -95,7 +121,8 @@ export class GameGateway
   }
 
   handleConnection(clientSocket: Socket) {
-    console.log('New client connection:', clientSocket.id);
+    console.log('Game: New client connection:', clientSocket.id);
+    return;
 
     let playerType: string;
     if (this.serverTotalPlayers % 2 === 0) {
@@ -215,6 +242,42 @@ export class GameGateway
     }
 
     this.server.emit('updateBallPosition', { x: this.ball.x, y: this.ball.y });
+  }
+
+  @SubscribeMessage('invitePlayerToGame')
+  async handleInvitePlayerToGame(
+    @ConnectedSocket() clientSocket: Socket,
+    @MessageBody() guestId: number,
+    @User() user: UserEntity,
+  ) {
+    const guest = await this.userService.getUserById(guestId)
+
+    this.queues.invites.push({
+      guest,
+      user
+    });
+  }
+
+  @SubscribeMessage('findMyInvites')
+  handleFindMyInvites(@ConnectedSocket() clientSocket: Socket,
+  @MessageBody() player: any,
+  @User('id') userId: number) {
+    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);
+    console.log(response);
+    
+    clientSocket.emit("listInvites", response);
+  }
+
+  private async validate(client: Socket) {
+    const cookies = cookie.parse(client.handshake.headers.cookie);
+    const sid = cookies['connect.sid'].split('.')[0].slice(2);
+
+    try {
+      const session = await this.sessionService.getSessionById(sid);
+      return await this.userService.getUserById(session.userId);
+    } catch (error) {
+      throw new WsException('Unauthorized connection');
+    }
   }
 
   @SubscribeMessage('movePlayer')

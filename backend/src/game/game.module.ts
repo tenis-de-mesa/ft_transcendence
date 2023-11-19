@@ -4,11 +4,14 @@ import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
 import { SessionsService } from '../users/sessions/sessions.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SessionEntity } from '../core/entities';
+import { SessionEntity, UserEntity } from '../core/entities';
+import { UsersService } from '../users/users.service';
+import { UsersModule } from '../users/users.module';
+import { BlockListEntity } from '../core/entities/blockList.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SessionEntity])],
+  imports: [TypeOrmModule.forFeature([SessionEntity, UserEntity, BlockListEntity]), UsersModule],
   controllers: [GameController],
-  providers: [GameService, GameGateway, SessionsService],
+  providers: [GameService, GameGateway, UsersService, SessionsService],
 })
 export class GameModule {}

@@ -10,6 +10,8 @@ import { Data } from "../data";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
+import { Button } from "../components";
+import { useGameWebSocket } from "../hooks";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -18,7 +20,23 @@ export default function Users() {
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
+  const socket = useGameWebSocket();
+
+  const handleGameInvite = (player) => {
+    socket.emit("findMyInvites", player.id);
+  };
+
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
+
+  useEffect(() => {
+    socket.on('listInvites', (invites) => {
+      console.log(invites);
+    });
+
+    return () => {
+      socket.off("listInvites");
+    };
+  })
 
   useEffect(() => {
     // The current user is online by default
@@ -44,7 +62,14 @@ export default function Users() {
       }),
       columnHelper.accessor("id", {
         header: "Action",
-        cell: (info) => <AddFriendButton user={info.row.original} />,
+        cell: (info) => {
+          return (
+            <>
+              <AddFriendButton user={info.row.original} />
+              <Button variant="error" onClick={() => handleGameInvite(info.row.original)}>Play</Button>
+            </>
+          )
+        } 
       }),
     ],
     []
