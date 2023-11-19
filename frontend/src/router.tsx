@@ -35,6 +35,8 @@ import {
   updateChatMemberRole,
   enableTFA,
   disableTFA,
+  regenerateTFACodes,
+  loginTFACheck,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -56,6 +58,8 @@ import {
   Login,
   EnableTFA,
   DisableTFA,
+  RegenerateTFACodes,
+  LoginTFACheck,
 } from "./routes";
 
 const router = createBrowserRouter(
@@ -63,6 +67,12 @@ const router = createBrowserRouter(
     <Route>
       {/* Public routes */}
       <Route path="/login" element={<Login />} />,
+      <Route
+        path="/login/tfa-check"
+        element={<LoginTFACheck />}
+        action={loginTFACheck}
+      />
+      ,
       <Route path="/login/:provider" loader={providerLogin} />,
       <Route path="/logout" loader={logout} />,
       <Route element={<RequireAuth />}>
@@ -133,6 +143,11 @@ const router = createBrowserRouter(
               path="disable"
               action={disableTFA}
               element={<DisableTFA />}
+            />
+            <Route
+              path="regenerate-codes"
+              action={regenerateTFACodes}
+              element={<RegenerateTFACodes />}
             />
           </Route>
         </Route>

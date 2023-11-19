@@ -1,18 +1,16 @@
 import { useState } from "react";
-import { useFetcher, useLoaderData } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 import { Alert, Button, Card, Input, Typography } from "../components";
 import { FiLock } from "react-icons/fi";
 import { RecoveryCodes } from "../components/tfa/RecoveryCodes";
 
-type EnableTfaLoaderData = {
-  secret: string;
-  qrCode: string;
-};
-
-const EnableTFA = () => {
+const RegenerateTFACodes = () => {
   const fetcher = useFetcher();
-  const { secret, qrCode } = useLoaderData() as EnableTfaLoaderData;
   const [tfaCode, setTfaCode] = useState("");
+
+  console.log("fetcher.state", fetcher.state);
+  console.log("fetcher.data", fetcher.data);
+  console.log("fetcher.json", fetcher.json);
 
   if (fetcher.data?.status === "success") {
     return (
@@ -33,22 +31,13 @@ const EnableTFA = () => {
         )}
         <Card>
           <Card.Title>
-            <Typography variant="h6">Two Factor Authentication</Typography>
+            <Typography variant="h6">Regenerate recovery codes</Typography>
           </Card.Title>
           <Card.Body className="!px-10 pb-5">
-            <div className="inline-block">
-              <img
-                src={`data:image/png;base64,${qrCode}`}
-                alt="QR Code"
-                style={{}}
-              />
-            </div>
             <Typography variant="md" className="text-left mb-4">
-              Use your authentication app to scan the QR code above, or enter
-              the code manually:
-              <strong>
-                <code> {secret}</code>
-              </strong>
+              In case you lost access to your two factor authentication recovery
+              codes, you can regenerate them, but this action will
+              <strong> invalidate all your previous recovery codes</strong>.
             </Typography>
             <fetcher.Form method="POST">
               <Input
@@ -63,7 +52,7 @@ const EnableTFA = () => {
               />
               <div className="flex justify-center mt-4">
                 <Button variant="primary" type="submit" className="px-10">
-                  Enable
+                  Regenerate codes
                 </Button>
               </div>
             </fetcher.Form>
@@ -74,4 +63,4 @@ const EnableTFA = () => {
   );
 };
 
-export default EnableTFA;
+export default RegenerateTFACodes;

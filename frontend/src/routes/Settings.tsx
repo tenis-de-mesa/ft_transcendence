@@ -52,7 +52,7 @@ const Settings = () => {
                   Disable
                 </Button>
               </Link>
-              <Link to="/tfa/regenerate">
+              <Link to="/tfa/regenerate-codes">
                 <Button variant="info" size="sm">
                   Reset recovery codes
                 </Button>

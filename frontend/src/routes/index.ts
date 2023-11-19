@@ -14,3 +14,5 @@ export { default as Friends } from "./Friends";
 export { default as Login } from "./Login";
 export { default as EnableTFA } from "./EnableTFA";
 export { default as DisableTFA } from "./DisableTFA";
+export { default as RegenerateTFACodes } from "./RegenerateTFACodes";
+export { default as LoginTFACheck } from "./LoginTFACheck";

@@ -15,3 +15,5 @@ export * from "./unbanChatMember";
 export * from "./updateChatMemberRole";
 export * from "./enableTFA";
 export * from "./disableTFA";
+export * from "./regenerateTFACodes";
+export * from "./loginTFACheck";
