@@ -12,4 +12,6 @@ export * from "./muteChatMember";
 export * from "./unmuteChatMember";
 export * from "./banChatMember";
 export * from "./unbanChatMember";
-export * from "./updateChatMemberRole"
+export * from "./updateChatMemberRole";
+export * from "./enableTFA";
+export * from "./disableTFA";

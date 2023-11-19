@@ -8,3 +8,4 @@ export * from "./loadFriendsList";
 export * from "./loadUserById";
 export * from "./redirectToChat";
 export * from "./loadAllChats";
+export * from "./generateTFASecret";

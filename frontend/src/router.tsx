@@ -14,6 +14,7 @@ import {
   loadUserById,
   redirectToChat,
   loadAllChats,
+  generateTFASecret,
 } from "./loaders";
 
 import {
@@ -32,6 +33,8 @@ import {
   banChatMember,
   unbanChatMember,
   updateChatMemberRole,
+  enableTFA,
+  disableTFA,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -51,6 +54,8 @@ import {
   Channels,
   Friends,
   Login,
+  EnableTFA,
+  DisableTFA,
 } from "./routes";
 
 const router = createBrowserRouter(
@@ -116,6 +121,19 @@ const router = createBrowserRouter(
           <Route path="leaderboard" element={<Leaderboard />} />
           <Route path="games" element={<Games />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="tfa">
+            <Route
+              path="enable"
+              loader={generateTFASecret}
+              action={enableTFA}
+              element={<EnableTFA />}
+            />
+            <Route
+              path="disable"
+              action={disableTFA}
+              element={<DisableTFA />}
+            />
+          </Route>
         </Route>
       </Route>
     </Route>
