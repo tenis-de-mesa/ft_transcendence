@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useFetcher, useLoaderData } from "react-router-dom";
 import { Alert, Button, Card, Input, Typography } from "../components";
 import { FiLock } from "react-icons/fi";
-import { AuthContext } from "../contexts";
+import { RecoveryCodes } from "../components/tfa/RecoveryCodes";
 
 type EnableTfaLoaderData = {
   secret: string;
@@ -11,63 +11,27 @@ type EnableTfaLoaderData = {
 
 const EnableTFA = () => {
   const fetcher = useFetcher();
-  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const { secret, qrCode } = useLoaderData() as EnableTfaLoaderData;
   const [tfaCode, setTfaCode] = useState("");
-  const [recoveryCodes, setRecoveryCodes] = useState([]);
 
   console.log("fetcher.state", fetcher.state);
   console.log("fetcher.data", fetcher.data);
   console.log("fetcher.json", fetcher.json);
 
-  useEffect(() => {
-    if (fetcher.data && fetcher.data.status === "success") {
-      setCurrentUser({
-        ...currentUser,
-        tfaEnabled: true,
-      });
-      setRecoveryCodes(fetcher.data.recoveryCodes);
-    }
-  }, [fetcher.data, setCurrentUser, currentUser]);
-
-  if (recoveryCodes.length > 0) {
+  if (fetcher.data?.status === "success") {
     return (
-      <div className="h-full grid justify-center items-center">
-        <div className="max-w-md">
-          {fetcher.data && fetcher.data.message && (
-            <Alert severity={fetcher.data.status} className="w-full mb-2">
-              {fetcher.data.message.toString()}
-            </Alert>
-          )}
-          <Card>
-            <Card.Title>
-              <Typography variant="h6">Two Factor Authentication</Typography>
-            </Card.Title>
-            <Card.Body position="left">
-              <Typography variant="md">
-                These are recovery codes in case you lose access to your
-                authentication app:
-              </Typography>
-              <Typography variant="md" className="list-disc list-inside">
-                {recoveryCodes.map((code) => (
-                  <li key={code}>{code}</li>
-                ))}
-              </Typography>
-              <Typography variant="md" customWeight="bold" className="mt-4">
-                Store them safely, as they won't be displayed again.
-              </Typography>
-            </Card.Body>
-          </Card>
-        </div>
-      </div>
+      <RecoveryCodes
+        recoveryCodes={fetcher.data.recoveryCodes}
+        message={fetcher.data.message}
+      />
     );
   }
 
   return (
     <div className="h-full grid justify-center items-center">
       <div className="max-w-md">
-        {fetcher.data && fetcher.data.status === "error" && (
-          <Alert severity="error" className="w-full mb-2">
+        {fetcher.data && fetcher.data.message && (
+          <Alert severity={fetcher.data.status} className="w-full mb-2">
             {fetcher.data.message.toString()}
           </Alert>
         )}

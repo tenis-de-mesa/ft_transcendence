@@ -127,6 +127,7 @@ const router = createBrowserRouter(
               loader={generateTFASecret}
               action={enableTFA}
               element={<EnableTFA />}
+              shouldRevalidate={() => false}
             />
             <Route
               path="disable"
