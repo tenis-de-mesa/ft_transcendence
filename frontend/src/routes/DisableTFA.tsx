@@ -17,7 +17,7 @@ const DisableTFA = () => {
       tfaEnabled: false,
     });
     // Navigate to settings page with the success message
-    navigate("/settings", { state: { success: fetcher.data.message } });
+    navigate("/settings", { state: { success: "TFA Disabled" } });
   }
 
   return (

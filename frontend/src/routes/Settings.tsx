@@ -22,14 +22,9 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <Typography variant="h6">Two Factor Authentication</Typography>
             {tfaEnabled ? (
-              <span className="flex items-center text-success-500 ">
-                enabled
-              </span>
+              <span className="text-success-500 ">enabled</span>
             ) : (
-              <span className="flex items-center gap-1 text-error-500 ">
-                <div className="w-2 h-2 rounded-full bg-error-500"></div>
-                disabled
-              </span>
+              <span className="text-error-500 ">disabled</span>
             )}
           </div>
         </Card.Title>
