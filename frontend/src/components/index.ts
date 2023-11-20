@@ -14,3 +14,4 @@ export * from "./Typography";
 export * from "./UserForm";
 export * from "./UserUpdateAvatar";
 export * from "./UserWithStatus";
+export * from "./StateAlerts";

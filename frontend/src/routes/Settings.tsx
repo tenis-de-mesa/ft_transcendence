@@ -2,32 +2,21 @@ import { useContext } from "react";
 import { Typography } from "../components/Typography";
 import { AuthContext } from "../contexts";
 import { Link } from "react-router-dom";
-import { Alert, Button, Card } from "../components";
-import { useLocation } from "react-router-dom";
-
-type AlertSeverity = "primary" | "success" | "info" | "warning" | "error";
-type SettingsState = {
-  [key in AlertSeverity]?: string;
-};
+import { Button, Card, StateAlerts } from "../components";
 
 const Settings = () => {
   const { currentUser } = useContext(AuthContext);
-  const location = useLocation();
-  const state = location.state as SettingsState;
+
   const tfaEnabled = currentUser.tfaEnabled;
 
   return (
-    <div>
+    <div className="max-w-xl">
       <Typography variant="h4" className="mb-10">
         Settings
       </Typography>
 
-      {state &&
-        (Object.keys(state) as Array<keyof SettingsState>).map((severity) => (
-          <Alert className="w-full mb-3" severity={severity}>
-            {state[severity]}
-          </Alert>
-        ))}
+      <StateAlerts />
+
       <Card>
         <Card.Title>
           <div className="flex items-center justify-between">

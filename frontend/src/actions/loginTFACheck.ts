@@ -20,5 +20,5 @@ export async function loginTFACheck({ request }: ActionFunctionArgs) {
     };
   }
 
-  return redirect("/");
+  return redirect("/login/intra");
 }
