@@ -26,6 +26,10 @@ export default function Users() {
     socket.emit("findMyInvites", player.id);
   };
 
+  const submitGameInvite = function (player) {
+    socket.emit('invitePlayerToGame', player.id)
+  }
+
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
@@ -36,7 +40,7 @@ export default function Users() {
     return () => {
       socket.off("listInvites");
     };
-  })
+  }, [])
 
   useEffect(() => {
     // The current user is online by default
@@ -66,7 +70,8 @@ export default function Users() {
           return (
             <>
               <AddFriendButton user={info.row.original} />
-              <Button variant="error" onClick={() => handleGameInvite(info.row.original)}>Play</Button>
+              <Button variant="error" onClick={() => submitGameInvite(info.row.original)}>Play</Button>
+              
             </>
           )
         } 
@@ -78,7 +83,7 @@ export default function Users() {
   return (
     <>
       <Typography variant="h5">Users</Typography>
-
+      <Button variant="info" onClick={() => handleGameInvite(currentUser)}>Show my invites</Button>
       <div className="h-[92%] mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}

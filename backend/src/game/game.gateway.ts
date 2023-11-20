@@ -64,7 +64,7 @@ export class GameGateway
       guest: UserEntity
     }[]
     // open: []
-  }
+  };
 
   gameRooms: GameRoom[];
   serverTotalRooms: number;
@@ -84,9 +84,14 @@ export class GameGateway
     private readonly sessionService: SessionsService,
     private readonly userService: UsersService
   ) {
-    // this.interval = setInterval(() => {
-    //   this.gameLoop();
-    // }, 16);
+    this.interval = setInterval(() => {
+      this.gameLoop();
+    }, 16);
+    this.queues = {
+      // all: []
+      invites: []
+      // open: []
+    };
   }
 
   afterInit(server: Server) {
@@ -122,7 +127,7 @@ export class GameGateway
 
   handleConnection(clientSocket: Socket) {
     console.log('Game: New client connection:', clientSocket.id);
-    return;
+    // return;
 
     let playerType: string;
     if (this.serverTotalPlayers % 2 === 0) {
@@ -250,6 +255,10 @@ export class GameGateway
     @MessageBody() guestId: number,
     @User() user: UserEntity,
   ) {
+    if (this.queues.invites.find((i) => i.guest.id == guestId)) {
+      return
+    }
+
     const guest = await this.userService.getUserById(guestId)
 
     this.queues.invites.push({
@@ -262,9 +271,7 @@ export class GameGateway
   handleFindMyInvites(@ConnectedSocket() clientSocket: Socket,
   @MessageBody() player: any,
   @User('id') userId: number) {
-    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);
-    console.log(response);
-    
+    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);    
     clientSocket.emit("listInvites", response);
   }
 
