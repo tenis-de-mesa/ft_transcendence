@@ -14,7 +14,7 @@ export class AuthenticatedGuard implements CanActivate {
       throw new UnauthorizedException('User is not logged in');
     }
 
-    if (request.url.includes('tfa/authenticate')) {
+    if (request.url.match(/\/auth\/tfa\/(authenticate|recover)/)) {
       return true;
     }
 
