@@ -10,7 +10,7 @@ type ChatBanMemberCardProps = {
 };
 
 export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
-  const { closeCard } = useContext(ChatContext);
+  const { closeCard, currentChat } = useContext(ChatContext);
   // TODO: Retrieve errors
   const { Form } = useFetcher();
 
@@ -50,7 +50,11 @@ export default function ChatBanMemberCard({ user }: ChatBanMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="ban" method="POST" onSubmit={closeCard}>
+          <Form
+            action={`${currentChat?.id}/ban`}
+            method="POST"
+            onSubmit={closeCard}
+          >
             <input type="hidden" name="banUserId" value={user?.id} />
             <Button variant="error">
               <Typography variant="md" customWeight="bold">

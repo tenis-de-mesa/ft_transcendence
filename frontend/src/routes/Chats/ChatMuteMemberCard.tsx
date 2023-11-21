@@ -10,7 +10,7 @@ type ChatMuteMemberCardProps = {
 };
 
 export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
-  const { closeCard } = useContext(ChatContext);
+  const { closeCard, currentChat } = useContext(ChatContext);
   const [selectedTime, setSelectedTime] = useState(60000);
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
@@ -102,7 +102,11 @@ export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="mute" method="POST" onSubmit={closeCard}>
+          <Form
+            action={`${currentChat?.id}/mute`}
+            method="POST"
+            onSubmit={closeCard}
+          >
             <input type="hidden" name="userId" value={user?.id} />
             <input type="hidden" name="muteDuration" value={selectedTime} />
             <Button variant="error">

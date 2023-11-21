@@ -10,7 +10,7 @@ type ChatKickMemberCardProps = {
 };
 
 export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
-  const { closeCard } = useContext(ChatContext);
+  const { closeCard, currentChat } = useContext(ChatContext);
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
 
@@ -49,7 +49,11 @@ export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="kick" method="POST" onSubmit={closeCard}>
+          <Form
+            action={`${currentChat?.id}/kick`}
+            method="POST"
+            onSubmit={closeCard}
+          >
             <input type="hidden" name="userId" value={user?.id} />
             <Button variant="error">
               <Typography variant="md" customWeight="bold">
