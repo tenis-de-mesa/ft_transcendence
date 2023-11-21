@@ -17,6 +17,7 @@ import {
   ChatEntity,
 } from '.';
 import { BlockListEntity } from './blockList.entity';
+import { GameEntity } from './game.entity';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -124,6 +125,9 @@ export class UserEntity {
 
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
+
+  @ManyToMany(() => GameEntity)
+  games: GameEntity[]
 
   @DeleteDateColumn()
   deletedAt?: Date;

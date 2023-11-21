@@ -1,6 +1,8 @@
+import { Socket } from "socket.io";
+import { UserEntity } from "../core/entities";
+
 export type Player = {
-    id: string;
-    userId: number;
+    user: UserEntity;
     y: number;
     playerType: string;
 };
@@ -24,7 +26,7 @@ export interface Score {
 }
 
 export interface GameRoom {
-    id: string;
+    gameId: number;
     players: Player[];
     direction: Direction;
     score: Score;

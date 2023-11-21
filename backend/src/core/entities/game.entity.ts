@@ -2,45 +2,45 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
+export enum GameStatus {
+  START = 'start',
+  FINISH = 'finish',
+}
 @Entity({ name: 'games' })
 export class GameEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  player1: number;
-
-  @Column()
-  player2: number;
-
-  @Column()
+  @Column({ default: 0 })
   score1: number;
 
-  @Column()
+  @Column({ default: 0 })
   score2: number;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, {
-    nullable: true,
-    onDelete: 'SET NULL',
+  @Column({
+    type: 'enum',
+    enum: GameStatus,
+    default: GameStatus.START,
   })
-  user1: UserEntity;
+  status: GameStatus;
 
-  @ManyToOne(() => UserEntity, (user) => user.id, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
-  user2: UserEntity;
+  @ManyToMany(() => UserEntity)
+  @JoinTable()
+  users: UserEntity[]
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   constructor(game?: GameEntity) {
     this.id = game?.id;
-    this.player1 = game?.player1;
-    this.player2 = game?.player2;
     this.score1 = game?.score1;
     this.score2 = game?.score2;
+    this.users = game?.users
   }
 }

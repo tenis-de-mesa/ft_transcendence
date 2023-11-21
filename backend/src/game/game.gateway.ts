@@ -41,6 +41,13 @@ export class GameGateway
 
   games: any[]
 
+  allUsers: Record<number, {
+    user: UserEntity,
+    client: Socket
+  }>
+
+  allClientSockets: Record<string, number>
+
   // 
 
   gameRooms: GameRoom[];
@@ -60,7 +67,10 @@ export class GameGateway
     private readonly gameService: GameService
   ) {
     this.interval = setInterval(() => {
-      this.gameLoop();
+      // this.gameLoop();
+      this.gameService.updateGame(this.server)
+
+     
     }, 16);
     this.queues = {
       // all: []
@@ -68,6 +78,9 @@ export class GameGateway
       // open: []
     };
     this.games = []
+
+    this.allUsers = {}
+    this.allClientSockets = {}
   }
 
   afterInit(server: Server) {
@@ -89,15 +102,21 @@ export class GameGateway
   }
 
   handleConnection(clientSocket: Socket) {
-    console.log('Game: New client connection:', clientSocket.id);
-    // return;
+    // TODO: not exists user?
+    const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    let playerType: string;
-    if (this.serverTotalPlayers % 2 === 0) {
-      playerType = 'left';
-    } else {
-      playerType = 'right';
-    }
+    console.log('Game: New client connection:', clientSocket.id, "userId", user.id);
+
+    this.allUsers[user.id] = { client: clientSocket, user: user }
+
+    this.allClientSockets[clientSocket.id] = user.id
+
+    // let playerType: string;
+    // if (this.serverTotalPlayers % 2 === 0) {
+    //   playerType = 'left';
+    // } else {
+    //   playerType = 'right';
+    // }
 
     // const newPlayerConnection: Player = {
     //   id: clientSocket.id,
@@ -105,7 +124,7 @@ export class GameGateway
     //   playerType: playerType,
     // };
 
-    const newPlayerStringId: string = clientSocket.id;
+    // const newPlayerStringId: string = clientSocket.id;
 
     // this.players[newPlayerStringId] = newPlayerConnection;
     // this.serverTotalPlayers++;
@@ -119,16 +138,21 @@ export class GameGateway
   }
 
   handleDisconnect(clientSocket: Socket) {
-    console.log('Client disconnected:', clientSocket.id);
+    const userId = this.allClientSockets[clientSocket.id]
 
-    const playerStringId: string = clientSocket.id;
-    this.players[playerStringId] = undefined;
-    this.serverTotalPlayers--;
+    console.log('Client disconnected:', clientSocket.id, 'userId', userId);
+
+    delete this.allUsers[userId]
+    delete this.allClientSockets[clientSocket.id]
+
+    // const playerStringId: string = clientSocket.id;
+    // this.players[playerStringId] = undefined;
+    // this.serverTotalPlayers--;
 
     // this.removePlayerFromRoom(playerStringId);
 
-    this.server.emit('socketConnection', this.players);
-    clientSocket.emit('playerDisconnection', playerStringId);
+    // this.server.emit('socketConnection', this.players);
+    // clientSocket.emit('playerDisconnection', playerStringId);
   }
 
   // addPlayerToRoom(player: Player) {
@@ -168,15 +192,15 @@ export class GameGateway
   //   }
   // }
 
-  gameLoop() {
-    for (const game of this.games) {
-      game.gameLoop()
-      const room = game.game.id
-      const x = game.game.ball.x
-      const y = game.game.ball.y
-      this.server.to(room).emit('updateBallPosition', { x, y });
-    }
-  }
+  // gameLoop() {
+  //   for (const game of this.games) {
+  //     game.gameLoop()
+  //     const room = game.game.id
+  //     const x = game.game.ball.x
+  //     const y = game.game.ball.y
+  //     this.server.to(room).emit('updateBallPosition', { x, y });
+  //   }
+  // }
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
@@ -207,12 +231,12 @@ export class GameGateway
     }
     this.queues.invites = this.queues.invites.filter((i) => !(i.guest.id == userId && i.user.id == userIdInvitation))
 
-    const game = new GameService()
+    const gameId = this.gameService.newGame(match.user, match.guest)
+  
+    this.allUsers[match.user.id].client.join(`game:${gameId}`)
+    this.allUsers[match.guest.id].client.join(`game:${gameId}`)
 
-    game.initGame({ id: `gameRoom-${match.user.id}-${match.guest.id}`, player1: match.user, player2: match.guest })
-
-    this.games.push(game)
-
+    console.log('accept')
   }
 
   @SubscribeMessage('findMyInvites')
@@ -235,36 +259,38 @@ export class GameGateway
     }
   }
 
-  @SubscribeMessage('movePlayer')
-  async handlePlayerMovement(
-    @ConnectedSocket() clientSocket: Socket,
-    @MessageBody() direction: Direction,
-    @User('id') userId: number
-  ) {
-    const playerId = clientSocket.id;
 
-    const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
 
-    const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
+  // @SubscribeMessage('movePlayer')
+  // async handlePlayerMovement(
+  //   @ConnectedSocket() clientSocket: Socket,
+  //   @MessageBody() direction: Direction,
+  //   @User('id') userId: number
+  // ) {
+  //   const playerId = clientSocket.id;
 
-    if (direction.up) {
-      if (this.games[gameIndex].game.players[position].y < 10) {
-        this.games[gameIndex].game.players[position].y = 0;
-      } else {
-        this.games[gameIndex].game.players[position].y -= 10;
-      }
-    }
-    if (direction.down) {
-      if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
-        this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
-      } else {
-        this.games[gameIndex].game.players[position].y += 10;
-      }
-    }
+  //   const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
 
-    this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
-      playerId,
-      position: this.games[gameIndex].game.players[position],
-    });
-  }
+  //   const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
+
+  //   if (direction.up) {
+  //     if (this.games[gameIndex].game.players[position].y < 10) {
+  //       this.games[gameIndex].game.players[position].y = 0;
+  //     } else {
+  //       this.games[gameIndex].game.players[position].y -= 10;
+  //     }
+  //   }
+  //   if (direction.down) {
+  //     if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
+  //       this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
+  //     } else {
+  //       this.games[gameIndex].game.players[position].y += 10;
+  //     }
+  //   }
+
+  //   this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
+  //     playerId,
+  //     position: this.games[gameIndex].game.players[position],
+  //   });
+  // }
 }
