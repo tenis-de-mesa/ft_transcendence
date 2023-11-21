@@ -20,6 +20,8 @@ export default function Users() {
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
+  const [invites, setInvites] = useState([])
+
   const socket = useGameWebSocket();
 
   const handleGameInvite = (player) => {
@@ -30,17 +32,22 @@ export default function Users() {
     socket.emit('invitePlayerToGame', player.id)
   }
 
+  const acceptGameInvite = function (playerId) {
+    socket.emit('acceptInvitePlayerToGame', playerId)
+  }
+
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
-    socket.on('listInvites', (invites) => {
+    socket.on('listInvites', (listInvites) => {
       console.log(invites);
+      setInvites(listInvites)
     });
 
     return () => {
       socket.off("listInvites");
     };
-  }, [])
+  }, [invites])
 
   useEffect(() => {
     // The current user is online by default
@@ -84,6 +91,13 @@ export default function Users() {
     <>
       <Typography variant="h5">Users</Typography>
       <Button variant="info" onClick={() => handleGameInvite(currentUser)}>Show my invites</Button>
+      {
+        invites.map((i) => {
+          return <div className="text-white">{i.nickname}
+          <Button variant="info" onClick={() => acceptGameInvite(i.id)}>Aceitar</Button>
+          </div>
+        })
+      }
       <div className="h-[92%] mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}

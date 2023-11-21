@@ -15,35 +15,8 @@ import { UserEntity } from '../core/entities';
 import { User } from '../core/decorators';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
-
-type Player = {
-  id: string;
-  y: number;
-  playerType: string;
-};
-
-interface Ball {
-  x: number;
-  y: number;
-  speedX: number;
-  speedY: number;
-  radius: number;
-}
-
-interface GameRoom {
-  id: number;
-  players: Player[];
-}
-
-type Direction = {
-  up: boolean;
-  down: boolean;
-};
-
-interface Score {
-  playerOne: number;
-  playerTwo: number;
-}
+import { Ball, GameRoom, Player, Score, Direction } from './game.interface';
+import { GameService } from './game.service';
 
 @WebSocketGateway({
   namespace: 'games',
@@ -66,6 +39,10 @@ export class GameGateway
     // open: []
   };
 
+  games: any[]
+
+  // 
+
   gameRooms: GameRoom[];
   serverTotalRooms: number;
 
@@ -75,14 +52,12 @@ export class GameGateway
   windowWidth = 700;
   windowHeight = 600;
 
-  ball: Ball;
-  score: Score;
-
   interval: NodeJS.Timeout;
 
   constructor(
     private readonly sessionService: SessionsService,
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
+    private readonly gameService: GameService
   ) {
     this.interval = setInterval(() => {
       this.gameLoop();
@@ -92,10 +67,10 @@ export class GameGateway
       invites: []
       // open: []
     };
+    this.games = []
   }
 
   afterInit(server: Server) {
-    console.log(this.queues)
     this.server.use((socket, next) => {
       this.validate(socket)
         .then((user) => {
@@ -111,18 +86,6 @@ export class GameGateway
     this.players = {};
     this.serverTotalPlayers = 0;
 
-    this.ball = {
-      x: this.windowWidth / 2,
-      y: this.windowHeight / 2,
-      speedX: 4,
-      speedY: 4,
-      radius: 16,
-    };
-
-    this.score = {
-      playerOne: 0,
-      playerTwo: 0,
-    };
   }
 
   handleConnection(clientSocket: Socket) {
@@ -136,21 +99,21 @@ export class GameGateway
       playerType = 'right';
     }
 
-    const newPlayerConnection: Player = {
-      id: clientSocket.id,
-      y: 0,
-      playerType: playerType,
-    };
+    // const newPlayerConnection: Player = {
+    //   id: clientSocket.id,
+    //   y: 0,
+    //   playerType: playerType,
+    // };
 
     const newPlayerStringId: string = clientSocket.id;
 
-    this.players[newPlayerStringId] = newPlayerConnection;
-    this.serverTotalPlayers++;
+    // this.players[newPlayerStringId] = newPlayerConnection;
+    // this.serverTotalPlayers++;
 
-    this.addPlayerToRoom(newPlayerConnection);
+    // this.addPlayerToRoom(newPlayerConnection);
 
-    this.server.emit('socketConnection', this.players);
-    clientSocket.emit('playerConnection', newPlayerConnection.id);
+    // this.server.emit('socketConnection', this.players);
+    // clientSocket.emit('playerConnection', newPlayerConnection.id);
 
     // this.server.emit('ballPosition', this.ball);
   }
@@ -162,91 +125,57 @@ export class GameGateway
     this.players[playerStringId] = undefined;
     this.serverTotalPlayers--;
 
-    this.removePlayerFromRoom(playerStringId);
+    // this.removePlayerFromRoom(playerStringId);
 
     this.server.emit('socketConnection', this.players);
     clientSocket.emit('playerDisconnection', playerStringId);
   }
 
-  addPlayerToRoom(player: Player) {
-    const availableRoom = this.gameRooms.find(
-      (room) => room.players.length < 2,
-    );
+  // addPlayerToRoom(player: Player) {
+  //   const availableRoom = this.gameRooms.find(
+  //     (room) => room.players.length < 2,
+  //   );
 
-    if (availableRoom) {
-      availableRoom.players.push(player);
-    } else {
-      const newRoom: GameRoom = {
-        id: this.gameRooms.length + 1,
-        players: [player],
-      };
+  //   if (availableRoom) {
+  //     availableRoom.players.push(player);
+  //   } else {
+  //     const newRoom: GameRoom = {
+  //       id: this.gameRooms.length + 1,
+  //       players: [player],
+  //     };
 
-      this.gameRooms.push(newRoom);
-      this.serverTotalRooms++;
-    }
-  }
+  //     this.gameRooms.push(newRoom);
+  //     this.serverTotalRooms++;
+  //   }
+  // }
 
-  removePlayerFromRoom(playerId: string) {
-    for (const room of this.gameRooms) {
-      const playerIndex = room.players.findIndex(
-        (player) => player.id === playerId,
-      );
+  // removePlayerFromRoom(playerId: string) {
+  //   for (const room of this.gameRooms) {
+  //     const playerIndex = room.players.findIndex(
+  //       (player) => player.id === playerId,
+  //     );
 
-      if (playerIndex !== -1) {
-        room.players.splice(playerIndex, 1);
+  //     if (playerIndex !== -1) {
+  //       room.players.splice(playerIndex, 1);
 
-        if (room.players.length === 0) {
-          const roomIndex = this.gameRooms.findIndex((r) => r.id === room.id);
-          this.gameRooms.splice(roomIndex, 1);
-        }
+  //       if (room.players.length === 0) {
+  //         const roomIndex = this.gameRooms.findIndex((r) => r.id === room.id);
+  //         this.gameRooms.splice(roomIndex, 1);
+  //       }
 
-        break;
-      }
-    }
-  }
+  //       break;
+  //     }
+  //   }
+  // }
 
   gameLoop() {
-    this.ball.x += this.ball.speedX;
-    this.ball.y += this.ball.speedY;
-
-    if (this.ball.x <= 0 || this.ball.x >= this.windowWidth) {
-      this.ball.speedX = -this.ball.speedX;
+    for (const game of this.games) {
+      game.gameLoop()
+      const room = game.game.id
+      const x = game.game.ball.x
+      const y = game.game.ball.y
+      this.server.to(room).emit('updateBallPosition', { x, y });
     }
-
-    if (this.ball.y <= 0 || this.ball.y >= this.windowHeight) {
-      this.ball.speedY = -this.ball.speedY;
-    }
-
-    for (const playerId in this.players) {
-      const player = this.players[playerId];
-
-      if (player) {
-        let playerX: number;
-        if (player.playerType === 'left') {
-          playerX = 10;
-        } else if (player.playerType === 'right') {
-          playerX = this.windowWidth - 20;
-        }
-        const playerY = player.y;
-
-        const playerWidth = 10;
-        const playerHeight = 100;
-
-        const ballInXRange =
-          this.ball.x + this.ball.radius > playerX &&
-          this.ball.x - this.ball.radius < playerX + playerWidth;
-
-        const ballInYRange =
-          this.ball.y + this.ball.radius > playerY &&
-          this.ball.y - this.ball.radius < playerY + playerHeight;
-
-        if (ballInXRange && ballInYRange) {
-          this.ball.speedX = -this.ball.speedX;
-        }
-      }
-    }
-
-    this.server.emit('updateBallPosition', { x: this.ball.x, y: this.ball.y });
   }
 
   @SubscribeMessage('invitePlayerToGame')
@@ -267,11 +196,30 @@ export class GameGateway
     });
   }
 
+  @SubscribeMessage('acceptInvitePlayerToGame')
+  async handleAcceptInvitePlayerToGame(
+    @User('id') userId: number,
+    @MessageBody() userIdInvitation: number
+  ) {
+    const match = this.queues.invites.find((i) => i.guest.id == userId && i.user.id == userIdInvitation)
+    if (!match) {
+      return
+    }
+    this.queues.invites = this.queues.invites.filter((i) => !(i.guest.id == userId && i.user.id == userIdInvitation))
+
+    const game = new GameService()
+
+    game.initGame({ id: `gameRoom-${match.user.id}-${match.guest.id}`, player1: match.user, player2: match.guest })
+
+    this.games.push(game)
+
+  }
+
   @SubscribeMessage('findMyInvites')
   handleFindMyInvites(@ConnectedSocket() clientSocket: Socket,
-  @MessageBody() player: any,
-  @User('id') userId: number) {
-    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);    
+    @MessageBody() player: any,
+    @User('id') userId: number) {
+    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);
     clientSocket.emit("listInvites", response);
   }
 
@@ -291,27 +239,32 @@ export class GameGateway
   async handlePlayerMovement(
     @ConnectedSocket() clientSocket: Socket,
     @MessageBody() direction: Direction,
+    @User('id') userId: number
   ) {
     const playerId = clientSocket.id;
 
+    const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
+
+    const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
+
     if (direction.up) {
-      if (this.players[playerId].y < 10) {
-        this.players[playerId].y = 0;
+      if (this.games[gameIndex].game.players[position].y < 10) {
+        this.games[gameIndex].game.players[position].y = 0;
       } else {
-        this.players[playerId].y -= 10;
+        this.games[gameIndex].game.players[position].y -= 10;
       }
     }
     if (direction.down) {
-      if (this.players[playerId].y > this.windowHeight - 100 - 10) {
-        this.players[playerId].y = this.windowHeight - 100;
+      if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
+        this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
       } else {
-        this.players[playerId].y += 10;
+        this.games[gameIndex].game.players[position].y += 10;
       }
     }
 
-    this.server.emit('updatePlayerPosition', {
+    this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
       playerId,
-      position: this.players[playerId],
+      position: this.games[gameIndex].game.players[position],
     });
   }
 }
