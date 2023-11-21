@@ -1,5 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
-import { MessageEntity, ChatMemberEntity } from '.';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  Column,
+  ManyToOne,
+} from 'typeorm';
+import { MessageEntity, ChatMemberEntity, UserEntity } from '.';
 
 export enum ChatAccess {
   PUBLIC = 'public',
@@ -34,8 +40,8 @@ export class ChatEntity {
   @Column({ nullable: true })
   password: string;
 
-  @Column({ nullable: true })
-  createdByUser: number;
+  @ManyToOne(() => UserEntity, (user) => user.createdChats)
+  createdBy: UserEntity;
 
   @OneToMany(() => ChatMemberEntity, (member) => member.chat)
   users: ChatMemberEntity[];
@@ -50,6 +56,6 @@ export class ChatEntity {
     this.password = chat?.password;
     this.users = chat?.users;
     this.messages = chat?.messages;
-    this.createdByUser = chat?.createdByUser;
+    this.createdBy = chat?.createdBy;
   }
 }

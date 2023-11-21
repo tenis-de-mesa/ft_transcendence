@@ -28,7 +28,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      })
+      }),
     );
   }, [currentUser.id]);
 
@@ -47,7 +47,7 @@ export default function Users() {
         cell: (info) => <AddFriendButton user={info.row.original} />,
       }),
     ],
-    []
+    [],
   );
 
   return (

@@ -3,7 +3,14 @@ import { FiX } from "react-icons/fi";
 import { Form } from "react-router-dom";
 import { User } from "../../types";
 import { AuthContext } from "../../contexts";
-import { Button, Card, Hr, Input, Overlay, Typography } from "../../components";
+import {
+  Avatar,
+  Button,
+  Card,
+  Input,
+  Overlay,
+  Typography,
+} from "../../components";
 
 export default function NewChannelCard({ onClose }) {
   const { currentUser } = useContext(AuthContext);
@@ -69,29 +76,32 @@ export default function NewChannelCard({ onClose }) {
     <>
       <Overlay />
 
-      <Card
-        id="create-channel-card"
-        className="absolute z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
-      >
-        <Card.Title hr={false}>
-          <div className="flex items-center justify-between gap-5">
-            <Typography variant="h6" customWeight="bold" className="text-left">
-              Select friends to chat with
+      <Form method="POST" action="/channels" onSubmit={handleNewChannelSubmit}>
+        <Card
+          id="create-channel-card"
+          className="fixed z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
+        >
+          <Card.Title>
+            <Typography
+              variant="h6"
+              customWeight="bold"
+              className="text-center"
+            >
+              New channel
             </Typography>
             <Button
               variant="info"
               size="sm"
               IconOnly={<FiX />}
               onClick={onClose}
+              className="absolute top-0 right-0 m-3"
             />
-          </div>
-        </Card.Title>
-        <Card.Body>
-          <Form
-            method="POST"
-            action="/channels"
-            onSubmit={handleNewChannelSubmit}
-          >
+          </Card.Title>
+          <Card.Body position="left">
+            <Typography variant="lg" className="text-left">
+              Select participants
+            </Typography>
+
             <Input
               type="text"
               placeholder="Search users"
@@ -100,23 +110,42 @@ export default function NewChannelCard({ onClose }) {
             />
 
             <div className="my-3 overflow-y-auto min-h-[15rem]">
-              {filteredUsers.length > 1 ? (
+              {filteredUsers.length >= 1 ? (
                 <ul className="flex flex-col items-start">
                   {filteredUsers.map((user) => {
                     if (user.id === currentUser.id) return null;
 
                     return (
-                      <li key={user.id}>
-                        <input
-                          className="mr-1"
-                          type="checkbox"
-                          value={user.id}
-                          name="users[]"
-                          checked={selectedUsersId.includes(user.id)}
-                          onChange={() => toggleUserSelection(user.id)}
-                        />
-                        <Typography variant="md" as="label">
-                          {user.nickname}
+                      <li key={user.id} className="w-full">
+                        <Typography
+                          variant="md"
+                          as="label"
+                          customWeight={
+                            selectedUsersId.includes(user.id)
+                              ? "bold"
+                              : "regular"
+                          }
+                        >
+                          <input
+                            className="mr-1 hidden"
+                            type="checkbox"
+                            value={user.id}
+                            name="users[]"
+                            checked={selectedUsersId.includes(user.id)}
+                            onChange={() => toggleUserSelection(user.id)}
+                          />
+                          <div className={`flex items-center m-1`}>
+                            <Avatar
+                              className="mr-2"
+                              seed={user.login}
+                              size="sm"
+                              src={user.avatarUrl}
+                            />
+                            {user.nickname}
+                            {selectedUsersId.includes(user.id) && (
+                              <span className="text-green-500 m-2">✓</span>
+                            )}
+                          </div>
                         </Typography>
                       </li>
                     );
@@ -129,9 +158,7 @@ export default function NewChannelCard({ onClose }) {
               )}
             </div>
 
-            <Hr className="my-3"></Hr>
-
-            <div className="text-left">
+            <Typography variant="md" as="label">
               <input
                 type="checkbox"
                 name="hasPassword"
@@ -139,10 +166,8 @@ export default function NewChannelCard({ onClose }) {
                 className="mr-1 mb-3"
                 onChange={() => setHasPassword(!hasPassword)}
               />
-              <Typography variant="md" as="label">
-                Protect with password
-              </Typography>
-            </div>
+              Protect with password
+            </Typography>
 
             {hasPassword && (
               <div className="mb-3">
@@ -150,12 +175,14 @@ export default function NewChannelCard({ onClose }) {
                   name="password"
                   type="password"
                   placeholder="Insert password"
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 ></Input>
               </div>
             )}
-
+          </Card.Body>
+          <Card.Footer>
             <Button
               className="justify-center w-full font-bold"
               type="submit"
@@ -164,9 +191,9 @@ export default function NewChannelCard({ onClose }) {
             >
               Create Channel
             </Button>
-          </Form>
-        </Card.Body>
-      </Card>
+          </Card.Footer>
+        </Card>
+      </Form>
     </>
   );
 }

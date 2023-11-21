@@ -28,7 +28,7 @@ export default function Root() {
         <div className="">
           <Sidebar darkMode={isDark} options={navitems} />
         </div>
-        <div className="w-[calc(100%-16rem)] h-[calc(100%-2rem)] px-3 m-auto">
+        <div className="w-full h-full py-3 px-10">
           <Outlet />
         </div>
       </div>
