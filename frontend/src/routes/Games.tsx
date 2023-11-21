@@ -29,7 +29,7 @@ const Games = () => {
         }
       });
     }
-  
+
     if (ballPosition) {
       rc.circle(ballPosition.x, ballPosition.y, 16, { stroke: "white", fill: "white" });
     }

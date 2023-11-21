@@ -91,6 +91,7 @@ export default function Users() {
     <>
       <Typography variant="h5">Users</Typography>
       <Button variant="info" onClick={() => handleGameInvite(currentUser)}>Show my invites</Button>
+      <div>
       {
         invites.map((i) => {
           return <div className="text-white">{i.nickname}
@@ -98,6 +99,7 @@ export default function Users() {
           </div>
         })
       }
+      </div>
       <div className="h-[92%] mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
