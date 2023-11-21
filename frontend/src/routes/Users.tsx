@@ -1,4 +1,4 @@
-import { Link, redirect, useLoaderData } from "react-router-dom";
+import { Link, Navigate, redirect, useLoaderData, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types";
 
@@ -16,6 +16,7 @@ import { useWebSocket } from "../hooks";
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
+  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
@@ -25,7 +26,10 @@ export default function Users() {
   const socket = useWebSocket();
 
   const handleGameInvite = (player) => {
-    socket.emit("findMyInvites", player.id);
+    socket.emit("findMyInvites", player.id, (listInvites) => {
+      console.log(invites);
+      setInvites(listInvites)
+    });
   };
 
   const submitGameInvite = function (player) {
@@ -39,19 +43,14 @@ export default function Users() {
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
-    socket.on('listInvites', (listInvites) => {
-      console.log(invites);
-      setInvites(listInvites)
-    });
-
     socket.on('gameAvailable', (gameId) => {
-      return redirect(`/game/${gameId}`);
+      navigate(`/games/${gameId}`);
     })
 
     return () => {
-      socket.off("listInvites");
+      socket.off("gameAvailable");
     };
-  }, [invites])
+  }, [navigate, socket])
 
   useEffect(() => {
     // The current user is online by default
@@ -81,7 +80,10 @@ export default function Users() {
           return (
             <>
               <AddFriendButton user={info.row.original} />
+
+
               <Button variant="error" onClick={() => submitGameInvite(info.row.original)}>Play</Button>
+
 
             </>
           )
@@ -113,3 +115,7 @@ export default function Users() {
     </>
   );
 }
+function redirectDocument(arg0: string): void {
+  throw new Error("Function not implemented.");
+}
+

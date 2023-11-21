@@ -111,7 +111,7 @@ export class GameService {
       direction: { down: false, up: false }
     }
 
-    return game.id
+    return game
   }
 
   updateGame(server: Server) {

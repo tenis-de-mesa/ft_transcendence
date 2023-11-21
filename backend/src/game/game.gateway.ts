@@ -221,6 +221,7 @@ export class GameGateway
 
   @SubscribeMessage('acceptInvitePlayerToGame')
   async handleAcceptInvitePlayerToGame(
+    @ConnectedSocket() clientSocket: Socket,
     @User('id') userId: number,
     @MessageBody() userIdInvitation: number
   ) {
@@ -230,13 +231,10 @@ export class GameGateway
     }
     this.queues.invites = this.queues.invites.filter((i) => !(i.guest.id == userId && i.user.id == userIdInvitation))
 
-    const gameId = this.gameService.newGame(match.user, match.guest)
+    const game = await this.gameService.newGame(match.user, match.guest)
 
-    // this.allUsers[match.user.id].client.join(`game:${gameId}`)
-    // this.allUsers[match.guest.id].client.join(`game:${gameId}`)
-
-    this.allUsers[match.user.id].client.emit('gameAvailable', gameId)
-    this.allUsers[match.guest.id].client.emit('gameAvailable', gameId)
+    this.allUsers[match.user.id].client.emit('gameAvailable', game.id)
+    clientSocket.emit('gameAvailable', game.id)
   }
 
   @SubscribeMessage('findMyInvites')
@@ -244,7 +242,7 @@ export class GameGateway
     @MessageBody() player: any,
     @User('id') userId: number) {
     const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);
-    clientSocket.emit("listInvites", response);
+    return response
   }
 
   private async validate(client: Socket) {
