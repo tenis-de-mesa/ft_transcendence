@@ -38,23 +38,12 @@ export class GameGateway
     // open: []
   };
 
-  games: any[]
-
   allUsers: Record<number, {
     user: UserEntity,
     client: Socket
   }>
 
   allClientSockets: Record<string, number>
-
-  // 
-
-
-  players: Record<string, Player | undefined>;
-  serverTotalPlayers: number;
-
-  windowWidth = 700;
-  windowHeight = 600;
 
   interval: NodeJS.Timeout;
 
@@ -71,7 +60,6 @@ export class GameGateway
       invites: []
       // open: []
     };
-    this.games = []
 
     this.allUsers = {}
     this.allClientSockets = {}
@@ -86,12 +74,6 @@ export class GameGateway
         })
         .catch((error) => next(error));
     });
-
-
-
-    this.players = {};
-    this.serverTotalPlayers = 0;
-
   }
 
   handleConnection(clientSocket: Socket) {
@@ -103,31 +85,6 @@ export class GameGateway
     this.allUsers[user.id] = { client: clientSocket, user: user }
 
     this.allClientSockets[clientSocket.id] = user.id
-
-    // let playerType: string;
-    // if (this.serverTotalPlayers % 2 === 0) {
-    //   playerType = 'left';
-    // } else {
-    //   playerType = 'right';
-    // }
-
-    // const newPlayerConnection: Player = {
-    //   id: clientSocket.id,
-    //   y: 0,
-    //   playerType: playerType,
-    // };
-
-    // const newPlayerStringId: string = clientSocket.id;
-
-    // this.players[newPlayerStringId] = newPlayerConnection;
-    // this.serverTotalPlayers++;
-
-    // this.addPlayerToRoom(newPlayerConnection);
-
-    // this.server.emit('socketConnection', this.players);
-    // clientSocket.emit('playerConnection', newPlayerConnection.id);
-
-    // this.server.emit('ballPosition', this.ball);
   }
 
   handleDisconnect(clientSocket: Socket) {
@@ -137,18 +94,7 @@ export class GameGateway
 
     delete this.allUsers[userId]
     delete this.allClientSockets[clientSocket.id]
-
-    // const playerStringId: string = clientSocket.id;
-    // this.players[playerStringId] = undefined;
-    // this.serverTotalPlayers--;
-
-    // this.removePlayerFromRoom(playerStringId);
-
-    // this.server.emit('socketConnection', this.players);
-    // clientSocket.emit('playerDisconnection', playerStringId);
   }
-
-
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(

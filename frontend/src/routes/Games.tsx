@@ -9,7 +9,7 @@ const Games = () => {
   const canvasRef = useRef(null);
   const socket = useWebSocket();
 
-  const [totalPlayers, setTotalPlayers] = useState([]);
+  const [players, setPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
 
   useLayoutEffect(() => {
@@ -19,8 +19,8 @@ const Games = () => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (totalPlayers) {
-      totalPlayers.forEach((player, index) => {
+    if (players) {
+      players.forEach((player, index) => {
         if (index === 0) {
           rc.rectangle(10, player.y, 10, 100, { stroke: "white", fill: "white" });
         } else if (index === 1) {
@@ -32,7 +32,7 @@ const Games = () => {
     if (ballPosition) {
       rc.circle(ballPosition.x, ballPosition.y, 16, { stroke: "white", fill: "white" });
     }
-  }, [totalPlayers, ballPosition]);
+  }, [players, ballPosition]);
 
   const handleKeyDown = (event) => {
     switch (event.key) {
@@ -58,9 +58,7 @@ const Games = () => {
     if (socket) {
       console.log(`Will join game ${id}`);
       socket.emit(`joinGame`, id, (game) => {
-        console.log("Received game after joining:");
-        console.log(game); // ok
-        setTotalPlayers(game.players);
+        setPlayers(game.players);
       });
 
       socket.on('connect', () => {
@@ -72,7 +70,7 @@ const Games = () => {
       });
 
       socket.on("updatePlayerPosition", (players) => {
-        setTotalPlayers(players);
+        setPlayers(players);
       });
 
       socket.on('updateBallPosition', ({ x, y }) => {
@@ -82,8 +80,6 @@ const Games = () => {
       return () => {
         socket.off("connect");
         socket.off("disconnect");
-        socket.off("socketConnection");
-        socket.off("socketDisconnection");
         socket.off("updatePlayerPosition");
         socket.off("updateBallPosition");
         window.removeEventListener('keydown', handleKeyDown);
