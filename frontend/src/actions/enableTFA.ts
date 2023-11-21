@@ -2,7 +2,6 @@ import { ActionFunctionArgs } from "react-router-dom";
 import { makeRequest } from "../api";
 
 export async function enableTFA({ request }: ActionFunctionArgs) {
-  console.log("enableTFA");
   const formData = await request.formData();
 
   const body = {

@@ -8,10 +8,6 @@ const RegenerateTFACodes = () => {
   const fetcher = useFetcher();
   const [tfaCode, setTfaCode] = useState("");
 
-  console.log("fetcher.state", fetcher.state);
-  console.log("fetcher.data", fetcher.data);
-  console.log("fetcher.json", fetcher.json);
-
   if (fetcher.data?.status === "success") {
     return (
       <RecoveryCodes
