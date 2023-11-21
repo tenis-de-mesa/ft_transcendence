@@ -1,12 +1,12 @@
 import { Typography } from "../components/Typography";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import rough from "roughjs";
-import { useGameWebSocket } from "../hooks/useGameWebSocket";
+import { useWebSocket } from "../hooks";
 
 const Games = () => {
   const canvasRef = useRef(null);
 
-  const socket = useGameWebSocket();
+  const socket = useWebSocket();
 
   const [totalPlayers, setTotalPlayers] = useState(null);
   const [ballPosition, setBallPosition] = useState(null);

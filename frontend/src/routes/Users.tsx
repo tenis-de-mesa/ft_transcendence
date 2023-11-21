@@ -11,7 +11,7 @@ import { AddFriendButton } from "../components/AddFriendButton";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
 import { Button } from "../components";
-import { useGameWebSocket } from "../hooks";
+import { useWebSocket } from "../hooks";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -22,7 +22,7 @@ export default function Users() {
 
   const [invites, setInvites] = useState([])
 
-  const socket = useGameWebSocket();
+  const socket = useWebSocket();
 
   const handleGameInvite = (player) => {
     socket.emit("findMyInvites", player.id);
@@ -78,10 +78,10 @@ export default function Users() {
             <>
               <AddFriendButton user={info.row.original} />
               <Button variant="error" onClick={() => submitGameInvite(info.row.original)}>Play</Button>
-              
+
             </>
           )
-        } 
+        }
       }),
     ],
     [],
@@ -92,13 +92,13 @@ export default function Users() {
       <Typography variant="h5">Users</Typography>
       <Button variant="info" onClick={() => handleGameInvite(currentUser)}>Show my invites</Button>
       <div>
-      {
-        invites.map((i) => {
-          return <div className="text-white">{i.nickname}
-          <Button variant="info" onClick={() => acceptGameInvite(i.id)}>Aceitar</Button>
-          </div>
-        })
-      }
+        {
+          invites.map((i) => {
+            return <div className="text-white">{i.nickname}
+              <Button variant="info" onClick={() => acceptGameInvite(i.id)}>Aceitar</Button>
+            </div>
+          })
+        }
       </div>
       <div className="h-[92%] mt-6">
         <Table

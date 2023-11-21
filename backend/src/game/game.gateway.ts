@@ -19,7 +19,6 @@ import { Ball, GameRoom, Player, Score, Direction } from './game.interface';
 import { GameService } from './game.service';
 
 @WebSocketGateway({
-  namespace: 'games',
   cors: {
     origin: 'http://localhost:3000',
     credentials: true,
@@ -70,7 +69,7 @@ export class GameGateway
       // this.gameLoop();
       this.gameService.updateGame(this.server)
 
-     
+
     }, 16);
     this.queues = {
       // all: []
@@ -232,7 +231,7 @@ export class GameGateway
     this.queues.invites = this.queues.invites.filter((i) => !(i.guest.id == userId && i.user.id == userIdInvitation))
 
     const gameId = this.gameService.newGame(match.user, match.guest)
-  
+
     this.allUsers[match.user.id].client.join(`game:${gameId}`)
     this.allUsers[match.guest.id].client.join(`game:${gameId}`)
 
