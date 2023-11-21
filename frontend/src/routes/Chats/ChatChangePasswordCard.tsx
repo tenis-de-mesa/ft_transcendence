@@ -1,6 +1,6 @@
 import { ChangeEvent, useContext, useState } from "react";
 import { useFetcher } from "react-router-dom";
-import { FiX } from "react-icons/fi";
+import { FiChevronLeft } from "react-icons/fi";
 import { ChatContext } from "../../contexts/";
 import { Card, Typography, Button, Input, Hr, Alert } from "../../components";
 
@@ -10,12 +10,16 @@ const emptyForm = {
   confirmPassword: "",
 };
 
-export default function ChatChangePasswordCard() {
-  const { currentChat, closeCard } = useContext(ChatContext);
+type ChatChangePasswordCardProps = {
+  onBack: () => void;
+};
+
+export default function ChatChangePasswordCard({
+  onBack,
+}: ChatChangePasswordCardProps) {
+  const { currentChat } = useContext(ChatContext);
   const { Form, data: result, state } = useFetcher();
-
   const [passwordForm, setPasswordForm] = useState(emptyForm);
-
   const { currentPassword, newPassword, confirmPassword } = passwordForm;
 
   const disableChange =
@@ -50,15 +54,16 @@ export default function ChatChangePasswordCard() {
             Change channel password
           </Typography>
           <Button
-            IconOnly={<FiX />}
+            IconOnly={<FiChevronLeft />}
             size="md"
             variant="info"
-            onClick={closeCard}
+            onClick={onBack}
           />
         </Card.Title>
         <Card.Body>
           <Form
             className="flex flex-col gap-3 text-left"
+            action={`${currentChat?.id}/manage-password`}
             method="POST"
             onSubmit={handleFormSubmit}
           >
@@ -104,11 +109,8 @@ export default function ChatChangePasswordCard() {
               variant="info"
               type="submit"
               disabled={disableChange}
-              formAction={
-                currentChat.access === "protected"
-                  ? "change-password"
-                  : "set-password"
-              }
+              name="intent"
+              value={currentChat?.access === "protected" ? "change" : "set"}
             >
               {state !== "idle"
                 ? "Loading..."
@@ -126,7 +128,8 @@ export default function ChatChangePasswordCard() {
                   variant="error"
                   type="submit"
                   disabled={disableRemove}
-                  formAction={"remove-password"}
+                  name="intent"
+                  value="remove"
                 >
                   {state !== "idle"
                     ? "Loading..."

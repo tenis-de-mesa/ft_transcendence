@@ -27,7 +27,13 @@ export default function ChatSettingsCard() {
       <Card.Body className="flex flex-col gap-3 [&>*]:font-bold [&>*]:justify-center">
         <Button
           variant="info"
-          onClick={() => setShowCard(<ChatChangePasswordCard />)}
+          onClick={() =>
+            setShowCard(
+              <ChatChangePasswordCard
+                onBack={() => setShowCard(<ChatSettingsCard />)}
+              />
+            )
+          }
         >
           Manage channel password
         </Button>
