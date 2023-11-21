@@ -293,6 +293,21 @@ export class ChatsService {
     return member.role;
   }
 
+  async getMembersByStatus(
+    chatId: number,
+    status: ChatMemberStatus,
+  ): Promise<ChatMemberEntity[]> {
+    return await this.chatMemberRepository.find({
+      where: {
+        chatId,
+        status,
+      },
+      relations: {
+        user: true,
+      },
+    });
+  }
+
   async findDirectChat(
     currentUser: UserEntity,
     otherUserId: number,

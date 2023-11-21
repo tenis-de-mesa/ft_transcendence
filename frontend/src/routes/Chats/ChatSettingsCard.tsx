@@ -4,6 +4,7 @@ import { ChatContext } from "../../contexts";
 import { Card, Typography, Button } from "../../components";
 
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
+import ChatManageMutedMembersCard from "./ChatManageMutedMembersCard";
 
 export default function ChatSettingsCard() {
   const { setShowCard, closeCard } = useContext(ChatContext);
@@ -37,7 +38,16 @@ export default function ChatSettingsCard() {
         >
           Manage channel password
         </Button>
-        <Button variant="info" onClick={() => {}}>
+        <Button
+          variant="info"
+          onClick={() =>
+            setShowCard(
+              <ChatManageMutedMembersCard
+                onBack={() => setShowCard(<ChatSettingsCard />)}
+              />
+            )
+          }
+        >
           Manage muted members
         </Button>
         <Button variant="info" onClick={() => {}}>
