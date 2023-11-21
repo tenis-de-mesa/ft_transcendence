@@ -11,7 +11,15 @@ import { BlockListEntity } from '../core/entities/blockList.entity';
 import { GameEntity } from '../core/entities/game.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SessionEntity, UserEntity, BlockListEntity, GameEntity]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      SessionEntity,
+      UserEntity,
+      BlockListEntity,
+      GameEntity,
+    ]),
+    UsersModule,
+  ],
   controllers: [GameController],
   providers: [GameService, GameGateway, UsersService, SessionsService],
 })

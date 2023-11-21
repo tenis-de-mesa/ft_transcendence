@@ -127,7 +127,7 @@ export class UserEntity {
   blockedUsers: BlockListEntity[];
 
   @ManyToMany(() => GameEntity)
-  games: GameEntity[]
+  games: GameEntity[];
 
   @DeleteDateColumn()
   deletedAt?: Date;

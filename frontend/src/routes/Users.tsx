@@ -1,4 +1,10 @@
-import { Link, Navigate, redirect, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  redirect,
+  useLoaderData,
+  useNavigate,
+} from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types";
 
@@ -21,36 +27,36 @@ export default function Users() {
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
-  const [invites, setInvites] = useState([])
+  const [invites, setInvites] = useState([]);
 
   const socket = useWebSocket();
 
   const handleGameInvite = (player) => {
     socket.emit("findMyInvites", player.id, (listInvites) => {
       console.log(invites);
-      setInvites(listInvites)
+      setInvites(listInvites);
     });
   };
 
   const submitGameInvite = function (player) {
-    socket.emit('invitePlayerToGame', player.id)
-  }
+    socket.emit("invitePlayerToGame", player.id);
+  };
 
   const acceptGameInvite = function (playerId) {
-    socket.emit('acceptInvitePlayerToGame', playerId)
-  }
+    socket.emit("acceptInvitePlayerToGame", playerId);
+  };
 
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
-    socket.on('gameAvailable', (gameId) => {
+    socket.on("gameAvailable", (gameId) => {
       navigate(`/games/${gameId}`);
-    })
+    });
 
     return () => {
       socket.off("gameAvailable");
     };
-  }, [navigate, socket])
+  }, [navigate, socket]);
 
   useEffect(() => {
     // The current user is online by default
@@ -81,13 +87,15 @@ export default function Users() {
             <>
               <AddFriendButton user={info.row.original} />
 
-
-              <Button variant="error" onClick={() => submitGameInvite(info.row.original)}>Play</Button>
-
-
+              <Button
+                variant="error"
+                onClick={() => submitGameInvite(info.row.original)}
+              >
+                Play
+              </Button>
             </>
-          )
-        }
+          );
+        },
       }),
     ],
     [],
@@ -96,15 +104,20 @@ export default function Users() {
   return (
     <>
       <Typography variant="h5">Users</Typography>
-      <Button variant="info" onClick={() => handleGameInvite(currentUser)}>Show my invites</Button>
+      <Button variant="info" onClick={() => handleGameInvite(currentUser)}>
+        Show my invites
+      </Button>
       <div>
-        {
-          invites.map((i) => {
-            return <div className="text-white">{i.nickname}
-              <Button variant="info" onClick={() => acceptGameInvite(i.id)}>Aceitar</Button>
+        {invites.map((i) => {
+          return (
+            <div className="text-white">
+              {i.nickname}
+              <Button variant="info" onClick={() => acceptGameInvite(i.id)}>
+                Aceitar
+              </Button>
             </div>
-          })
-        }
+          );
+        })}
       </div>
       <div className="h-[92%] mt-6">
         <Table
@@ -118,4 +131,3 @@ export default function Users() {
 function redirectDocument(arg0: string): void {
   throw new Error("Function not implemented.");
 }
-

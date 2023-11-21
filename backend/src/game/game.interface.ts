@@ -1,28 +1,28 @@
-import { Socket } from "socket.io";
-import { UserEntity } from "../core/entities";
+import { Socket } from 'socket.io';
+import { UserEntity } from '../core/entities';
 
 export type Player = {
-    user: UserEntity;
-    y: number;
-    score: number;
-    playerType: string;
+  user: UserEntity;
+  y: number;
+  score: number;
+  playerType: string;
 };
 
 export interface Ball {
-    x: number;
-    y: number;
-    speedX: number;
-    speedY: number;
-    radius: number;
+  x: number;
+  y: number;
+  speedX: number;
+  speedY: number;
+  radius: number;
 }
 
 export type Direction = {
-    up: boolean;
-    down: boolean;
+  up: boolean;
+  down: boolean;
 };
 
 export interface GameRoom {
-    gameId: number;
-    players: Player[];
-    ball: Ball;
+  gameId: number;
+  players: Player[];
+  ball: Ball;
 }

@@ -24,40 +24,48 @@ const Games = () => {
     if (players) {
       players.forEach((player, index) => {
         if (index === 0) {
-          rc.rectangle(10, player.y, 10, 100, { stroke: "white", fill: "white" });
-          ctx.fillText(player.score, canvas.width * 1 / 4 - 10, 50);
+          rc.rectangle(10, player.y, 10, 100, {
+            stroke: "white",
+            fill: "white",
+          });
+          ctx.fillText(player.score, (canvas.width * 1) / 4 - 10, 50);
         } else if (index === 1) {
-          rc.rectangle(canvas.width - 20, player.y, 10, 100, { stroke: "white", fill: "white" });
-          ctx.fillText(player.score, canvas.width * 3 / 4 - 10, 50);
+          rc.rectangle(canvas.width - 20, player.y, 10, 100, {
+            stroke: "white",
+            fill: "white",
+          });
+          ctx.fillText(player.score, (canvas.width * 3) / 4 - 10, 50);
         }
       });
     }
 
     if (ballPosition) {
-      rc.circle(ballPosition.x, ballPosition.y, 16, { stroke: "white", fill: "white" });
+      rc.circle(ballPosition.x, ballPosition.y, 16, {
+        stroke: "white",
+        fill: "white",
+      });
     }
   }, [players, ballPosition]);
 
   const handleKeyDown = (event) => {
     switch (event.key) {
-      case 'w':
+      case "w":
         socket.emit("movePlayer", { gameId: id, up: true });
         break;
-      case 's':
+      case "s":
         socket.emit("movePlayer", { gameId: id, down: true });
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         socket.emit("movePlayer", { gameId: id, up: true });
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         socket.emit("movePlayer", { gameId: id, down: true });
         break;
     }
   };
 
-
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     if (socket) {
       console.log(`Will join game ${id}`);
@@ -65,19 +73,19 @@ const Games = () => {
         setPlayers(game.players);
       });
 
-      socket.on('connect', () => {
-        console.log('Conectado ao servidor');
+      socket.on("connect", () => {
+        console.log("Conectado ao servidor");
       });
 
-      socket.on('disconnect', () => {
-        console.log('Desconectado do servidor');
+      socket.on("disconnect", () => {
+        console.log("Desconectado do servidor");
       });
 
       socket.on("updatePlayerPosition", (players) => {
         setPlayers(players);
       });
 
-      socket.on('updateBallPosition', ({ x, y }) => {
+      socket.on("updateBallPosition", ({ x, y }) => {
         setBallPosition({ x, y });
       });
 
@@ -86,16 +94,14 @@ const Games = () => {
         socket.off("disconnect");
         socket.off("updatePlayerPosition");
         socket.off("updateBallPosition");
-        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener("keydown", handleKeyDown);
       };
     }
   }, [socket]);
 
   return (
     <>
-      <Typography variant="h5">
-        Games
-      </Typography>
+      <Typography variant="h5">Games</Typography>
 
       <div className="flex justify-center mt-10">
         <canvas

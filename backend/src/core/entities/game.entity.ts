@@ -32,7 +32,7 @@ export class GameEntity {
 
   @ManyToMany(() => UserEntity)
   @JoinTable()
-  users: UserEntity[]
+  users: UserEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -41,6 +41,6 @@ export class GameEntity {
     this.id = game?.id;
     this.score1 = game?.score1;
     this.score2 = game?.score2;
-    this.users = game?.users
+    this.users = game?.users;
   }
 }

@@ -17,9 +17,9 @@ export class GameService {
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
   ) {
-    this.games = {}
+    this.games = {};
 
-    this.loadGames()
+    this.loadGames();
   }
 
   async findOne(id: number): Promise<GameEntity> {
@@ -29,7 +29,7 @@ export class GameService {
       },
       relations: {
         users: true,
-      }
+      },
     });
 
     if (!game) {
@@ -42,34 +42,49 @@ export class GameService {
   async loadGames() {
     const games = await this.gameRepository.find({
       where: {
-        status: GameStatus.START
+        status: GameStatus.START,
       },
       relations: {
-        users: true
-      }
-    })
+        users: true,
+      },
+    });
 
-    console.log('loadGames', games.length)
+    console.log('loadGames', games.length);
 
     for (const game of games) {
-      this.games[game.id] = this.resetDataGame(game.id, game.users[0], game.users[1], game.score1, game.score2)
+      this.games[game.id] = this.resetDataGame(
+        game.id,
+        game.users[0],
+        game.users[1],
+        game.score1,
+        game.score2,
+      );
     }
   }
 
-  resetDataGame(gameId: number, user1: UserEntity, user2: UserEntity, score1: number, score2: number): GameRoom {
+  resetDataGame(
+    gameId: number,
+    user1: UserEntity,
+    user2: UserEntity,
+    score1: number,
+    score2: number,
+  ): GameRoom {
     return {
       gameId,
-      players: [{
-        playerType: 'left',
-        y: 0,
-        score: score1,
-        user: user1
-      }, {
-        playerType: 'rigth',
-        y: 0,
-        score: score2,
-        user: user2
-      }],
+      players: [
+        {
+          playerType: 'left',
+          y: 0,
+          score: score1,
+          user: user1,
+        },
+        {
+          playerType: 'rigth',
+          y: 0,
+          score: score2,
+          user: user2,
+        },
+      ],
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
@@ -77,22 +92,22 @@ export class GameService {
         speedY: 4,
         radius: 16,
       },
-    }
+    };
   }
 
   async newGame(user1: UserEntity, user2: UserEntity) {
-    const game = await this.gameRepository.save({ users: [user1, user2] })
+    const game = await this.gameRepository.save({ users: [user1, user2] });
 
-    console.log('newGame', game.id)
+    console.log('newGame', game.id);
 
-    this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0)
+    this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
 
-    return this.games[game.id]
+    return this.games[game.id];
   }
 
   updateGame(server: Server) {
     Object.keys(this.games).forEach((gameId) => {
-      const game = this.games[gameId]
+      const game = this.games[gameId];
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
@@ -106,11 +121,11 @@ export class GameService {
       }
 
       if (game.ball.x <= 0) {
-        this.gainedAPoint(game.gameId, 0)
-        return
+        this.gainedAPoint(game.gameId, 0);
+        return;
       } else if (game.ball.x >= this.windowWidth) {
-        this.gainedAPoint(game.gameId, 1)
-        return
+        this.gainedAPoint(game.gameId, 1);
+        return;
       }
 
       for (const player of game.players) {
@@ -140,40 +155,51 @@ export class GameService {
         }
       }
 
-      server.to(`game:${gameId}`).emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
-    })
-
+      server
+        .to(`game:${gameId}`)
+        .emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
+    });
   }
 
   gainedAPoint(gameId: number, player: 0 | 1) {
-    const { players } = this.games[gameId]
+    const { players } = this.games[gameId];
 
-    players[player].score++
+    players[player].score++;
 
     if (players[player].score >= 10) {
-      this.finishGame(gameId)
+      this.finishGame(gameId);
     }
 
-    this.games[gameId] = this.resetDataGame(gameId,
-      players[0].user, players[1].user, players[0].score, players[1].score)
+    this.games[gameId] = this.resetDataGame(
+      gameId,
+      players[0].user,
+      players[1].user,
+      players[0].score,
+      players[1].score,
+    );
   }
 
   finishGame(gameId: number) {
-    const game = this.games[gameId]
+    const game = this.games[gameId];
     this.gameRepository.update(gameId, {
       score1: game.players[0].score,
       score2: game.players[1].score,
-      status: GameStatus.FINISH
-    })
-    delete this.games[gameId]
+      status: GameStatus.FINISH,
+    });
+    delete this.games[gameId];
   }
 
-  movePlayers(server: Server, userId: number, body: {
-    up: boolean;
-    down: boolean;
-    gameId: number;
-  }) {
-    const position = this.games[body.gameId].players[0].user.id == userId ? 0 : 1
+  movePlayers(
+    server: Server,
+    userId: number,
+    body: {
+      up: boolean;
+      down: boolean;
+      gameId: number;
+    },
+  ) {
+    const position =
+      this.games[body.gameId].players[0].user.id == userId ? 0 : 1;
 
     if (body.up) {
       if (this.games[body.gameId].players[position].y < 10) {
@@ -183,14 +209,18 @@ export class GameService {
       }
     }
     if (body.down) {
-      if (this.games[body.gameId].players[position].y > this.windowHeight - 100 - 10) {
+      if (
+        this.games[body.gameId].players[position].y >
+        this.windowHeight - 100 - 10
+      ) {
         this.games[body.gameId].players[position].y = this.windowHeight - 100;
       } else {
         this.games[body.gameId].players[position].y += 10;
       }
     }
 
-    server.to(`game:${body.gameId}`).emit('updatePlayerPosition',
-      this.games[body.gameId].players);
+    server
+      .to(`game:${body.gameId}`)
+      .emit('updatePlayerPosition', this.games[body.gameId].players);
   }
 }

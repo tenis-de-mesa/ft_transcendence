@@ -26,43 +26,47 @@ import { GameService } from './game.service';
   cookie: true,
 })
 export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
 
   queues: {
     // all: []
     invites: {
-      user: UserEntity,
-      guest: UserEntity
-    }[]
+      user: UserEntity;
+      guest: UserEntity;
+    }[];
     // open: []
   };
 
-  allUsers: Record<number, {
-    user: UserEntity,
-    client: Socket
-  }>
+  allUsers: Record<
+    number,
+    {
+      user: UserEntity;
+      client: Socket;
+    }
+  >;
 
-  allClientSockets: Record<string, number>
+  allClientSockets: Record<string, number>;
 
   interval: NodeJS.Timeout;
 
   constructor(
     private readonly sessionService: SessionsService,
     private readonly userService: UsersService,
-    private readonly gameService: GameService
+    private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.gameService.updateGame(this.server)
+      this.gameService.updateGame(this.server);
     }, 16);
     this.queues = {
       // all: []
-      invites: []
+      invites: [],
       // open: []
     };
 
-    this.allUsers = {}
-    this.allClientSockets = {}
+    this.allUsers = {};
+    this.allClientSockets = {};
   }
 
   afterInit(server: Server) {
@@ -80,20 +84,25 @@ export class GameGateway
     // TODO: not exists user?
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    console.log('Game: New client connection:', clientSocket.id, "userId", user.id);
+    console.log(
+      'Game: New client connection:',
+      clientSocket.id,
+      'userId',
+      user.id,
+    );
 
-    this.allUsers[user.id] = { client: clientSocket, user: user }
+    this.allUsers[user.id] = { client: clientSocket, user: user };
 
-    this.allClientSockets[clientSocket.id] = user.id
+    this.allClientSockets[clientSocket.id] = user.id;
   }
 
   handleDisconnect(clientSocket: Socket) {
-    const userId = this.allClientSockets[clientSocket.id]
+    const userId = this.allClientSockets[clientSocket.id];
 
     console.log('Client disconnected:', clientSocket.id, 'userId', userId);
 
-    delete this.allUsers[userId]
-    delete this.allClientSockets[clientSocket.id]
+    delete this.allUsers[userId];
+    delete this.allClientSockets[clientSocket.id];
   }
 
   @SubscribeMessage('invitePlayerToGame')
@@ -103,14 +112,14 @@ export class GameGateway
     @User() user: UserEntity,
   ) {
     if (this.queues.invites.find((i) => i.guest.id == guestId)) {
-      return
+      return;
     }
 
-    const guest = await this.userService.getUserById(guestId)
+    const guest = await this.userService.getUserById(guestId);
 
     this.queues.invites.push({
       guest,
-      user
+      user,
     });
   }
 
@@ -118,26 +127,34 @@ export class GameGateway
   async handleAcceptInvitePlayerToGame(
     @ConnectedSocket() clientSocket: Socket,
     @User('id') userId: number,
-    @MessageBody() userIdInvitation: number
+    @MessageBody() userIdInvitation: number,
   ) {
-    const match = this.queues.invites.find((i) => i.guest.id == userId && i.user.id == userIdInvitation)
+    const match = this.queues.invites.find(
+      (i) => i.guest.id == userId && i.user.id == userIdInvitation,
+    );
     if (!match) {
-      return
+      return;
     }
-    this.queues.invites = this.queues.invites.filter((i) => !(i.guest.id == userId && i.user.id == userIdInvitation))
+    this.queues.invites = this.queues.invites.filter(
+      (i) => !(i.guest.id == userId && i.user.id == userIdInvitation),
+    );
 
-    const game = await this.gameService.newGame(match.user, match.guest)
+    const game = await this.gameService.newGame(match.user, match.guest);
 
-    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId)
-    clientSocket.emit('gameAvailable', game.gameId)
+    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId);
+    clientSocket.emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('findMyInvites')
-  handleFindMyInvites(@ConnectedSocket() clientSocket: Socket,
+  handleFindMyInvites(
+    @ConnectedSocket() clientSocket: Socket,
     @MessageBody() player: any,
-    @User('id') userId: number) {
-    const response = this.queues.invites.filter((i) => i.guest.id == userId).map((i) => i.user);
-    return response
+    @User('id') userId: number,
+  ) {
+    const response = this.queues.invites
+      .filter((i) => i.guest.id == userId)
+      .map((i) => i.user);
+    return response;
   }
 
   private async validate(client: Socket) {
@@ -158,19 +175,20 @@ export class GameGateway
     @MessageBody() gameId: number,
   ) {
     client.join(`game:${gameId}`);
-    const game = this.gameService.games[gameId]
+    const game = this.gameService.games[gameId];
     return game;
   }
 
   @SubscribeMessage('movePlayer')
   async handlePlayerMovement(
     @User('id') userId: number,
-    @MessageBody() body: {
+    @MessageBody()
+    body: {
       up: boolean;
       down: boolean;
       gameId: number;
-    }
+    },
   ) {
-    this.gameService.movePlayers(this.server, userId, body)
+    this.gameService.movePlayers(this.server, userId, body);
   }
 }
