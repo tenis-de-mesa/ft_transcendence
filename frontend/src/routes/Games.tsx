@@ -2,13 +2,14 @@ import { Typography } from "../components/Typography";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import rough from "roughjs";
 import { useWebSocket } from "../hooks";
+import { useParams } from "react-router-dom";
 
 const Games = () => {
+  const { id } = useParams<{ id: string }>();
   const canvasRef = useRef(null);
-
   const socket = useWebSocket();
 
-  const [totalPlayers, setTotalPlayers] = useState(null);
+  const [totalPlayers, setTotalPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
   // const [playerId, setPlayerId] = useState<string | undefined>(undefined);
 
@@ -36,6 +37,8 @@ const Games = () => {
   }, [totalPlayers, ballPosition]);
 
   const handleKeyDown = (event) => {
+    console.log("Inside handle key down");
+    console.log(event.key);
     switch (event.key) {
       case 'w':
         socket.emit("movePlayer", { up: true });
@@ -51,15 +54,21 @@ const Games = () => {
         break;
     }
   };
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [socket]);
+
 
   useEffect(() => {
+    console.log("inside useEffect");
+
+    window.addEventListener('keydown', handleKeyDown);
+
     if (socket) {
+      console.log(`Will join game ${id}`);
+      socket.emit(`joinGame`, id, (game) => {
+        console.log("Received game after joining:");
+        console.log(game); // ok
+        setTotalPlayers(game.players);
+      });
+
       socket.on('connect', () => {
         console.log('Conectado ao servidor');
       });
@@ -67,22 +76,6 @@ const Games = () => {
       socket.on('disconnect', () => {
         console.log('Desconectado do servidor');
       });
-
-      socket.on("socketConnection", (totalPlayers) => {
-        setTotalPlayers(totalPlayers)
-      });
-
-      socket.on("socketDisconnection", (totalPlayers) => {
-        setTotalPlayers(totalPlayers)
-      });
-
-      // socket.on("playerConnection", (playerConnectionId) => {
-      //   setPlayerId(playerConnectionId)
-      // });
-
-      // socket.on("playerDisconnection", (playerConnectionId) => {
-      //   setPlayerId(playerConnectionId)
-      // });
 
       socket.on("updatePlayerPosition", ({ playerId, position }) => {
         setTotalPlayers((prevPlayers) => ({
@@ -100,10 +93,9 @@ const Games = () => {
         socket.off("disconnect");
         socket.off("socketConnection");
         socket.off("socketDisconnection");
-        // socket.off("playerConnection");
-        // socket.off("playerDisconnection");
         socket.off("updatePlayerPosition");
         socket.off("updateBallPosition");
+        window.removeEventListener('keydown', handleKeyDown);
       };
     }
   }, [socket]);

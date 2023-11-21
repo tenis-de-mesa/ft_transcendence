@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { GameRoom, Player } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,6 +20,23 @@ export class GameService {
     this.games = {}
 
     this.loadGames()
+  }
+
+  async findOne(id: number): Promise<GameEntity> {
+    const game = await this.gameRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        users: true,
+      }
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    return game;
   }
 
   async loadGames() {
@@ -141,7 +158,7 @@ export class GameService {
         }
       }
 
-      server.to(`game:${game.id}`).emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
+      server.to(`game:${gameId}`).emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
     })
 
 

@@ -232,10 +232,11 @@ export class GameGateway
 
     const gameId = this.gameService.newGame(match.user, match.guest)
 
-    this.allUsers[match.user.id].client.join(`game:${gameId}`)
-    this.allUsers[match.guest.id].client.join(`game:${gameId}`)
+    // this.allUsers[match.user.id].client.join(`game:${gameId}`)
+    // this.allUsers[match.guest.id].client.join(`game:${gameId}`)
 
-    console.log('accept')
+    this.allUsers[match.user.id].client.emit('gameAvailable', gameId)
+    this.allUsers[match.guest.id].client.emit('gameAvailable', gameId)
   }
 
   @SubscribeMessage('findMyInvites')
@@ -258,38 +259,51 @@ export class GameGateway
     }
   }
 
+  @SubscribeMessage('joinGame')
+  async handleJoinGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameId: number,
+  ) {
+    client.join(`game:${gameId}`);
+    const game = this.gameService.games[gameId]
+    return game;
+  }
 
 
-  // @SubscribeMessage('movePlayer')
-  // async handlePlayerMovement(
-  //   @ConnectedSocket() clientSocket: Socket,
-  //   @MessageBody() direction: Direction,
-  //   @User('id') userId: number
-  // ) {
-  //   const playerId = clientSocket.id;
+  @SubscribeMessage('movePlayer')
+  async handlePlayerMovement(
+    @ConnectedSocket() clientSocket: Socket,
+    @MessageBody() direction: Direction,
+    @User('id') userId: number,
+  ) {
+    console.log("ClientSocket");
+    console.log(clientSocket);
+    console.log("ClientSocket.rooms");
+    console.log(clientSocket.rooms);
+    const playerId = clientSocket.id;
 
-  //   const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
+    const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
 
-  //   const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
+    const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
 
-  //   if (direction.up) {
-  //     if (this.games[gameIndex].game.players[position].y < 10) {
-  //       this.games[gameIndex].game.players[position].y = 0;
-  //     } else {
-  //       this.games[gameIndex].game.players[position].y -= 10;
-  //     }
-  //   }
-  //   if (direction.down) {
-  //     if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
-  //       this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
-  //     } else {
-  //       this.games[gameIndex].game.players[position].y += 10;
-  //     }
-  //   }
+    if (direction.up) {
+      if (this.games[gameIndex].game.players[position].y < 10) {
+        this.games[gameIndex].game.players[position].y = 0;
+      } else {
+        this.games[gameIndex].game.players[position].y -= 10;
+      }
+    }
+    if (direction.down) {
+      if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
+        this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
+      } else {
+        this.games[gameIndex].game.players[position].y += 10;
+      }
+    }
 
-  //   this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
-  //     playerId,
-  //     position: this.games[gameIndex].game.players[position],
-  //   });
-  // }
+    this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
+      playerId,
+      position: this.games[gameIndex].game.players[position],
+    });
+  }
 }

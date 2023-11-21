@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, redirect, useLoaderData } from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types";
 
@@ -43,6 +43,10 @@ export default function Users() {
       console.log(invites);
       setInvites(listInvites)
     });
+
+    socket.on('gameAvailable', (gameId) => {
+      return redirect(`/game/${gameId}`);
+    })
 
     return () => {
       socket.off("listInvites");
