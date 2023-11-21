@@ -15,7 +15,7 @@ import { UserEntity } from '../core/entities';
 import { User } from '../core/decorators';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
-import { Ball, GameRoom, Player, Score, Direction } from './game.interface';
+import { Ball, GameRoom, Player, Direction } from './game.interface';
 import { GameService } from './game.service';
 
 @WebSocketGateway({
@@ -128,8 +128,8 @@ export class GameGateway
 
     const game = await this.gameService.newGame(match.user, match.guest)
 
-    this.allUsers[match.user.id].client.emit('gameAvailable', game.id)
-    clientSocket.emit('gameAvailable', game.id)
+    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId)
+    clientSocket.emit('gameAvailable', game.gameId)
   }
 
   @SubscribeMessage('findMyInvites')

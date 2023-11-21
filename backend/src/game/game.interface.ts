@@ -4,6 +4,7 @@ import { UserEntity } from "../core/entities";
 export type Player = {
     user: UserEntity;
     y: number;
+    score: number;
     playerType: string;
 };
 
@@ -20,15 +21,8 @@ export type Direction = {
     down: boolean;
 };
 
-export interface Score {
-    playerOne: number;
-    playerTwo: number;
-}
-
 export interface GameRoom {
     gameId: number;
     players: Player[];
-    direction: Direction;
-    score: Score;
     ball: Ball;
 }
