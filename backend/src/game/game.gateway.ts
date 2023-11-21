@@ -49,8 +49,6 @@ export class GameGateway
 
   // 
 
-  gameRooms: GameRoom[];
-  serverTotalRooms: number;
 
   players: Record<string, Player | undefined>;
   serverTotalPlayers: number;
@@ -66,10 +64,7 @@ export class GameGateway
     private readonly gameService: GameService
   ) {
     this.interval = setInterval(() => {
-      // this.gameLoop();
       this.gameService.updateGame(this.server)
-
-
     }, 16);
     this.queues = {
       // all: []
@@ -92,8 +87,7 @@ export class GameGateway
         .catch((error) => next(error));
     });
 
-    this.gameRooms = [];
-    this.serverTotalRooms = 0;
+
 
     this.players = {};
     this.serverTotalPlayers = 0;
@@ -154,52 +148,7 @@ export class GameGateway
     // clientSocket.emit('playerDisconnection', playerStringId);
   }
 
-  // addPlayerToRoom(player: Player) {
-  //   const availableRoom = this.gameRooms.find(
-  //     (room) => room.players.length < 2,
-  //   );
 
-  //   if (availableRoom) {
-  //     availableRoom.players.push(player);
-  //   } else {
-  //     const newRoom: GameRoom = {
-  //       id: this.gameRooms.length + 1,
-  //       players: [player],
-  //     };
-
-  //     this.gameRooms.push(newRoom);
-  //     this.serverTotalRooms++;
-  //   }
-  // }
-
-  // removePlayerFromRoom(playerId: string) {
-  //   for (const room of this.gameRooms) {
-  //     const playerIndex = room.players.findIndex(
-  //       (player) => player.id === playerId,
-  //     );
-
-  //     if (playerIndex !== -1) {
-  //       room.players.splice(playerIndex, 1);
-
-  //       if (room.players.length === 0) {
-  //         const roomIndex = this.gameRooms.findIndex((r) => r.id === room.id);
-  //         this.gameRooms.splice(roomIndex, 1);
-  //       }
-
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // gameLoop() {
-  //   for (const game of this.games) {
-  //     game.gameLoop()
-  //     const room = game.game.id
-  //     const x = game.game.ball.x
-  //     const y = game.game.ball.y
-  //     this.server.to(room).emit('updateBallPosition', { x, y });
-  //   }
-  // }
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
@@ -267,41 +216,15 @@ export class GameGateway
     return game;
   }
 
-
   @SubscribeMessage('movePlayer')
   async handlePlayerMovement(
-    @ConnectedSocket() clientSocket: Socket,
-    @MessageBody() direction: Direction,
     @User('id') userId: number,
+    @MessageBody() body: {
+      up: boolean;
+      down: boolean;
+      gameId: number;
+    }
   ) {
-    console.log("ClientSocket");
-    console.log(clientSocket);
-    console.log("ClientSocket.rooms");
-    console.log(clientSocket.rooms);
-    const playerId = clientSocket.id;
-
-    const gameIndex = this.games.findIndex((i) => i.game.players[0].userId == userId || i.game.players[1].userId == userId)
-
-    const position = this.games[gameIndex].game.players[0].userId == userId ? 0 : 1
-
-    if (direction.up) {
-      if (this.games[gameIndex].game.players[position].y < 10) {
-        this.games[gameIndex].game.players[position].y = 0;
-      } else {
-        this.games[gameIndex].game.players[position].y -= 10;
-      }
-    }
-    if (direction.down) {
-      if (this.games[gameIndex].game.players[position].y > this.windowHeight - 100 - 10) {
-        this.games[gameIndex].game.players[position].y = this.windowHeight - 100;
-      } else {
-        this.games[gameIndex].game.players[position].y += 10;
-      }
-    }
-
-    this.server.to(this.games[gameIndex].game.id).emit('updatePlayerPosition', {
-      playerId,
-      position: this.games[gameIndex].game.players[position],
-    });
+    this.gameService.movePlayers(this.server, userId, body)
   }
 }

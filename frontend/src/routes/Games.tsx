@@ -11,7 +11,6 @@ const Games = () => {
 
   const [totalPlayers, setTotalPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
-  // const [playerId, setPlayerId] = useState<string | undefined>(undefined);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -21,8 +20,7 @@ const Games = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (totalPlayers) {
-      Object.keys(totalPlayers).forEach((id, index) => {
-        const player = totalPlayers[id];
+      totalPlayers.forEach((player, index) => {
         if (index === 0) {
           rc.rectangle(10, player.y, 10, 100, { stroke: "white", fill: "white" });
         } else if (index === 1) {
@@ -37,28 +35,24 @@ const Games = () => {
   }, [totalPlayers, ballPosition]);
 
   const handleKeyDown = (event) => {
-    console.log("Inside handle key down");
-    console.log(event.key);
     switch (event.key) {
       case 'w':
-        socket.emit("movePlayer", { up: true });
+        socket.emit("movePlayer", { gameId: id, up: true });
         break;
       case 's':
-        socket.emit("movePlayer", { down: true });
+        socket.emit("movePlayer", { gameId: id, down: true });
         break;
       case 'ArrowUp':
-        socket.emit("movePlayer", { up: true });
+        socket.emit("movePlayer", { gameId: id, up: true });
         break;
       case 'ArrowDown':
-        socket.emit("movePlayer", { down: true });
+        socket.emit("movePlayer", { gameId: id, down: true });
         break;
     }
   };
 
 
   useEffect(() => {
-    console.log("inside useEffect");
-
     window.addEventListener('keydown', handleKeyDown);
 
     if (socket) {
@@ -77,11 +71,8 @@ const Games = () => {
         console.log('Desconectado do servidor');
       });
 
-      socket.on("updatePlayerPosition", ({ playerId, position }) => {
-        setTotalPlayers((prevPlayers) => ({
-          ...prevPlayers,
-          [playerId]: position,
-        }));
+      socket.on("updatePlayerPosition", (players) => {
+        setTotalPlayers(players);
       });
 
       socket.on('updateBallPosition', ({ x, y }) => {

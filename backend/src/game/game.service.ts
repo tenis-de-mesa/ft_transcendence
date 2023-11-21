@@ -163,4 +163,30 @@ export class GameService {
 
 
   }
+
+  movePlayers(server: Server, userId: number, body: {
+    up: boolean;
+    down: boolean;
+    gameId: number;
+  }) {
+    const position = this.games[body.gameId].players[0].user.id == userId ? 0 : 1
+
+    if (body.up) {
+      if (this.games[body.gameId].players[position].y < 10) {
+        this.games[body.gameId].players[position].y = 0;
+      } else {
+        this.games[body.gameId].players[position].y -= 10;
+      }
+    }
+    if (body.down) {
+      if (this.games[body.gameId].players[position].y > this.windowHeight - 100 - 10) {
+        this.games[body.gameId].players[position].y = this.windowHeight - 100;
+      } else {
+        this.games[body.gameId].players[position].y += 10;
+      }
+    }
+
+    server.to(`game:${body.gameId}`).emit('updatePlayerPosition',
+      this.games[body.gameId].players);
+  }
 }
