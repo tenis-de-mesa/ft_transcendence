@@ -1,9 +1,13 @@
 import classNames from "classnames";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "../components/nav/Sidebar";
 import { navitems as navitemsTemplate } from "../data";
 import { useContext } from "react";
 import { AuthContext } from "../contexts";
+import { Toaster } from "sonner";
+import { useWebSocket } from "../hooks";
+import { toast } from "sonner";
+import { User } from "../types";
 
 export const isDark = true;
 
@@ -30,8 +34,37 @@ export default function Root() {
         </div>
         <div className="w-full h-full py-3 px-10">
           <Outlet />
+          <Toaster
+            theme="dark"
+            duration={6000}
+            toastOptions={{
+              className: "my-toast",
+            }}
+          />
+          <SocketListener />
         </div>
       </div>
     </div>
   );
+}
+
+function SocketListener() {
+  const socket = useWebSocket();
+  const navigate = useNavigate();
+
+  socket.on("newGameInvite", (user: User) => {
+    console.log("newGameInvite", user);
+    toast(`${user.nickname} invited you to play a game`, {
+      action: {
+        label: "View invites",
+        onClick: () => navigate("/games"),
+      },
+    });
+  });
+
+  socket.on("gameAvailable", (gameId) => {
+    console.log("gameAvailable", gameId);
+    navigate(`/games/${gameId}`);
+  });
+  return null;
 }

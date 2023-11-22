@@ -1,117 +1,60 @@
+import { useContext, useEffect, useState } from "react";
+import { Button, Card } from "../components";
 import { Typography } from "../components/Typography";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import rough from "roughjs";
+import { AuthContext } from "../contexts";
 import { useWebSocket } from "../hooks";
-import { useParams } from "react-router-dom";
 
 const Games = () => {
-  const { id } = useParams<{ id: string }>();
-  const canvasRef = useRef(null);
+  const { currentUser } = useContext(AuthContext);
+  const [invites, setInvites] = useState([]);
   const socket = useWebSocket();
 
-  const [players, setPlayers] = useState([]);
-  const [ballPosition, setBallPosition] = useState(null);
-
-  useLayoutEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const rc = rough.canvas(canvas);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "30px Arial";
-    ctx.fillStyle = "white";
-
-    if (players) {
-      players.forEach((player, index) => {
-        if (index === 0) {
-          rc.rectangle(10, player.y, 10, 100, {
-            stroke: "white",
-            fill: "white",
-          });
-          ctx.fillText(player.score, (canvas.width * 1) / 4 - 10, 50);
-        } else if (index === 1) {
-          rc.rectangle(canvas.width - 20, player.y, 10, 100, {
-            stroke: "white",
-            fill: "white",
-          });
-          ctx.fillText(player.score, (canvas.width * 3) / 4 - 10, 50);
-        }
+  useEffect(() => {
+    const getInvites = () => {
+      socket.emit("findMyInvites", currentUser.id, (invitesList) => {
+        setInvites(invitesList);
       });
-    }
+    };
 
-    if (ballPosition) {
-      rc.circle(ballPosition.x, ballPosition.y, 16, {
-        stroke: "white",
-        fill: "white",
-      });
-    }
-  }, [players, ballPosition]);
+    socket.on("newGameInvite", getInvites);
+    getInvites();
+  }, [socket, currentUser.id]);
 
-  const handleKeyDown = (event) => {
-    switch (event.key) {
-      case "w":
-        socket.emit("movePlayer", { gameId: id, up: true });
-        break;
-      case "s":
-        socket.emit("movePlayer", { gameId: id, down: true });
-        break;
-      case "ArrowUp":
-        socket.emit("movePlayer", { gameId: id, up: true });
-        break;
-      case "ArrowDown":
-        socket.emit("movePlayer", { gameId: id, down: true });
-        break;
-    }
+  const acceptGameInvite = function (invite) {
+    socket.emit("acceptInvitePlayerToGame", invite.id);
   };
 
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-
-    if (socket) {
-      console.log(`Will join game ${id}`);
-      socket.emit(`joinGame`, id, (game) => {
-        setPlayers(game.players);
-      });
-
-      socket.on("connect", () => {
-        console.log("Conectado ao servidor");
-      });
-
-      socket.on("disconnect", () => {
-        console.log("Desconectado do servidor");
-      });
-
-      socket.on("updatePlayerPosition", (players) => {
-        setPlayers(players);
-      });
-
-      socket.on("updateBallPosition", ({ x, y }) => {
-        setBallPosition({ x, y });
-      });
-
-      return () => {
-        socket.off("connect");
-        socket.off("disconnect");
-        socket.off("updatePlayerPosition");
-        socket.off("updateBallPosition");
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }
-  }, [socket]);
-
   return (
-    <>
-      <Typography variant="h5">Games</Typography>
+    <div>
+      <Typography variant="h4" className="mb-10">
+        Games
+      </Typography>
 
-      <div className="flex justify-center mt-10">
-        <canvas
-          ref={canvasRef}
-          width={700}
-          height={600}
-          className="dark:bg-gray-900"
-        />
-      </div>
-    </>
+      <Card className="max-w-xl">
+        <Card.Title position="center">
+          <Typography variant="h6">Game Invites</Typography>
+        </Card.Title>
+        <Card.Body className="!px-10" position="left">
+          <ul>
+            {invites.map((invite) => {
+              return (
+                <li key={invite.id} className="text-white mb-2">
+                  <div className="flex items-center gap-2">
+                    {invite.nickname}
+                    <Button
+                      variant="info"
+                      onClick={() => acceptGameInvite(invite)}
+                    >
+                      Aceitar
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </Card.Body>
+      </Card>
+    </div>
   );
 };
 

@@ -2,11 +2,15 @@ import { INavitem } from "../@interfaces";
 
 import {
   LuBarChart2,
+  LuGamepad,
+  LuGamepad2,
   LuGlobe,
+  LuHeart,
   LuHome,
   LuMessagesSquare,
   LuSettings,
   LuUser,
+  LuUserCheck,
   LuUsers,
 } from "react-icons/lu";
 
@@ -28,14 +32,14 @@ export const navitems: INavitem[] = [
   {
     order: 2,
     path: "users",
-    label: "All users",
+    label: "Users",
     icon: <LuUsers />,
   },
   {
     order: 3,
     path: "friends",
     label: "Friends",
-    icon: <LuUsers />,
+    icon: <LuHeart />,
   },
   {
     order: 4,
@@ -47,7 +51,7 @@ export const navitems: INavitem[] = [
     order: 5,
     path: "games",
     label: "Games",
-    icon: <LuGlobe />,
+    icon: <LuGamepad2 />,
   },
   {
     order: 6,

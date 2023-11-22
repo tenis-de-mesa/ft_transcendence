@@ -1,10 +1,4 @@
-import {
-  Link,
-  Navigate,
-  redirect,
-  useLoaderData,
-  useNavigate,
-} from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types";
 
@@ -49,10 +43,6 @@ export default function Users() {
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
-    socket.on("gameAvailable", (gameId) => {
-      navigate(`/games/${gameId}`);
-    });
-
     return () => {
       socket.off("gameAvailable");
     };
@@ -66,7 +56,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      }),
+      })
     );
   }, [currentUser.id]);
 
@@ -98,7 +88,7 @@ export default function Users() {
         },
       }),
     ],
-    [],
+    []
   );
 
   return (
@@ -127,7 +117,4 @@ export default function Users() {
       </div>
     </>
   );
-}
-function redirectDocument(arg0: string): void {
-  throw new Error("Function not implemented.");
 }

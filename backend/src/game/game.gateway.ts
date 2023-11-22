@@ -26,7 +26,8 @@ import { GameService } from './game.service';
   cookie: true,
 })
 export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
 
   queues: {
@@ -119,6 +120,8 @@ export class GameGateway
       guest,
       user,
     });
+
+    this.allUsers[guest.id].client.emit('newGameInvite', user);
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')

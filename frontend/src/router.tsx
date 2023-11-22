@@ -46,12 +46,13 @@ import {
   Home,
   ChatNew,
   Leaderboard,
-  Games,
   Settings,
   ErrorBoundary,
   Channels,
   Friends,
   Login,
+  Games,
+  Game,
 } from "./routes";
 
 const router = createBrowserRouter(
@@ -115,12 +116,13 @@ const router = createBrowserRouter(
             loader={loadUserById}
           />
           <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="games/:id" element={<Games />} loader={loadGame} />
+          <Route path="games" element={<Games />} />
+          <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 export default router;
