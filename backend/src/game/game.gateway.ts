@@ -26,8 +26,7 @@ import { GameService } from './game.service';
   cookie: true,
 })
 export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   queues: {
@@ -107,7 +106,6 @@ export class GameGateway
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
-    @ConnectedSocket() clientSocket: Socket,
     @MessageBody() guestId: number,
     @User() user: UserEntity,
   ) {
@@ -146,15 +144,10 @@ export class GameGateway
   }
 
   @SubscribeMessage('findMyInvites')
-  handleFindMyInvites(
-    @ConnectedSocket() clientSocket: Socket,
-    @MessageBody() player: any,
-    @User('id') userId: number,
-  ) {
-    const response = this.queues.invites
+  handleFindMyInvites(@User('id') userId: number) {
+    return this.queues.invites
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
-    return response;
   }
 
   private async validate(client: Socket) {

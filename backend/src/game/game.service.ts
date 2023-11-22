@@ -42,7 +42,7 @@ export class GameService {
   async loadGames() {
     const games = await this.gameRepository.find({
       where: {
-        status: GameStatus.START,
+        status: GameStatus.START || GameStatus.STOP,
       },
       relations: {
         users: true,
@@ -74,13 +74,13 @@ export class GameService {
       players: [
         {
           playerType: 'left',
-          y: 0,
+          y: this.windowHeight / 2,
           score: score1,
           user: user1,
         },
         {
           playerType: 'rigth',
-          y: 0,
+          y: this.windowHeight / 2,
           score: score2,
           user: user2,
         },
@@ -88,8 +88,8 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
-        speedX: 4,
-        speedY: 4,
+        speedX: 2,
+        speedY: 2,
         radius: 16,
       },
     };
@@ -121,11 +121,9 @@ export class GameService {
       }
 
       if (game.ball.x <= 0) {
-        this.gainedAPoint(game.gameId, 0);
-        return;
+        return this.gainedAPoint(game.gameId, 0);
       } else if (game.ball.x >= this.windowWidth) {
-        this.gainedAPoint(game.gameId, 1);
-        return;
+        return this.gainedAPoint(game.gameId, 1);
       }
 
       for (const player of game.players) {
@@ -167,7 +165,7 @@ export class GameService {
     players[player].score++;
 
     if (players[player].score >= 10) {
-      this.finishGame(gameId);
+      return this.finishGame(gameId);
     }
 
     this.games[gameId] = this.resetDataGame(

@@ -9,6 +9,7 @@ import {
 import { UserEntity } from './user.entity';
 
 export enum GameStatus {
+  STOP = 'stop',
   START = 'start',
   FINISH = 'finish',
 }
@@ -26,7 +27,7 @@ export class GameEntity {
   @Column({
     type: 'enum',
     enum: GameStatus,
-    default: GameStatus.START,
+    default: GameStatus.STOP,
   })
   status: GameStatus;
 
