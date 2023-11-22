@@ -8,7 +8,7 @@ export async function leaveChannel({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   const { method } = request;
   const body = {
-    newOwnerId: formData.get("new-owner-id"),
+    newOwnerId: Number(formData.get("newOwnerId")),
   };
 
   const conditions = [
@@ -34,6 +34,8 @@ export async function leaveChannel({ request, params }: ActionFunctionArgs) {
       message: error.message,
     };
   }
+
+  console.log("emitting");
 
   socket.emit("removeUserFromChat", id);
   return redirect(`/channels`);

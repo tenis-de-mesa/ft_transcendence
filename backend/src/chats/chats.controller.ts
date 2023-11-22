@@ -234,6 +234,14 @@ export class ChatsController {
     this.eventEmitter.emit('chat.updateMemberRole', member);
   }
 
+  @Get(':id/members')
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async getMembers(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ChatMemberEntity[]> {
+    return await this.chatsService.getMembers(id);
+  }
+
   @Get(':id/members/:status')
   @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
   async getMembersByStatus(

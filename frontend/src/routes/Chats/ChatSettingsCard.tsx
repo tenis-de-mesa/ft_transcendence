@@ -6,6 +6,7 @@ import { Card, Typography, Button } from "../../components";
 import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatManageMutedMembersCard from "./ChatManageMutedMembersCard";
 import ChatManageBannedMembersCard from "./ChatManageBannedMembersCard";
+import ChatLeaveCard from "./ChatLeaveCard";
 
 export default function ChatSettingsCard() {
   const { setShowCard, closeCard } = useContext(ChatContext);
@@ -63,7 +64,13 @@ export default function ChatSettingsCard() {
         >
           Manage banned members
         </Button>
-        <Button variant="error" onClick={() => {}}>
+        <Button variant="error" onClick={() =>
+            setShowCard(
+              <ChatLeaveCard
+                onBack={() => setShowCard(<ChatSettingsCard />)}
+              />
+            )
+          }>
           Leave channel
         </Button>
       </Card.Body>
