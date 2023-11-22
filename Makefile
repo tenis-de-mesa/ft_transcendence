@@ -35,10 +35,12 @@ format:
 
 test:
 	docker compose --profile test up db-test -d
-	docker compose run --rm --no-deps frontend pnpm test
 	docker compose run --rm --no-deps backend pnpm test
 	docker compose run --rm --no-deps backend pnpm test:integration
 	docker compose run --rm --no-deps backend pnpm test:e2e
+	docker compose run --rm --no-deps backend pnpm lint
+	docker compose run --rm --no-deps frontend pnpm test
+	docker compose run --rm --no-deps frontend pnpm lint
 	docker compose --profile test down db-test
 
 backend-sh:
