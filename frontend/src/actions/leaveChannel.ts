@@ -35,8 +35,6 @@ export async function leaveChannel({ request, params }: ActionFunctionArgs) {
     };
   }
 
-  console.log("emitting");
-
   socket.emit("removeUserFromChat", id);
   return redirect(`/channels`);
 }

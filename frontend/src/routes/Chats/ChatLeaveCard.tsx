@@ -68,7 +68,7 @@ export default function ChatLeaveCard({ onBack }: ChatLeaveCardProps) {
         <Card.Body position="left">
           {userRole === "owner" ? (
             <>
-              {members?.length === 1 ? (
+              {members.length <= 1 ? (
                 <Typography variant="md">
                   You are the only member of this channel. If you leave, the
                   channel will be deleted.

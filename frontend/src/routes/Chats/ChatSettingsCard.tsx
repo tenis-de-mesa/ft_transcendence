@@ -9,7 +9,8 @@ import ChatManageBannedMembersCard from "./ChatManageBannedMembersCard";
 import ChatLeaveCard from "./ChatLeaveCard";
 
 export default function ChatSettingsCard() {
-  const { setShowCard, closeCard } = useContext(ChatContext);
+  const { setShowCard, closeCard, userRole } = useContext(ChatContext);
+  const isAdmin = userRole === "owner" || userRole === "admin";
 
   return (
     <Card
@@ -28,49 +29,56 @@ export default function ChatSettingsCard() {
         />
       </Card.Title>
       <Card.Body className="flex flex-col gap-3 [&>*]:font-bold [&>*]:justify-center">
+        {isAdmin && (
+          <>
+            {" "}
+            <Button
+              variant="info"
+              onClick={() =>
+                setShowCard(
+                  <ChatChangePasswordCard
+                    onBack={() => setShowCard(<ChatSettingsCard />)}
+                  />
+                )
+              }
+            >
+              Manage channel password
+            </Button>
+            <Button
+              variant="info"
+              onClick={() =>
+                setShowCard(
+                  <ChatManageMutedMembersCard
+                    onBack={() => setShowCard(<ChatSettingsCard />)}
+                  />
+                )
+              }
+            >
+              Manage muted members
+            </Button>
+            <Button
+              variant="info"
+              onClick={() =>
+                setShowCard(
+                  <ChatManageBannedMembersCard
+                    onBack={() => setShowCard(<ChatSettingsCard />)}
+                  />
+                )
+              }
+            >
+              Manage banned members
+            </Button>
+          </>
+        )}
+
         <Button
-          variant="info"
+          variant="error"
           onClick={() =>
             setShowCard(
-              <ChatChangePasswordCard
-                onBack={() => setShowCard(<ChatSettingsCard />)}
-              />
+              <ChatLeaveCard onBack={() => setShowCard(<ChatSettingsCard />)} />
             )
           }
         >
-          Manage channel password
-        </Button>
-        <Button
-          variant="info"
-          onClick={() =>
-            setShowCard(
-              <ChatManageMutedMembersCard
-                onBack={() => setShowCard(<ChatSettingsCard />)}
-              />
-            )
-          }
-        >
-          Manage muted members
-        </Button>
-        <Button
-          variant="info"
-          onClick={() =>
-            setShowCard(
-              <ChatManageBannedMembersCard
-                onBack={() => setShowCard(<ChatSettingsCard />)}
-              />
-            )
-          }
-        >
-          Manage banned members
-        </Button>
-        <Button variant="error" onClick={() =>
-            setShowCard(
-              <ChatLeaveCard
-                onBack={() => setShowCard(<ChatSettingsCard />)}
-              />
-            )
-          }>
           Leave channel
         </Button>
       </Card.Body>

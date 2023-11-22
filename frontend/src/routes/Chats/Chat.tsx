@@ -14,8 +14,7 @@ import ChatSettingsCard from "./ChatSettingsCard";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userRole, userStatus, setShowCard } =
-    useContext(ChatContext);
+  const { setCurrentChat, userStatus, setShowCard } = useContext(ChatContext);
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
 
@@ -27,7 +26,6 @@ export default function Chat() {
     };
   }, [chat, currentUser?.id]);
 
-  const isAdmin = userRole === "owner" || userRole === "admin";
   const members = chat.users.map((user) => user.userId);
 
   const isBlockedForOthers =
@@ -51,7 +49,7 @@ export default function Chat() {
             Chat {chat.id}
           </Typography>
 
-          {isAdmin && chat.access !== "private" && (
+          {chat.access !== "private" && (
             <Button
               className="absolute right-[16px]"
               IconOnly={<FaGear />}

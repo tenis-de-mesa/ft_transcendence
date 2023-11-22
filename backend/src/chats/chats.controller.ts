@@ -235,7 +235,6 @@ export class ChatsController {
   }
 
   @Get(':id/members')
-  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
   async getMembers(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ChatMemberEntity[]> {
