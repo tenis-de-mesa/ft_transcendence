@@ -31,10 +31,6 @@ export default function Users() {
     });
   };
 
-  const submitGameInvite = function (player) {
-    socket.emit("invitePlayerToGame", player.id);
-  };
-
   const acceptGameInvite = function (playerId) {
     socket.emit("acceptInvitePlayerToGame", playerId);
   };
@@ -72,7 +68,7 @@ export default function Users() {
 
               <Button
                 variant="error"
-                onClick={() => submitGameInvite(info.row.original)}
+                onClick={() => socket.emit("invitePlayerToGame", info.row.original)}
               >
                 Play
               </Button>
@@ -81,7 +77,7 @@ export default function Users() {
         },
       }),
     ],
-    [],
+    [socket],
   );
 
   return (
