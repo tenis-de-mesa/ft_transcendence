@@ -20,8 +20,8 @@
     "test:watch": "jest --watchAll",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "NODE_ENV=test jest --bail --runInBand --config ./test/jest-e2e.json",
-    "test:e2e:ci": "NODE_ENV=ci jest --runInBand --bail --config ./test/jest-e2e.json",
+    "test:e2e": "NODE_ENV=test jest --bail --runInBand --detectOpenHandles --forceExit --config ./test/jest-e2e.json",
+    "test:e2e:ci": "NODE_ENV=ci jest --bail --runInBand --detectOpenHandles --forceExit --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:show": "typeorm-ts-node-commonjs migration:show -d src/data-source.ts",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts"
