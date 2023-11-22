@@ -78,7 +78,7 @@ export class GameGateway
         })
         .catch((error) => next(error));
     });
-    this.gameService.setServer(this.server)
+    this.gameService.setServer(this.server);
   }
 
   handleConnection(clientSocket: Socket) {

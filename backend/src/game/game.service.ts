@@ -25,7 +25,7 @@ export class GameService {
   }
 
   setServer(server: Server) {
-    this.server = server
+    this.server = server;
   }
 
   async findOne(id: number): Promise<GameEntity> {
@@ -182,7 +182,7 @@ export class GameService {
       players[1].score,
     );
 
-    this.emitUpdatePlayerPosition(gameId)
+    this.emitUpdatePlayerPosition(gameId);
   }
 
   finishGame(gameId: number) {
@@ -224,7 +224,7 @@ export class GameService {
       }
     }
 
-    this.emitUpdatePlayerPosition(body.gameId)
+    this.emitUpdatePlayerPosition(body.gameId);
   }
 
   emitUpdatePlayerPosition(gameId: number) {
