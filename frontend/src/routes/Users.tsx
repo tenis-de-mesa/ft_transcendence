@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { User } from "../types";
 
@@ -16,7 +16,6 @@ import { useWebSocket } from "../hooks";
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
-  const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
