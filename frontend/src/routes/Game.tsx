@@ -47,24 +47,24 @@ const Game = () => {
     }
   }, [players, ballPosition]);
 
-  const handleKeyDown = (event) => {
-    switch (event.key) {
-      case "w":
-        socket.emit("movePlayer", { gameId: id, up: true });
-        break;
-      case "s":
-        socket.emit("movePlayer", { gameId: id, down: true });
-        break;
-      case "ArrowUp":
-        socket.emit("movePlayer", { gameId: id, up: true });
-        break;
-      case "ArrowDown":
-        socket.emit("movePlayer", { gameId: id, down: true });
-        break;
-    }
-  };
-
   useEffect(() => {
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case "w":
+          socket.emit("movePlayer", { gameId: id, up: true });
+          break;
+        case "s":
+          socket.emit("movePlayer", { gameId: id, down: true });
+          break;
+        case "ArrowUp":
+          socket.emit("movePlayer", { gameId: id, up: true });
+          break;
+        case "ArrowDown":
+          socket.emit("movePlayer", { gameId: id, down: true });
+          break;
+      }
+    };
+
     window.addEventListener("keydown", handleKeyDown);
 
     if (socket) {
