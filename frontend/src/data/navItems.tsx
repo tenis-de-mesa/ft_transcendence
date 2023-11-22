@@ -2,15 +2,15 @@ import { INavitem } from "../@interfaces";
 
 import {
   LuBarChart2,
-  LuGamepad,
+  // LuGamepad,
   LuGamepad2,
-  LuGlobe,
+  // LuGlobe,
   LuHeart,
   LuHome,
   LuMessagesSquare,
   LuSettings,
   LuUser,
-  LuUserCheck,
+  // LuUserCheck,
   LuUsers,
 } from "react-icons/lu";
 

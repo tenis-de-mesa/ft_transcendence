@@ -43,12 +43,6 @@ export default function Users() {
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
-    return () => {
-      socket.off("gameAvailable");
-    };
-  }, [navigate, socket]);
-
-  useEffect(() => {
     // The current user is online by default
     setUsers((prevUsers) =>
       prevUsers.map((user) => {
@@ -58,7 +52,7 @@ export default function Users() {
         return user;
       })
     );
-  }, [currentUser.id]);
+  }, [currentUser.id, users]);
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [

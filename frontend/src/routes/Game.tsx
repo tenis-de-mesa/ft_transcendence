@@ -97,7 +97,7 @@ const Game = () => {
         window.removeEventListener("keydown", handleKeyDown);
       };
     }
-  }, [socket]);
+  }, [socket, id]);
 
   return (
     <>
