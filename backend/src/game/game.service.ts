@@ -10,6 +10,8 @@ import { Server } from 'socket.io';
 export class GameService {
   games: Record<number, GameRoom>;
 
+  server: Server;
+
   windowWidth = 700;
   windowHeight = 600;
 
@@ -20,6 +22,10 @@ export class GameService {
     this.games = {};
 
     this.loadGames();
+  }
+
+  setServer(server: Server) {
+    this.server = server
   }
 
   async findOne(id: number): Promise<GameEntity> {
@@ -105,7 +111,7 @@ export class GameService {
     return this.games[game.id];
   }
 
-  updateGame(server: Server) {
+  updateGame() {
     Object.keys(this.games).forEach((gameId) => {
       const game = this.games[gameId];
 
@@ -153,8 +159,8 @@ export class GameService {
         }
       }
 
-      server
-        .to(`game:${gameId}`)
+      this.server
+        ?.to(`game:${gameId}`)
         .emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
     });
   }
@@ -175,6 +181,8 @@ export class GameService {
       players[0].score,
       players[1].score,
     );
+
+    this.emitUpdatePlayerPosition(gameId)
   }
 
   finishGame(gameId: number) {
@@ -188,7 +196,6 @@ export class GameService {
   }
 
   movePlayers(
-    server: Server,
     userId: number,
     body: {
       up: boolean;
@@ -217,8 +224,12 @@ export class GameService {
       }
     }
 
-    server
-      .to(`game:${body.gameId}`)
-      .emit('updatePlayerPosition', this.games[body.gameId].players);
+    this.emitUpdatePlayerPosition(body.gameId)
+  }
+
+  emitUpdatePlayerPosition(gameId: number) {
+    this.server
+      ?.to(`game:${gameId}`)
+      .emit('updatePlayerPosition', this.games[gameId].players);
   }
 }

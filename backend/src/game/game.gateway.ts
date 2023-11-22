@@ -57,7 +57,7 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.gameService.updateGame(this.server);
+      this.gameService.updateGame();
     }, 16);
     this.queues = {
       // all: []
@@ -78,6 +78,7 @@ export class GameGateway
         })
         .catch((error) => next(error));
     });
+    this.gameService.setServer(this.server)
   }
 
   handleConnection(clientSocket: Socket) {
@@ -185,6 +186,6 @@ export class GameGateway
       gameId: number;
     },
   ) {
-    this.gameService.movePlayers(this.server, userId, body);
+    this.gameService.movePlayers(userId, body);
   }
 }
