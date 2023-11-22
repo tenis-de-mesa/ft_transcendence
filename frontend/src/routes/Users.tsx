@@ -49,7 +49,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      })
+      }),
     );
   }, [currentUser.id, users]);
 
@@ -81,7 +81,7 @@ export default function Users() {
         },
       }),
     ],
-    []
+    [],
   );
 
   return (
