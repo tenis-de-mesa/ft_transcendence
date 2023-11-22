@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
-import { BiSolidUserVoice } from "react-icons/bi";
 import { makeRequest } from "../../api";
 import { ChatMember } from "../../types";
 import { ChatContext } from "../../contexts";
@@ -75,9 +74,10 @@ export default function ChatManageMutedMembersCard({
                     type="submit"
                     name="unmuteUserId"
                     value={member?.userId}
-                    IconOnly={<BiSolidUserVoice />}
-                    variant="success"
-                  />
+                    variant="error"
+                  >
+                    Unmute
+                  </Button>
                 </Form>
               </div>
             ))}

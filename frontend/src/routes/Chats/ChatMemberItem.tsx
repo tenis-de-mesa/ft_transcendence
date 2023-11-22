@@ -8,7 +8,7 @@ type ChatMemberItemProps = {
 
 export default function ChatMemberItem({ user }: ChatMemberItemProps) {
   return (
-    <div className="flex items-center gap-2 px-4 py-2 rounded-md hover:bg-gray-700">
+    <div className="flex flex-1 items-center gap-2 px-4 py-2 rounded-md hover:bg-gray-700">
       <Avatar seed={user?.login} src={user?.avatarUrl} size="sm" />
       <div className="text-left">
         <Typography variant="md">{user?.nickname}</Typography>
