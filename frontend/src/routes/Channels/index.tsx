@@ -26,7 +26,7 @@ export default function Channels() {
             (user) => user.userId === props.getValue()
           );
 
-          return <span>{member.user.nickname ?? "Deleted user"}</span>;
+          return <span>{member?.user?.nickname ?? "Deleted user"}</span>;
         },
       }),
       columnHelper.accessor("access", {

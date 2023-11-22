@@ -297,15 +297,15 @@ export class ChatsService {
     chatId: number,
     status: ChatMemberStatus,
   ): Promise<ChatMemberEntity[]> {
-    return await this.chatMemberRepository.find({
-      where: {
-        chatId,
-        status,
-      },
-      relations: {
-        user: true,
-      },
-    });
+    const query = this.chatMemberRepository
+      .createQueryBuilder('member')
+      .withDeleted()
+      .leftJoinAndSelect('member.user', 'user')
+      .where('member.chatId = :chatId', { chatId })
+      .andWhere('member.status = :status', { status })
+      .andWhere('user.deletedAt IS NULL');
+
+    return await query.getMany();
   }
 
   async findDirectChat(
