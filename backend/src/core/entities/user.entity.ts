@@ -27,6 +27,7 @@ export enum AuthProvider {
 export enum UserStatus {
   OFFLINE = 'offline',
   ONLINE = 'online',
+  IN_GAME = 'in_game',
 }
 
 @Entity({ name: 'users' })

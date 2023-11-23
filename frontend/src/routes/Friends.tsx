@@ -4,10 +4,9 @@ import { Avatar } from "../components/Avatar";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Data } from "../data/tableData";
-import { Button } from "../components/Button";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { Typography } from "../components/Typography";
 import { InviteGameButton } from "../components";
+import { ChatButton } from "../components";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -38,14 +37,7 @@ export default function Friends() {
       cell: (props) => {
         return (
           <div className="flex space-x-1">
-            <Link to={`/chats/with/${props.row.original.id}`}>
-              <Button
-                variant="info"
-                size="sm"
-              >
-                Chat
-              </Button>
-            </Link>
+            <ChatButton user={props.row.original} />
             <InviteGameButton user={props.row.original} />
           </div>
         )

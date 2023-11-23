@@ -48,6 +48,8 @@ const Game = () => {
   }, [players, ballPosition]);
 
   useEffect(() => {
+    if (!socket) return;
+
     const handleKeyDown = (event) => {
       switch (event.key) {
         case "w":
@@ -67,25 +69,26 @@ const Game = () => {
 
     window.addEventListener("keydown", handleKeyDown);
 
-    if (socket) {
-      socket.emit(`joinGame`, id, (game) => {
-        setPlayers(game.players);
-      });
+    socket.emit(`joinGame`, id, (game) => {
+      setPlayers(game.players);
+    });
 
-      socket.on("updatePlayerPosition", (players) => {
-        setPlayers(players);
-      });
+    socket.on("updatePlayerPosition", (players) => {
+      setPlayers(players);
+    });
 
-      socket.on("updateBallPosition", ({ x, y }) => {
-        setBallPosition({ x, y });
-      });
+    socket.on("updateBallPosition", ({ x, y }) => {
+      setBallPosition({ x, y });
+    });
 
-      return () => {
-        socket.off("updatePlayerPosition");
-        socket.off("updateBallPosition");
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }
+    socket.emit("playerInGame");
+
+    return () => {
+      socket.off("updatePlayerPosition");
+      socket.off("updateBallPosition");
+      window.removeEventListener("keydown", handleKeyDown);
+      socket.emit("playerLeftGame");
+    };
   }, [socket, id]);
 
   return (

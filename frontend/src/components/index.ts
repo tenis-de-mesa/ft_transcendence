@@ -15,3 +15,4 @@ export * from "./UserForm";
 export * from "./UserUpdateAvatar";
 export * from "./UserWithStatus";
 export * from "./InviteGameButton";
+export * from "./ChatButton";

@@ -1,6 +1,6 @@
 export type UserStatus = {
   id: number;
-  status: string;
+  status: "online" | "offline" | "in_game";
 };
 
 export type User = {
