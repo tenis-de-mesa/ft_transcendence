@@ -1,4 +1,3 @@
-import { TbPingPong } from "react-icons/tb";
 import { Button } from "./Button";
 import { User } from "../types";
 import { useContext } from "react";
@@ -19,10 +18,9 @@ export function InviteGameButton({ user }: { user: User }) {
     <Button
       variant="error"
       size="sm"
-      LeadingIcon={<TbPingPong />}
       onClick={() => socket.emit("invitePlayerToGame", user.id)}
     >
-      Invite Game
+      Play
     </Button>
   );
 }

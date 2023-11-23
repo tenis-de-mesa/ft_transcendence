@@ -15,6 +15,7 @@ import { Data } from "../data";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import classNames from "classnames";
+import { Typography } from ".";
 
 export interface TableProps {
   columns: ColumnDef<Data>[];
@@ -38,7 +39,7 @@ const Table = ({ columns, data }: TableProps) => {
 
   return (
     <div className="relative overflow-scroll shadow-md no-scrollbar sm:rounded-lg">
-      <table className="w-full text-sm text-left text-gray-500 table-auto dark:text-gray-400">
+      <table className="w-full text-gray-500 table-fixed dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -77,20 +78,32 @@ const Table = ({ columns, data }: TableProps) => {
           ))}
         </thead>
 
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr
-              className="border-b bg-gray-50 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
-              key={row.id}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td className="px-6 py-4" key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+        {data.length > 0 ?
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr
+                className="border-b bg-gray-50 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                key={row.id}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td className="px-6 py-4" key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          :
+          <tbody className="text-right">
+            <tr>
+              <td>
+                <Typography variant="md" className="py-5 text-gray-900 dark:text-gray-500">
+                  Seems like you don't have any data register to display
+                </Typography>
+              </td>
             </tr>
-          ))}
-        </tbody>
+          </tbody>
+        }
       </table>
 
       <Pagination table={table} />
@@ -118,7 +131,7 @@ const Pagination = ({ table }: { table: Table<Data> }) => {
         <span className="flex items-center">
           <strong>
             {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
+            {table.getPageCount() || "1"}
           </strong>
         </span>
 

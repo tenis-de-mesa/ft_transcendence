@@ -7,6 +7,7 @@ import { Data } from "../data/tableData";
 import { Button } from "../components/Button";
 import { BsFillChatDotsFill } from "react-icons/bs";
 import { Typography } from "../components/Typography";
+import { InviteGameButton } from "../components";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -32,19 +33,23 @@ export default function Friends() {
       ),
     }),
 
-    columnHelper.display({
-      header: "actions",
-      cell: (props) => (
-        <Link to={`/chats/with/${props.row.original.id}`}>
-          <Button
-            variant="info"
-            size="sm"
-            TrailingIcon={<BsFillChatDotsFill />}
-          >
-            Chat
-          </Button>
-        </Link>
-      ),
+    columnHelper.accessor("id", {
+      header: "Actions",
+      cell: (props) => {
+        return (
+          <div className="flex space-x-1">
+            <Link to={`/chats/with/${props.row.original.id}`}>
+              <Button
+                variant="info"
+                size="sm"
+              >
+                Chat
+              </Button>
+            </Link>
+            <InviteGameButton user={props.row.original} />
+          </div>
+        )
+      }
     }),
   ];
 

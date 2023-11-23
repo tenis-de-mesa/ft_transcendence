@@ -7,7 +7,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
 import { Data } from "../data";
-import { AddFriendButton, InviteGameButton } from "../components";
+import { AddFriendButton, Button, InviteGameButton } from "../components";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
 
@@ -43,13 +43,21 @@ export default function Users() {
         ),
       }),
       columnHelper.accessor("id", {
-        header: "Action",
+        header: "Actions",
         cell: (info) => {
           return (
-            <>
+            <div className="flex space-x-1">
+              <Link to={`/chats/with/${info.row.original.id}`}>
+                <Button
+                  variant="info"
+                  size="sm"
+                >
+                  Chat
+                </Button>
+              </Link>
               <AddFriendButton user={info.row.original} />
               <InviteGameButton user={info.row.original} />
-            </>
+            </div>
           );
         },
       }),
