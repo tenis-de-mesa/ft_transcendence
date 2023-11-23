@@ -34,13 +34,7 @@ export default function Root() {
         </div>
         <div className="w-full h-full py-3 px-10">
           <Outlet />
-          <Toaster
-            theme="dark"
-            duration={6000}
-            toastOptions={{
-              className: "my-toast",
-            }}
-          />
+          <Toaster theme="dark" duration={6000} />
           <SocketListener />
         </div>
       </div>
