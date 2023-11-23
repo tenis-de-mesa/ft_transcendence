@@ -10,8 +10,6 @@ import { Data } from "../data";
 import { AddFriendButton, InviteGameButton } from "../components";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
-import { Button } from "../components";
-import { useWebSocket } from "../hooks";
 
 const columnHelper = createColumnHelper<User>();
 
@@ -20,7 +18,6 @@ export default function Users() {
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
-  const socket = useWebSocket();
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
@@ -31,7 +28,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      })
+      }),
     );
   }, [currentUser.id, users]);
 
@@ -51,13 +48,13 @@ export default function Users() {
           return (
             <>
               <AddFriendButton user={info.row.original} />
-              <InviteGameButton user={info.row.original}/>
+              <InviteGameButton user={info.row.original} />
             </>
           );
         },
       }),
     ],
-    [socket]
+    [],
   );
 
   return (
