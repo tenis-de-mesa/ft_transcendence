@@ -1,4 +1,3 @@
-import { Socket } from 'socket.io';
 import { UserEntity } from '../core/entities';
 
 export type Player = {

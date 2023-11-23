@@ -15,7 +15,6 @@ import { UserEntity } from '../core/entities';
 import { User } from '../core/decorators';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
-import { Ball, GameRoom, Player, Direction } from './game.interface';
 import { GameService } from './game.service';
 
 @WebSocketGateway({
@@ -69,7 +68,7 @@ export class GameGateway
     this.allClientSockets = {};
   }
 
-  afterInit(server: Server) {
+  afterInit() {
     this.server.use((socket, next) => {
       this.validate(socket)
         .then((user) => {

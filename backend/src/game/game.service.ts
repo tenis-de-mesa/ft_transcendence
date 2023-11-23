@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GameRoom, Player } from './game.interface';
+import { GameRoom } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
