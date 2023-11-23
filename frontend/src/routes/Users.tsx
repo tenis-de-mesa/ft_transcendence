@@ -7,7 +7,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
 import { Data } from "../data";
-import { AddFriendButton } from "../components/AddFriendButton";
+import { AddFriendButton, InviteGameButton } from "../components";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
 
@@ -30,7 +30,7 @@ export default function Users() {
         return user;
       }),
     );
-  }, [currentUser.id]);
+  }, [currentUser.id, users]);
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
@@ -44,7 +44,14 @@ export default function Users() {
       }),
       columnHelper.accessor("id", {
         header: "Action",
-        cell: (info) => <AddFriendButton user={info.row.original} />,
+        cell: (info) => {
+          return (
+            <>
+              <AddFriendButton user={info.row.original} />
+              <InviteGameButton user={info.row.original} />
+            </>
+          );
+        },
       }),
     ],
     [],
@@ -53,8 +60,7 @@ export default function Users() {
   return (
     <>
       <Typography variant="h5">Users</Typography>
-
-      <div className="h-[92%] mt-6">
+      <div className="mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
           data={users as unknown as Data[]}

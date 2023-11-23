@@ -39,7 +39,7 @@ export default function ChatMessages({ handleClick }: ChatMessagesProps) {
   const mapMessages = (
     message: Message,
     index: number,
-    messages: Message[]
+    messages: Message[],
   ) => {
     const currentMessage = messages[index];
     const lastMessage = messages[index - 1];
