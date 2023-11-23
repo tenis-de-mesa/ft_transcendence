@@ -78,7 +78,7 @@ const Table = ({ columns, data }: TableProps) => {
           ))}
         </thead>
 
-        {data.length > 0 ?
+        {data.length > 0 ? (
           <tbody>
             {table.getRowModel().rows.map((row) => (
               <tr
@@ -93,17 +93,20 @@ const Table = ({ columns, data }: TableProps) => {
               </tr>
             ))}
           </tbody>
-          :
+        ) : (
           <tbody className="text-right">
             <tr>
               <td>
-                <Typography variant="md" className="py-5 text-gray-900 dark:text-gray-500">
+                <Typography
+                  variant="md"
+                  className="py-5 text-gray-900 dark:text-gray-500"
+                >
                   Seems like you don't have any data register to display
                 </Typography>
               </td>
             </tr>
           </tbody>
-        }
+        )}
       </table>
 
       <Pagination table={table} />

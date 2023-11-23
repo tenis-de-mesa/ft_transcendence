@@ -40,8 +40,8 @@ export default function Friends() {
             <ChatButton user={props.row.original} />
             <InviteGameButton user={props.row.original} />
           </div>
-        )
-      }
+        );
+      },
     }),
   ];
 
