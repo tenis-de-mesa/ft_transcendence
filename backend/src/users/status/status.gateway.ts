@@ -80,9 +80,9 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('playerLeftGame')
   async handlePlayerLeftGame(@User() user: UserEntity) {
     this.userService.updateUser(user.id, {
-      status: UserStatus.OFFLINE,
+      status: UserStatus.ONLINE,
     });
-    this.emitUserStatus(user.id, UserStatus.OFFLINE);
+    this.emitUserStatus(user.id, UserStatus.ONLINE);
   }
 
   // Emit user status to all clients connected via websocket
