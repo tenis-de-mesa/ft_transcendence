@@ -64,7 +64,7 @@ function SocketListener() {
       socket.off("newGameInvite");
       socket.off("gameAvailable");
     };
-  }, [socket]);
+  }, [socket, navigate]);
 
   return null;
 }
