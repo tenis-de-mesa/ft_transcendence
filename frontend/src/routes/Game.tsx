@@ -73,8 +73,6 @@ const Game = () => {
       setPlayers(game.players);
     });
 
-    socket.emit("playerInGame");
-
     socket.on("updatePlayerPosition", (players) => {
       setPlayers(players);
     });
@@ -82,6 +80,8 @@ const Game = () => {
     socket.on("updateBallPosition", ({ x, y }) => {
       setBallPosition({ x, y });
     });
+
+    socket.emit("playerInGame");
 
     return () => {
       socket.off("updatePlayerPosition");
