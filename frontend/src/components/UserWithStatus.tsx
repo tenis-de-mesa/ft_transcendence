@@ -38,7 +38,8 @@ export const UserWithStatus: FC<UserWithStatusProps> = ({
         <div className="flex items-center gap-1">
           <div
             className={classNames("w-2", "h-2", "rounded-full", {
-              "bg-success-500": userStatus === "online",
+              "bg-success-500":
+                userStatus === "online" || userStatus === "in_game",
               "bg-gray-500": userStatus === "offline",
             })}
           ></div>
@@ -47,7 +48,9 @@ export const UserWithStatus: FC<UserWithStatusProps> = ({
             customColor="text-gray-500"
             className="-translate-y-[.09rem]"
           >
-            {userStatus}
+            {userStatus === "in_game" && "In Game ⚔️"}
+            {userStatus === "online" && "Online"}
+            {userStatus === "offline" && "Offline"}
           </Typography>
         </div>
       </div>

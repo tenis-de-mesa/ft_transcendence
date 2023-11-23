@@ -1,9 +1,9 @@
-import { TbPingPong } from "react-icons/tb";
 import { Button } from "./Button";
 import { User } from "../types";
 import { useContext } from "react";
 import { AuthContext } from "../contexts";
 import { useWebSocket } from "../hooks";
+import { LuSwords } from "react-icons/lu";
 
 export function InviteGameButton({ user }: { user: User }) {
   const { currentUser } = useContext(AuthContext);
@@ -17,12 +17,12 @@ export function InviteGameButton({ user }: { user: User }) {
 
   return (
     <Button
-      variant="error"
+      variant="info"
       size="sm"
-      LeadingIcon={<TbPingPong />}
+      LeadingIcon={<LuSwords />}
       onClick={() => socket.emit("invitePlayerToGame", user.id)}
     >
-      Invite Game
+      Invite to Game
     </Button>
   );
 }

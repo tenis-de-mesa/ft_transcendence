@@ -72,6 +72,8 @@ const Game = () => {
         setPlayers(game.players);
       });
 
+      socket.emit("playerInGame");
+
       socket.on("updatePlayerPosition", (players) => {
         setPlayers(players);
       });
@@ -81,6 +83,7 @@ const Game = () => {
       });
 
       return () => {
+        socket.emit("playerLeftGame");
         socket.off("updatePlayerPosition");
         socket.off("updateBallPosition");
         window.removeEventListener("keydown", handleKeyDown);
