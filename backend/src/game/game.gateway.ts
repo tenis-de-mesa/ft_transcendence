@@ -84,13 +84,6 @@ export class GameGateway
     // TODO: not exists user?
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    console.log(
-      'Game: New client connection:',
-      clientSocket.id,
-      'userId',
-      user.id,
-    );
-
     this.allUsers[user.id] = { client: clientSocket, user: user };
 
     this.allClientSockets[clientSocket.id] = user.id;
@@ -98,8 +91,6 @@ export class GameGateway
 
   handleDisconnect(clientSocket: Socket) {
     const userId = this.allClientSockets[clientSocket.id];
-
-    console.log('Client disconnected:', clientSocket.id, 'userId', userId);
 
     delete this.allUsers[userId];
     delete this.allClientSockets[clientSocket.id];

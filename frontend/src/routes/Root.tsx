@@ -53,7 +53,6 @@ function SocketListener() {
   const navigate = useNavigate();
 
   socket.on("newGameInvite", (user: User) => {
-    console.log("newGameInvite", user);
     toast(`${user.nickname} invited you to play a game`, {
       action: {
         label: "View invites",
@@ -63,7 +62,6 @@ function SocketListener() {
   });
 
   socket.on("gameAvailable", (gameId) => {
-    console.log("gameAvailable", gameId);
     navigate(`/games/${gameId}`);
   });
   return null;

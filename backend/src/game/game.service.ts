@@ -55,8 +55,6 @@ export class GameService {
       },
     });
 
-    console.log('loadGames', games.length);
-
     for (const game of games) {
       this.games[game.id] = this.resetDataGame(
         game.id,
@@ -103,8 +101,6 @@ export class GameService {
 
   async newGame(user1: UserEntity, user2: UserEntity) {
     const game = await this.gameRepository.save({ users: [user1, user2] });
-
-    console.log('newGame', game.id);
 
     this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
 

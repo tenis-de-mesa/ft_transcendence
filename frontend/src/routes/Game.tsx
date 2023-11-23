@@ -68,17 +68,8 @@ const Game = () => {
     window.addEventListener("keydown", handleKeyDown);
 
     if (socket) {
-      console.log(`Will join game ${id}`);
       socket.emit(`joinGame`, id, (game) => {
         setPlayers(game.players);
-      });
-
-      socket.on("connect", () => {
-        console.log("Conectado ao servidor");
-      });
-
-      socket.on("disconnect", () => {
-        console.log("Desconectado do servidor");
       });
 
       socket.on("updatePlayerPosition", (players) => {
@@ -90,8 +81,6 @@ const Game = () => {
       });
 
       return () => {
-        socket.off("connect");
-        socket.off("disconnect");
         socket.off("updatePlayerPosition");
         socket.off("updateBallPosition");
         window.removeEventListener("keydown", handleKeyDown);

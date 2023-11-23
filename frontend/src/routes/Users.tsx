@@ -20,21 +20,7 @@ export default function Users() {
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
-  const [invites, setInvites] = useState([]);
-
   const socket = useWebSocket();
-
-  const handleGameInvite = (player) => {
-    socket.emit("findMyInvites", player.id, (listInvites) => {
-      console.log(invites);
-      setInvites(listInvites);
-    });
-  };
-
-  const acceptGameInvite = function (playerId) {
-    socket.emit("acceptInvitePlayerToGame", playerId);
-  };
-
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
 
   useEffect(() => {
@@ -45,7 +31,7 @@ export default function Users() {
           return { ...user, status: "online" };
         }
         return user;
-      }),
+      })
     );
   }, [currentUser.id, users]);
 
@@ -68,7 +54,9 @@ export default function Users() {
 
               <Button
                 variant="error"
-                onClick={() => socket.emit("invitePlayerToGame", info.row.original)}
+                onClick={() =>
+                  socket.emit("invitePlayerToGame", info.row.original)
+                }
               >
                 Play
               </Button>
@@ -77,28 +65,13 @@ export default function Users() {
         },
       }),
     ],
-    [socket],
+    [socket]
   );
 
   return (
     <>
       <Typography variant="h5">Users</Typography>
-      <Button variant="info" onClick={() => handleGameInvite(currentUser)}>
-        Show my invites
-      </Button>
-      <div>
-        {invites.map((i) => {
-          return (
-            <div className="text-white">
-              {i.nickname}
-              <Button variant="info" onClick={() => acceptGameInvite(i.id)}>
-                Aceitar
-              </Button>
-            </div>
-          );
-        })}
-      </div>
-      <div className="h-[92%] mt-6">
+      <div className="mt-6">
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
           data={users as unknown as Data[]}
