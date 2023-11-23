@@ -635,13 +635,22 @@ export class ChatsService {
       throw new BadRequestException('Chat is not a channel');
     }
 
-    const [_, updateMember] = await Promise.all([
+    const [member, updateMember] = await Promise.all([
       this.getMember(chatId, userId),
       this.getMember(chatId, updateUserId),
     ]);
 
     if (updateMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner cannot be updated');
+    }
+
+    if (role === ChatMemberRole.OWNER && member.role === ChatMemberRole.OWNER) {
+      member.role = ChatMemberRole.ADMIN;
+
+      this.eventEmitter.emit(
+        'chat.updateMemberRole',
+        await this.chatMemberRepository.save(member),
+      );
     }
 
     updateMember.role = role;

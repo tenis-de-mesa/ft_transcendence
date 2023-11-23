@@ -7,10 +7,15 @@ import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatManageMutedMembersCard from "./ChatManageMutedMembersCard";
 import ChatManageBannedMembersCard from "./ChatManageBannedMembersCard";
 import ChatLeaveCard from "./ChatLeaveCard";
+import ChatTransferOwnershipCard from "./ChatTransferOwnershipCard";
 
 export default function ChatSettingsCard() {
   const { setShowCard, closeCard, userRole } = useContext(ChatContext);
   const isAdmin = userRole === "owner" || userRole === "admin";
+
+  const onBack = () => {
+    setShowCard(<ChatSettingsCard />);
+  };
 
   return (
     <Card
@@ -35,11 +40,7 @@ export default function ChatSettingsCard() {
             <Button
               variant="info"
               onClick={() =>
-                setShowCard(
-                  <ChatChangePasswordCard
-                    onBack={() => setShowCard(<ChatSettingsCard />)}
-                  />
-                )
+                setShowCard(<ChatChangePasswordCard onBack={onBack} />)
               }
             >
               Manage channel password
@@ -47,11 +48,7 @@ export default function ChatSettingsCard() {
             <Button
               variant="info"
               onClick={() =>
-                setShowCard(
-                  <ChatManageMutedMembersCard
-                    onBack={() => setShowCard(<ChatSettingsCard />)}
-                  />
-                )
+                setShowCard(<ChatManageMutedMembersCard onBack={onBack} />)
               }
             >
               Manage muted members
@@ -59,25 +56,27 @@ export default function ChatSettingsCard() {
             <Button
               variant="info"
               onClick={() =>
-                setShowCard(
-                  <ChatManageBannedMembersCard
-                    onBack={() => setShowCard(<ChatSettingsCard />)}
-                  />
-                )
+                setShowCard(<ChatManageBannedMembersCard onBack={onBack} />)
               }
             >
               Manage banned members
             </Button>
+            {userRole === "owner" && (
+              <Button
+                variant="info"
+                onClick={() =>
+                  setShowCard(<ChatTransferOwnershipCard onBack={onBack} />)
+                }
+              >
+                Transfer ownership
+              </Button>
+            )}
           </>
         )}
 
         <Button
           variant="error"
-          onClick={() =>
-            setShowCard(
-              <ChatLeaveCard onBack={() => setShowCard(<ChatSettingsCard />)} />
-            )
-          }
+          onClick={() => setShowCard(<ChatLeaveCard onBack={onBack} />)}
         >
           Leave channel
         </Button>

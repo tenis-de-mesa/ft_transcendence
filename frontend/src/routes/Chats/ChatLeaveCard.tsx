@@ -29,7 +29,7 @@ export default function ChatLeaveCard({ onBack }: ChatLeaveCardProps) {
   };
 
   useEffect(() => {
-    const fetchBannedMembers = async () => {
+    const fetchMembers = async () => {
       const { data, error } = await makeRequest<ChatMember[]>(
         `/chats/${currentChat?.id}/members`,
         { method: "GET" }
@@ -42,7 +42,7 @@ export default function ChatLeaveCard({ onBack }: ChatLeaveCardProps) {
       setMembers(data as ChatMember[]);
     };
 
-    fetchBannedMembers();
+    fetchMembers();
   }, [currentChat?.id]);
 
   return (
