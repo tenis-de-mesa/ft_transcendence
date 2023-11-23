@@ -182,6 +182,7 @@ export class GameService {
   }
 
   finishGame(gameId: number) {
+    this.emitUpdatePlayerPosition(gameId);
     const game = this.games[gameId];
     this.gameRepository.update(gameId, {
       score1: game.players[0].score,

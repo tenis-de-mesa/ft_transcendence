@@ -22,7 +22,7 @@ export function InviteGameButton({ user }: { user: User }) {
             size="sm"
             LeadingIcon={<TbPingPong />}
             onClick={() =>
-                socket.emit("invitePlayerToGame", user)
+                socket.emit("invitePlayerToGame", user.id)
             }
         >
             Invite Game
