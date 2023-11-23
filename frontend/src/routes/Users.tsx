@@ -7,7 +7,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
 import { Data } from "../data";
-import { AddFriendButton } from "../components/AddFriendButton";
+import { AddFriendButton, InviteGameButton } from "../components";
 import { AuthContext } from "../contexts";
 import { UserWithStatus } from "../components/UserWithStatus";
 import { Button } from "../components";
@@ -51,15 +51,7 @@ export default function Users() {
           return (
             <>
               <AddFriendButton user={info.row.original} />
-
-              <Button
-                variant="error"
-                onClick={() =>
-                  socket.emit("invitePlayerToGame", info.row.original)
-                }
-              >
-                Play
-              </Button>
+              <InviteGameButton user={info.row.original}/>
             </>
           );
         },
