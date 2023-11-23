@@ -4,8 +4,6 @@ import { Avatar } from "../components/Avatar";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Data } from "../data/tableData";
-import { Button } from "../components/Button";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { Typography } from "../components/Typography";
 import { ChatButton } from "../components";
 

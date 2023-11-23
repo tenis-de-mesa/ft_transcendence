@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { User } from "../types";
 import UserForm from "../components/UserForm";
 
@@ -9,7 +9,6 @@ import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { AuthContext } from "../contexts";
 import { useContext } from "react";
 import { ChatButton } from "../components";
