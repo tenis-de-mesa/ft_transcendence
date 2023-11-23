@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "../components/nav/Sidebar";
 import { navitems as navitemsTemplate } from "../data";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../contexts";
 import { Toaster } from "sonner";
 import { useWebSocket } from "../hooks";
@@ -46,17 +46,25 @@ function SocketListener() {
   const socket = useWebSocket();
   const navigate = useNavigate();
 
-  socket.on("newGameInvite", (user: User) => {
-    toast(`${user.nickname} invited you to play a game`, {
-      action: {
-        label: "View invites",
-        onClick: () => navigate("/games"),
-      },
+  useEffect(() => {
+    socket.on("newGameInvite", (user: User) => {
+      toast(`${user.nickname} invited you to play a game`, {
+        action: {
+          label: "View invites",
+          onClick: () => navigate("/games"),
+        },
+      });
     });
-  });
 
-  socket.on("gameAvailable", (gameId) => {
-    navigate(`/games/${gameId}`);
-  });
+    socket.on("gameAvailable", (gameId) => {
+      navigate(`/games/${gameId}`);
+    });
+
+    return () => {
+      socket.off("newGameInvite");
+      socket.off("gameAvailable");
+    };
+  }, [socket]);
+
   return null;
 }
