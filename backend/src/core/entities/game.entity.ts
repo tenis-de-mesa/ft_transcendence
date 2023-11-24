@@ -39,10 +39,10 @@ export class GameEntity {
   playerTwo: UserEntity;
 
   @ManyToOne(() => UserEntity)
-  winner: UserEntity;
+  winner?: UserEntity;
 
   @ManyToOne(() => UserEntity)
-  loser: UserEntity;
+  loser?: UserEntity;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -53,6 +53,8 @@ export class GameEntity {
     this.playerTwoScore = game?.playerTwoScore;
     this.playerOne = game?.playerOne;
     this.playerTwo = game?.playerTwo;
+    this.winner = game?.winner;
+    this.loser = game?.loser;
     this.maxScore = game?.maxScore;
     this.status = game?.status;
     this.createdAt = game?.createdAt;

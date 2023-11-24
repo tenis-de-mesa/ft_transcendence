@@ -29,6 +29,16 @@ export class GameService {
   setServer(server: Server) {
     this.server = server;
   }
+  async findAll(): Promise<GameEntity[]> {
+    return await this.gameRepository.find({
+      relations: {
+        playerOne: true,
+        playerTwo: true,
+        winner: true,
+        loser: true,
+      },
+    });
+  }
 
   async findOne(id: number): Promise<GameEntity> {
     const game = await this.gameRepository.findOne({
@@ -181,7 +191,8 @@ export class GameService {
 
     if (players[player].score >= 10) {
       this.finishGame(gameId);
-      this.updatePlayerStats(players);
+      this.updatePlayerStats(players[0].user.id);
+      this.updatePlayerStats(players[1].user.id);
       return;
     }
 
@@ -196,26 +207,27 @@ export class GameService {
     this.emitUpdatePlayerPosition(gameId);
   }
 
-  async updatePlayerStats(players: Player[]) {
-    players.forEach(async ({ user }) => {
-      const winCount = await this.gameRepository.countBy({ winner: { id: user.id } })
-      const loseCount = await this.gameRepository.countBy({ loser: { id: user.id } })
-      this.userRepository.update(user.id, { winCount, loseCount })
+  async updatePlayerStats(userId: number) {
+    const winCount = await this.gameRepository.countBy({
+      winner: { id: userId },
     });
+    const loseCount = await this.gameRepository.countBy({
+      loser: { id: userId },
+    });
+    await this.userRepository.update({ id: userId }, { winCount, loseCount });
   }
 
   finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
     const game = this.gamesInMemory[gameId];
-    let winner;
-    let loser;
+    let winner: UserEntity;
+    let loser: UserEntity;
     if (game.players[0].score > game.players[1].score) {
-      winner = game.players[0];
-      loser = game.players[1];
-    }
-    else {
-      winner = game.players[1];
-      loser = game.players[0];
+      winner = game.players[0].user;
+      loser = game.players[1].user;
+    } else {
+      winner = game.players[1].user;
+      loser = game.players[0].user;
     }
 
     this.gameRepository.update(gameId, {

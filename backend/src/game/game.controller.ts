@@ -12,8 +12,8 @@ import { AuthenticatedGuard } from '../auth/guards';
 export class GameController {
   constructor(private readonly gameService: GameService) {}
   @Get('/')
-  playPingPong(): string {
-    return 'Ping Pong!';
+  async playPingPong() {
+    return await this.gameService.findAll();
   }
 
   @UseGuards(AuthenticatedGuard)

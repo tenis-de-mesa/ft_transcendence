@@ -21,8 +21,8 @@ const columnHelper = createColumnHelper<Game>();
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
   const profileUser = useLoaderData() as User; // loadUserById
-  const socket = useWebSocket()
-  const [gameHistory, setGameHistory] = useState([])
+  const socket = useWebSocket();
+  const [gameHistory, setGameHistory] = useState([]);
 
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
@@ -37,17 +37,13 @@ export default function Profile() {
     () => [
       columnHelper.accessor("id", {
         header: "ID",
-        cell: (info) => (
-          info.getValue()
-        ),
+        cell: (info) => info.getValue(),
       }),
       columnHelper.accessor("playerOne", {
         header: "Player One",
         cell: (info) => {
           return (
-            <div className="flex space-x-1">
-              {info.getValue().nickname}
-            </div>
+            <div className="flex space-x-1">{info.getValue().nickname}</div>
           );
         },
       }),
@@ -55,9 +51,7 @@ export default function Profile() {
         header: "Player Two",
         cell: (info) => {
           return (
-            <div className="flex space-x-1">
-              {info.getValue().nickname}
-            </div>
+            <div className="flex space-x-1">{info.getValue().nickname}</div>
           );
         },
       }),
@@ -73,15 +67,14 @@ export default function Profile() {
         },
       }),
     ],
-    [],
+    []
   );
 
-  // useEffect(() => {
-  //   socket.emit('getGameHistory', profileUser.id, (response) => {
-  //     console.log(response)
-  //     setGameHistory(response)
-  //   })
-  // }, [socket, gameHistory])
+  useEffect(() => {
+    socket.emit("getGameHistory", profileUser.id, (response) => {
+      setGameHistory(response);
+    });
+  }, [socket, profileUser.id]);
 
   return (
     <div className="profile h-full">
@@ -167,11 +160,8 @@ export default function Profile() {
         </div>
       </div>
       <div className="mt-6">
-      <Table
-        columns={columns as any}
-        data={gameHistory as any}
-      />
-    </div>
+        <Table columns={columns as any} data={gameHistory as any} />
+      </div>
     </div>
   );
 }
