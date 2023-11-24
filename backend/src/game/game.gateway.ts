@@ -162,7 +162,7 @@ export class GameGateway
     @MessageBody() gameId: number,
   ) {
     client.join(`game:${gameId}`);
-    const game = this.gameService.games[gameId];
+    const game = this.gameService.gamesInMemory[gameId];
     return game;
   }
 

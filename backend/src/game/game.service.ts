@@ -8,7 +8,7 @@ import { Server } from 'socket.io';
 
 @Injectable()
 export class GameService {
-  games: Record<number, GameRoom>;
+  gamesInMemory: Record<number, GameRoom>;
 
   server: Server;
 
@@ -19,7 +19,7 @@ export class GameService {
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
   ) {
-    this.games = {};
+    this.gamesInMemory = {};
 
     this.loadGames();
   }
@@ -58,7 +58,7 @@ export class GameService {
     });
 
     for (const game of games) {
-      this.games[game.id] = this.resetDataGame(
+      this.gamesInMemory[game.id] = this.resetDataGame(
         game.id,
         game.playerOne,
         game.playerTwo,
@@ -107,14 +107,14 @@ export class GameService {
       playerTwo: user2,
     });
 
-    this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
+    this.gamesInMemory[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
 
-    return this.games[game.id];
+    return this.gamesInMemory[game.id];
   }
 
   updateGame() {
-    Object.keys(this.games).forEach((gameId) => {
-      const game = this.games[gameId];
+    Object.keys(this.gamesInMemory).forEach((gameId) => {
+      const game = this.gamesInMemory[gameId];
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
@@ -167,7 +167,7 @@ export class GameService {
   }
 
   gainedAPoint(gameId: number, player: 0 | 1) {
-    const { players } = this.games[gameId];
+    const { players } = this.gamesInMemory[gameId];
 
     players[player].score++;
 
@@ -175,7 +175,7 @@ export class GameService {
       return this.finishGame(gameId);
     }
 
-    this.games[gameId] = this.resetDataGame(
+    this.gamesInMemory[gameId] = this.resetDataGame(
       gameId,
       players[0].user,
       players[1].user,
@@ -188,13 +188,13 @@ export class GameService {
 
   finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
-    const game = this.games[gameId];
+    const game = this.gamesInMemory[gameId];
     this.gameRepository.update(gameId, {
       playerOneScore: game.players[0].score,
       playerTwoScore: game.players[1].score,
       status: GameStatus.FINISH,
     });
-    delete this.games[gameId];
+    delete this.gamesInMemory[gameId];
   }
 
   movePlayers(
@@ -206,23 +206,23 @@ export class GameService {
     },
   ) {
     const position =
-      this.games[body.gameId].players[0].user.id == userId ? 0 : 1;
+      this.gamesInMemory[body.gameId].players[0].user.id == userId ? 0 : 1;
 
     if (body.up) {
-      if (this.games[body.gameId].players[position].y < 10) {
-        this.games[body.gameId].players[position].y = 0;
+      if (this.gamesInMemory[body.gameId].players[position].y < 10) {
+        this.gamesInMemory[body.gameId].players[position].y = 0;
       } else {
-        this.games[body.gameId].players[position].y -= 10;
+        this.gamesInMemory[body.gameId].players[position].y -= 10;
       }
     }
     if (body.down) {
       if (
-        this.games[body.gameId].players[position].y >
+        this.gamesInMemory[body.gameId].players[position].y >
         this.windowHeight - 100 - 10
       ) {
-        this.games[body.gameId].players[position].y = this.windowHeight - 100;
+        this.gamesInMemory[body.gameId].players[position].y = this.windowHeight - 100;
       } else {
-        this.games[body.gameId].players[position].y += 10;
+        this.gamesInMemory[body.gameId].players[position].y += 10;
       }
     }
 
@@ -232,6 +232,6 @@ export class GameService {
   emitUpdatePlayerPosition(gameId: number) {
     this.server
       ?.to(`game:${gameId}`)
-      .emit('updatePlayerPosition', this.games[gameId].players);
+      .emit('updatePlayerPosition', this.gamesInMemory[gameId].players);
   }
 }
