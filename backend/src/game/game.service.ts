@@ -248,6 +248,10 @@ export class GameService {
       gameId: number;
     },
   ) {
+    if (!this.gamesInMemory[body.gameId]) {
+      return;
+    }
+
     const position =
       this.gamesInMemory[body.gameId].players[0].user.id == userId ? 0 : 1;
 
