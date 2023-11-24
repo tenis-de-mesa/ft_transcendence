@@ -38,6 +38,12 @@ export class GameEntity {
   @ManyToOne(() => UserEntity)
   playerTwo: UserEntity;
 
+  @ManyToOne(() => UserEntity)
+  winner: UserEntity;
+
+  @ManyToOne(() => UserEntity)
+  loser: UserEntity;
+
   @CreateDateColumn()
   createdAt: Date;
 

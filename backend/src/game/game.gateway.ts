@@ -112,7 +112,7 @@ export class GameGateway
       user,
     });
 
-    this.allUsers[guest.id].client.emit('newGameInvite', user);
+    this.allUsers[guest.id]?.client.emit('newGameInvite', user);
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
@@ -177,5 +177,10 @@ export class GameGateway
     },
   ) {
     this.gameService.movePlayers(userId, body);
+  }
+
+  @SubscribeMessage('getGameHistory')
+  async handleGetGameHistory(@MessageBody() userId: number) {
+    return await this.gameService.getGameHistory(userId);
   }
 }

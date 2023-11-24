@@ -16,6 +16,8 @@ export type User = {
   blockedUsers: number[];
   friends: User[];
   deletedAt?: Date;
+  winCount: number;
+  loseCount: number;
 };
 
 export type Message = {
@@ -48,4 +50,12 @@ export type Chat = {
 export type NewChatMessage = {
   chatId: number;
   message: string;
+};
+
+export type Game = {
+  id: number,
+  playerOneScore: number,
+  playerTwoScore: number,
+  playerOne: User,
+  playerTwo: User
 };

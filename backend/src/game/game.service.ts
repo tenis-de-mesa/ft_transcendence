@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GameRoom } from './game.interface';
+import { GameRoom, Player } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,6 +18,8 @@ export class GameService {
   constructor(
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {
     this.gamesInMemory = {};
 
@@ -107,7 +109,13 @@ export class GameService {
       playerTwo: user2,
     });
 
-    this.gamesInMemory[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
+    this.gamesInMemory[game.id] = this.resetDataGame(
+      game.id,
+      user1,
+      user2,
+      0,
+      0,
+    );
 
     return this.gamesInMemory[game.id];
   }
@@ -172,7 +180,9 @@ export class GameService {
     players[player].score++;
 
     if (players[player].score >= 10) {
-      return this.finishGame(gameId);
+      this.finishGame(gameId);
+      this.updatePlayerStats(players);
+      return;
     }
 
     this.gamesInMemory[gameId] = this.resetDataGame(
@@ -186,12 +196,33 @@ export class GameService {
     this.emitUpdatePlayerPosition(gameId);
   }
 
+  async updatePlayerStats(players: Player[]) {
+    players.forEach(async ({ user }) => {
+      const winCount = await this.gameRepository.countBy({ winner: { id: user.id } })
+      const loseCount = await this.gameRepository.countBy({ loser: { id: user.id } })
+      this.userRepository.update(user.id, { winCount, loseCount })
+    });
+  }
+
   finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
     const game = this.gamesInMemory[gameId];
+    let winner;
+    let loser;
+    if (game.players[0].score > game.players[1].score) {
+      winner = game.players[0];
+      loser = game.players[1];
+    }
+    else {
+      winner = game.players[1];
+      loser = game.players[0];
+    }
+
     this.gameRepository.update(gameId, {
       playerOneScore: game.players[0].score,
       playerTwoScore: game.players[1].score,
+      winner: winner,
+      loser: loser,
       status: GameStatus.FINISH,
     });
     delete this.gamesInMemory[gameId];
@@ -220,7 +251,8 @@ export class GameService {
         this.gamesInMemory[body.gameId].players[position].y >
         this.windowHeight - 100 - 10
       ) {
-        this.gamesInMemory[body.gameId].players[position].y = this.windowHeight - 100;
+        this.gamesInMemory[body.gameId].players[position].y =
+          this.windowHeight - 100;
       } else {
         this.gamesInMemory[body.gameId].players[position].y += 10;
       }
@@ -233,5 +265,13 @@ export class GameService {
     this.server
       ?.to(`game:${gameId}`)
       .emit('updatePlayerPosition', this.gamesInMemory[gameId].players);
+  }
+
+  async getGameHistory(userId: number) {
+    const history = await this.gameRepository.find({
+      relations: { playerOne: true, playerTwo: true },
+      where: [{ playerOne: { id: userId } }, { playerTwo: { id: userId } }],
+    });
+    return history;
   }
 }

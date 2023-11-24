@@ -1,5 +1,5 @@
-import { useLoaderData } from "react-router-dom";
-import { User } from "../types";
+import { Link, useLoaderData } from "react-router-dom";
+import { Game, User } from "../types";
 import UserForm from "../components/UserForm";
 
 import "./Profile.css";
@@ -10,12 +10,20 @@ import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { AuthContext } from "../contexts";
-import { useContext } from "react";
-import { ChatButton } from "../components";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { ChatButton, UserWithStatus } from "../components";
+import { useWebSocket } from "../hooks";
+import Table from "../components/Table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+
+const columnHelper = createColumnHelper<Game>();
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
   const profileUser = useLoaderData() as User; // loadUserById
+  const socket = useWebSocket()
+  const [gameHistory, setGameHistory] = useState([])
+
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
@@ -24,6 +32,56 @@ export default function Profile() {
       alternate.classList.toggle("flipped");
     }
   };
+
+  const columns = useMemo<ColumnDef<Game>[]>(
+    () => [
+      columnHelper.accessor("id", {
+        header: "ID",
+        cell: (info) => (
+          info.getValue()
+        ),
+      }),
+      columnHelper.accessor("playerOne", {
+        header: "Player One",
+        cell: (info) => {
+          return (
+            <div className="flex space-x-1">
+              {info.getValue().nickname}
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("playerTwo", {
+        header: "Player Two",
+        cell: (info) => {
+          return (
+            <div className="flex space-x-1">
+              {info.getValue().nickname}
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("playerOneScore", {
+        header: "Score",
+        cell: (info) => {
+          const game = info.row.original;
+          return (
+            <div className="flex space-x-1">
+              {`${game.playerOneScore} x ${game.playerTwoScore}`}
+            </div>
+          );
+        },
+      }),
+    ],
+    [],
+  );
+
+  // useEffect(() => {
+  //   socket.emit('getGameHistory', profileUser.id, (response) => {
+  //     console.log(response)
+  //     setGameHistory(response)
+  //   })
+  // }, [socket, gameHistory])
 
   return (
     <div className="profile h-full">
@@ -75,6 +133,14 @@ export default function Profile() {
                     <strong>Nickname:</strong>
                     {profileUser.nickname}
                   </span>
+                  <span className="flex justify-between gap-1">
+                    <strong>Wins:</strong>
+                    {profileUser.winCount}
+                  </span>
+                  <span className="flex justify-between gap-1">
+                    <strong>Losses:</strong>
+                    {profileUser.loseCount}
+                  </span>
                 </Typography>
                 <div className="flex flex-col gap-2 py-4">
                   <ChatButton user={profileUser} />
@@ -100,6 +166,12 @@ export default function Profile() {
           </Card>
         </div>
       </div>
+      <div className="mt-6">
+      <Table
+        columns={columns as any}
+        data={gameHistory as any}
+      />
+    </div>
     </div>
   );
 }
