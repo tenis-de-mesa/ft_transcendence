@@ -11,7 +11,7 @@ import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
 import { AuthContext } from "../contexts";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { ChatButton, UserWithStatus } from "../components";
+import { ChatButton } from "../components";
 import { useWebSocket } from "../hooks";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
@@ -43,7 +43,7 @@ export default function Profile() {
         header: "Player One",
         cell: (info) => {
           return (
-            <div className="flex space-x-1">{info.getValue().nickname}</div>
+            <div className="flex space-x-1">{info.getValue()?.nickname}</div>
           );
         },
       }),
@@ -51,7 +51,7 @@ export default function Profile() {
         header: "Player Two",
         cell: (info) => {
           return (
-            <div className="flex space-x-1">{info.getValue().nickname}</div>
+            <div className="flex space-x-1">{info.getValue()?.nickname}</div>
           );
         },
       }),
@@ -77,8 +77,8 @@ export default function Profile() {
   }, [socket, profileUser.id]);
 
   return (
-    <div className="profile h-full">
-      <div className="flip-card grid">
+    <div className="grid justify-center align-center h-full">
+      <div className="grid justify-center align-center flip-card">
         <div className="wrapper self-center">
           <Card className="card front">
             <Card.Title>
@@ -159,7 +159,7 @@ export default function Profile() {
           </Card>
         </div>
       </div>
-      <div className="mt-6">
+      <div>
         <Table columns={columns as any} data={gameHistory as any} />
       </div>
     </div>
