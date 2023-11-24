@@ -51,7 +51,7 @@ function SocketListener() {
       toast(`${user.nickname} invited you to play a game`, {
         action: {
           label: "View invites",
-          onClick: () => navigate("/games"),
+          onClick: () => navigate("/"),
         },
       });
     });
