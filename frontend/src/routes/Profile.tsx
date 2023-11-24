@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { User } from "../types";
 import UserForm from "../components/UserForm";
 
@@ -9,9 +9,9 @@ import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import UserUpdateAvatar from "../components/UserUpdateAvatar";
 import { AddFriendButton } from "../components/AddFriendButton";
-import { BsFillChatDotsFill } from "react-icons/bs";
 import { AuthContext } from "../contexts";
 import { useContext } from "react";
+import { ChatButton } from "../components";
 
 export default function Profile() {
   const { currentUser } = useContext(AuthContext);
@@ -67,23 +67,18 @@ export default function Profile() {
             <Card.Body>
               <>
                 <Typography customWeight="regular" variant="md">
-                  <span className="flex justify-between">
+                  <span className="flex justify-between gap-1">
+                    <strong>Login:</strong>
+                    {profileUser.login}
+                  </span>
+                  <span className="flex justify-between gap-1">
                     <strong>Nickname:</strong>
                     {profileUser.nickname}
                   </span>
                 </Typography>
-                <div className="flex flex-col gap-2 p-2 mt-2">
+                <div className="flex flex-col gap-2 py-4">
+                  <ChatButton user={profileUser} />
                   <AddFriendButton user={profileUser} />
-
-                  <Link to={`/chats/with/${profileUser.id}`} className="grid">
-                    <Button
-                      variant="info"
-                      size="sm"
-                      LeadingIcon={<BsFillChatDotsFill />}
-                    >
-                      Chat
-                    </Button>
-                  </Link>
                 </div>
               </>
             </Card.Body>

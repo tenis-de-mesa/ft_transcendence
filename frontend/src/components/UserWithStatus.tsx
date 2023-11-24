@@ -40,6 +40,7 @@ export const UserWithStatus: FC<UserWithStatusProps> = ({
             className={classNames("w-2", "h-2", "rounded-full", {
               "bg-success-500": userStatus === "online",
               "bg-gray-500": userStatus === "offline",
+              "bg-info-500": userStatus === "in_game",
             })}
           ></div>
           <Typography
@@ -47,7 +48,9 @@ export const UserWithStatus: FC<UserWithStatusProps> = ({
             customColor="text-gray-500"
             className="-translate-y-[.09rem]"
           >
-            {userStatus}
+            {userStatus === "in_game" && "In Game ⚔️"}
+            {userStatus === "online" && "Online"}
+            {userStatus === "offline" && "Offline"}
           </Typography>
         </div>
       </div>
