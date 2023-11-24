@@ -2,14 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 export enum GameStatus {
-  STOP = 'stop',
   START = 'start',
   FINISH = 'finish',
 }
@@ -19,29 +17,38 @@ export class GameEntity {
   id: number;
 
   @Column({ default: 0 })
-  score1: number;
+  playerOneScore: number;
 
   @Column({ default: 0 })
-  score2: number;
+  playerTwoScore: number;
+
+  @Column({ default: 10 })
+  maxScore: number;
 
   @Column({
     type: 'enum',
     enum: GameStatus,
-    default: GameStatus.STOP,
+    default: GameStatus.START,
   })
   status: GameStatus;
 
-  @ManyToMany(() => UserEntity)
-  @JoinTable()
-  users: UserEntity[];
+  @ManyToOne(() => UserEntity)
+  playerOne: UserEntity;
+
+  @ManyToOne(() => UserEntity)
+  playerTwo: UserEntity;
 
   @CreateDateColumn()
   createdAt: Date;
 
   constructor(game?: GameEntity) {
     this.id = game?.id;
-    this.score1 = game?.score1;
-    this.score2 = game?.score2;
-    this.users = game?.users;
+    this.playerOneScore = game?.playerOneScore;
+    this.playerTwoScore = game?.playerTwoScore;
+    this.playerOne = game?.playerOne;
+    this.playerTwo = game?.playerTwo;
+    this.maxScore = game?.maxScore;
+    this.status = game?.status;
+    this.createdAt = game?.createdAt;
   }
 }

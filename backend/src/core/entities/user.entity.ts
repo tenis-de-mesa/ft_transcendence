@@ -127,8 +127,11 @@ export class UserEntity {
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
 
-  @ManyToMany(() => GameEntity)
-  games: GameEntity[];
+  @OneToMany(() => GameEntity, (game) => game.playerOne)
+  gamePlayerOne: GameEntity[];
+
+  @OneToMany(() => GameEntity, (game) => game.playerTwo)
+  gamePlayerTwo: GameEntity[];
 
   @DeleteDateColumn()
   deletedAt?: Date;

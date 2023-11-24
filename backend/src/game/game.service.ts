@@ -34,7 +34,8 @@ export class GameService {
         id,
       },
       relations: {
-        users: true,
+        playerOne: true,
+        playerTwo: true,
       },
     });
 
@@ -48,20 +49,21 @@ export class GameService {
   async loadGames() {
     const games = await this.gameRepository.find({
       where: {
-        status: GameStatus.START || GameStatus.STOP,
+        status: GameStatus.START,
       },
       relations: {
-        users: true,
+        playerOne: true,
+        playerTwo: true,
       },
     });
 
     for (const game of games) {
       this.games[game.id] = this.resetDataGame(
         game.id,
-        game.users[0],
-        game.users[1],
-        game.score1,
-        game.score2,
+        game.playerOne,
+        game.playerTwo,
+        game.playerOneScore,
+        game.playerTwoScore,
       );
     }
   }
@@ -100,7 +102,10 @@ export class GameService {
   }
 
   async newGame(user1: UserEntity, user2: UserEntity) {
-    const game = await this.gameRepository.save({ users: [user1, user2] });
+    const game = await this.gameRepository.save({
+      playerOne: user1,
+      playerTwo: user2,
+    });
 
     this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
 
@@ -185,8 +190,8 @@ export class GameService {
     this.emitUpdatePlayerPosition(gameId);
     const game = this.games[gameId];
     this.gameRepository.update(gameId, {
-      score1: game.players[0].score,
-      score2: game.players[1].score,
+      playerOneScore: game.players[0].score,
+      playerTwoScore: game.players[1].score,
       status: GameStatus.FINISH,
     });
     delete this.games[gameId];
