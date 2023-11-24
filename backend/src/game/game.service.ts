@@ -74,35 +74,49 @@ export class GameService {
         game.id,
         game.playerOne,
         game.playerTwo,
-        game.playerOneScore,
-        game.playerTwoScore,
       );
     }
   }
 
   resetDataGame(
     gameId: number,
-    user1: UserEntity,
-    user2: UserEntity,
-    score1: number,
-    score2: number,
+    userOne: UserEntity,
+    userTwo: UserEntity,
   ): GameRoom {
+    const maxScore = this.gamesInMemory[gameId]?.maxScore ?? 10;
+    const playerOneScore = this.gamesInMemory[gameId]?.playerOne.score ?? 0;
+    const playerTwoScore = this.gamesInMemory[gameId]?.playerTwo.score ?? 0;
+
+    const windowWidth = 700;
+    const windowHeight = 600;
+
     return {
       gameId,
-      players: [
-        {
-          playerType: 'left',
+      maxScore,
+      windowWidth,
+      windowHeight,
+      playerOne: {
+        playerType: 'left',
+        score: playerOneScore,
+        user: userOne,
+        paddle: {
+          x: 10,
           y: this.windowHeight / 2,
-          score: score1,
-          user: user1,
+          width: 10,
+          height: 100,
         },
-        {
-          playerType: 'rigth',
+      },
+      playerTwo: {
+        playerType: 'rigth',
+        score: playerTwoScore,
+        user: userTwo,
+        paddle: {
+          x: windowWidth - 20,
           y: this.windowHeight / 2,
-          score: score2,
-          user: user2,
+          width: 10,
+          height: 100,
         },
-      ],
+      },
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
@@ -119,18 +133,12 @@ export class GameService {
       playerTwo: user2,
     });
 
-    this.gamesInMemory[game.id] = this.resetDataGame(
-      game.id,
-      user1,
-      user2,
-      0,
-      0,
-    );
+    this.gamesInMemory[game.id] = this.resetDataGame(game.id, user1, user2);
 
     return this.gamesInMemory[game.id];
   }
 
-  updateGame() {
+  async updateGame() {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game = this.gamesInMemory[gameId];
 
@@ -151,7 +159,7 @@ export class GameService {
         return this.gainedAPoint(game.gameId, 1);
       }
 
-      for (const player of game.players) {
+      for (const player of [game.playerOne, game.playerTwo]) {
         if (player) {
           let playerX: number;
           if (player.playerType === 'left') {
@@ -184,24 +192,26 @@ export class GameService {
     });
   }
 
-  gainedAPoint(gameId: number, player: 0 | 1) {
-    const { players } = this.gamesInMemory[gameId];
+  async gainedAPoint(gameId: number, player: 0 | 1) {
+    const { playerOne, playerTwo, maxScore } = this.gamesInMemory[gameId];
 
-    players[player].score++;
+    if (player == 0) {
+      playerOne.score++;
+    } else {
+      playerTwo.score++;
+    }
 
-    if (players[player].score >= 10) {
-      this.finishGame(gameId);
-      this.updatePlayerStats(players[0].user.id);
-      this.updatePlayerStats(players[1].user.id);
+    if (playerOne.score >= maxScore || playerTwo.score >= maxScore) {
+      await this.finishGame(gameId);
+      this.updatePlayerStats(playerOne.user.id);
+      this.updatePlayerStats(playerTwo.user.id);
       return;
     }
 
     this.gamesInMemory[gameId] = this.resetDataGame(
       gameId,
-      players[0].user,
-      players[1].user,
-      players[0].score,
-      players[1].score,
+      playerOne.user,
+      playerTwo.user,
     );
 
     this.emitUpdatePlayerPosition(gameId);
@@ -217,27 +227,30 @@ export class GameService {
     await this.userRepository.update({ id: userId }, { winCount, loseCount });
   }
 
-  finishGame(gameId: number) {
+  async finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
+
     const game = this.gamesInMemory[gameId];
+
+    delete this.gamesInMemory[gameId];
+
     let winner: UserEntity;
     let loser: UserEntity;
-    if (game.players[0].score > game.players[1].score) {
-      winner = game.players[0].user;
-      loser = game.players[1].user;
+    if (game.playerOne.score > game.playerTwo.score) {
+      winner = game.playerOne.user;
+      loser = game.playerTwo.user;
     } else {
-      winner = game.players[1].user;
-      loser = game.players[0].user;
+      winner = game.playerTwo.user;
+      loser = game.playerOne.user;
     }
 
-    this.gameRepository.update(gameId, {
-      playerOneScore: game.players[0].score,
-      playerTwoScore: game.players[1].score,
+    await this.gameRepository.update(gameId, {
+      playerOneScore: game.playerOne.score,
+      playerTwoScore: game.playerTwo.score,
       winner: winner,
       loser: loser,
       status: GameStatus.FINISH,
     });
-    delete this.gamesInMemory[gameId];
   }
 
   movePlayers(
@@ -253,25 +266,32 @@ export class GameService {
     }
 
     const position =
-      this.gamesInMemory[body.gameId].players[0].user.id == userId ? 0 : 1;
+      this.gamesInMemory[body.gameId].playerOne.user.id == userId ? 0 : 1;
+
+    const player =
+      position == 0
+        ? this.gamesInMemory[body.gameId].playerOne
+        : this.gamesInMemory[body.gameId].playerTwo;
 
     if (body.up) {
-      if (this.gamesInMemory[body.gameId].players[position].y < 10) {
-        this.gamesInMemory[body.gameId].players[position].y = 0;
+      if (player.paddle.y < 10) {
+        player.paddle.y = 0;
       } else {
-        this.gamesInMemory[body.gameId].players[position].y -= 10;
+        player.paddle.y -= 10;
       }
     }
     if (body.down) {
-      if (
-        this.gamesInMemory[body.gameId].players[position].y >
-        this.windowHeight - 100 - 10
-      ) {
-        this.gamesInMemory[body.gameId].players[position].y =
-          this.windowHeight - 100;
+      if (player.paddle.y > this.windowHeight - 100 - 10) {
+        player.paddle.y = this.windowHeight - 100;
       } else {
-        this.gamesInMemory[body.gameId].players[position].y += 10;
+        player.paddle.y += 10;
       }
+    }
+
+    if (position == 0) {
+      this.gamesInMemory[body.gameId].playerOne = player;
+    } else {
+      this.gamesInMemory[body.gameId].playerTwo = player;
     }
 
     this.emitUpdatePlayerPosition(body.gameId);
@@ -280,7 +300,10 @@ export class GameService {
   emitUpdatePlayerPosition(gameId: number) {
     this.server
       ?.to(`game:${gameId}`)
-      .emit('updatePlayerPosition', this.gamesInMemory[gameId].players);
+      .emit('updatePlayerPosition', [
+        this.gamesInMemory[gameId].playerOne,
+        this.gamesInMemory[gameId].playerTwo,
+      ]);
   }
 
   async getGameHistory(userId: number) {

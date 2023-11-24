@@ -1,10 +1,17 @@
 import { UserEntity } from '../core/entities';
 
+export type Paddle = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type Player = {
   user: UserEntity;
-  y: number;
   score: number;
   playerType: string;
+  paddle: Paddle;
 };
 
 export interface Ball {
@@ -22,6 +29,10 @@ export type Direction = {
 
 export interface GameRoom {
   gameId: number;
-  players: Player[];
+  playerOne: Player;
+  playerTwo: Player;
   ball: Ball;
+  maxScore: number;
+  windowWidth: number;
+  windowHeight: number;
 }
