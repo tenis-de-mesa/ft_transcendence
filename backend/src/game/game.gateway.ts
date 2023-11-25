@@ -119,6 +119,16 @@ export class GameGateway
     this.queues.all.push(user);
   }
 
+  @SubscribeMessage('cancelFindGame')
+  handleCancelFindGame(@User() user: UserEntity) {
+    this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+  }
+
+  @SubscribeMessage('inFindGameQueue')
+  handleFindGameQueue(@User() user: UserEntity): boolean {
+    return Boolean(this.queues.all.find((u) => u.id == user.id));
+  }
+
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
     @MessageBody() guestId: number,
