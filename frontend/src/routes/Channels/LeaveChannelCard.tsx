@@ -1,17 +1,16 @@
-import { useContext } from "react";
-import { Alert, Button, Card, Typography } from "../../components";
-import { useFetcher } from "react-router-dom";
+import { Form } from "react-router-dom";
 import { FiX } from "react-icons/fi";
-import { ChatContext } from "../../contexts";
+import { Button, Card, Typography } from "../../components";
 
 type LeaveChannelCardProps = {
   id: number;
+  onClose: () => void;
 };
 
-export default function LeaveChannelCard({ id }: LeaveChannelCardProps) {
-  const { closeCard } = useContext(ChatContext);
-  const { Form, state, data: error } = useFetcher();
-
+export default function LeaveChannelCard({
+  id,
+  onClose,
+}: LeaveChannelCardProps) {
   return (
     <>
       <Card
@@ -29,7 +28,7 @@ export default function LeaveChannelCard({ id }: LeaveChannelCardProps) {
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={closeCard}
+            onClick={onClose}
           ></Button>
         </Card.Title>
         <Card.Body position="left">
@@ -38,21 +37,20 @@ export default function LeaveChannelCard({ id }: LeaveChannelCardProps) {
           </Typography>
         </Card.Body>
         <Card.Footer hr={false} className="space-y-3">
-          <Form className="space-y-3" action={`${id}/leave`} method="POST">
+          <Form
+            className="space-y-3"
+            action={`${id}/leave`}
+            method="POST"
+            onSubmit={onClose}
+          >
             <Button
               className="justify-center w-full font-bold"
               type="submit"
               variant="error"
             >
-              {state === "loading" ? "Loading..." : "Leave"}
+              Leave
             </Button>
           </Form>
-
-          {error?.message && state === "idle" && (
-            <Alert severity="error" className="w-full">
-              {error.message}
-            </Alert>
-          )}
         </Card.Footer>
       </Card>
     </>

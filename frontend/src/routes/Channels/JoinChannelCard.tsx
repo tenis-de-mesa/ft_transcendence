@@ -1,15 +1,14 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { Alert, Button, Card, Input, Typography } from "../../components";
-import { ChatContext } from "../../contexts";
 
 type JoinChannelCardProps = {
   id: number;
+  onClose: () => void;
 };
 
-export default function JoinChannelCard({ id }: JoinChannelCardProps) {
-  const { closeCard } = useContext(ChatContext);
+export default function JoinChannelCard({ id, onClose }: JoinChannelCardProps) {
   const [password, setPassword] = useState("");
   const { Form, state, data: error } = useFetcher();
 
@@ -30,7 +29,7 @@ export default function JoinChannelCard({ id }: JoinChannelCardProps) {
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={closeCard}
+            onClick={onClose}
           ></Button>
         </Card.Title>
         <Card.Body position="left" className="space-y-4">

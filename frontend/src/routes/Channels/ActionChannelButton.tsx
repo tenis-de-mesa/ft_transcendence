@@ -1,8 +1,7 @@
-import { useContext } from "react";
+import { useState } from "react";
 import { Link, useFetcher } from "react-router-dom";
 import { FiLock } from "react-icons/fi";
-import { Alert, Badge, Button } from "../../components";
-import { ChatContext } from "../../contexts";
+import { Alert, Badge, Button, Overlay } from "../../components";
 
 import JoinChannelCard from "./JoinChannelCard";
 import LeaveChannelCard from "./LeaveChannelCard";
@@ -20,7 +19,7 @@ export default function ActionChannelButton({
   isOwner,
   isMember,
 }: ActionChannelButtonProps) {
-  const { setShowCard } = useContext(ChatContext);
+  const [showCard, setShowCard] = useState<JSX.Element>(null);
   const { Form, state, data: error } = useFetcher();
 
   return (
@@ -36,7 +35,11 @@ export default function ActionChannelButton({
           <Button
             variant="error"
             size="sm"
-            onClick={() => setShowCard(<LeaveChannelCard id={id} />)}
+            onClick={() =>
+              setShowCard(
+                <LeaveChannelCard id={id} onClose={() => setShowCard(null)} />
+              )
+            }
           >
             Leave
           </Button>
@@ -53,10 +56,21 @@ export default function ActionChannelButton({
             variant="info"
             size="sm"
             TrailingIcon={<FiLock />}
-            onClick={() => setShowCard(<JoinChannelCard id={id} />)}
+            onClick={() =>
+              setShowCard(
+                <JoinChannelCard id={id} onClose={() => setShowCard(null)} />
+              )
+            }
           >
             Join
           </Button>
+        </>
+      )}
+
+      {showCard && (
+        <>
+          <Overlay />
+          {showCard}
         </>
       )}
 
