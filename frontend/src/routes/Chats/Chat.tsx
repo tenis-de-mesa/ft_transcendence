@@ -1,22 +1,20 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useLoaderData } from "react-router-dom";
-import { FiLock, FiUnlock } from "react-icons/fi";
-import { Chat, User } from "../../types";
+import { FaGear } from "react-icons/fa6";
+import { Chat } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
 import { Card, Typography, Button } from "../../components";
 import { socket } from "../../socket";
 
-import ChatProfileCard from "./ChatProfileCard";
-import ChatChangePasswordCard from "./ChatChangePasswordCard";
 import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
 import ChatMessageInput from "./ChatMessageInput";
+import ChatSettingsCard from "./ChatSettingsCard";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userRole, userStatus, showCard } =
-    useContext(ChatContext);
+  const { setCurrentChat, userStatus, setShowCard } = useContext(ChatContext);
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
 
@@ -28,11 +26,6 @@ export default function Chat() {
     };
   }, [chat, currentUser?.id]);
 
-  const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
-  const [isChangePassCardOpen, setIsChangePassCardOpen] = useState(false);
-  const [user, setUser] = useState<User>(null);
-
-  const isAdmin = userRole === "owner" || userRole === "admin";
   const members = chat.users.map((user) => user.userId);
 
   const isBlockedForOthers =
@@ -56,36 +49,19 @@ export default function Chat() {
             Chat {chat.id}
           </Typography>
 
-          {isAdmin && chat.access !== "private" && (
+          {chat.access !== "private" && (
             <Button
               className="absolute right-[16px]"
-              IconOnly={chat.access === "public" ? <FiUnlock /> : <FiLock />}
+              IconOnly={<FaGear />}
+              title="Settings"
               size="sm"
               variant="info"
-              onClick={() => setIsChangePassCardOpen(!isChangePassCardOpen)}
+              onClick={() => setShowCard(<ChatSettingsCard />)}
             ></Button>
           )}
         </Card.Title>
         <Card.Body position="left" className="pt-0 h-5/6">
-          {isProfileCardOpen && (
-            <ChatProfileCard
-              user={user}
-              handleClose={() => setIsProfileCardOpen(false)}
-            />
-          )}
-
-          {isChangePassCardOpen && (
-            <ChatChangePasswordCard
-              handleClose={() => setIsChangePassCardOpen(false)}
-            />
-          )}
-
-          <ChatMessages
-            handleClick={(user) => {
-              setUser(user);
-              setIsProfileCardOpen(true);
-            }}
-          />
+          <ChatMessages />
 
           <ChatMessageInput
             disabled={
@@ -99,8 +75,6 @@ export default function Chat() {
       {chat.type === "channel" && (
         <ChatMemberList initialMembers={chat.users} />
       )}
-
-      {showCard}
     </div>
   );
 }

@@ -2,18 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { Form } from "react-router-dom";
 import { User } from "../../types";
-import { AuthContext } from "../../contexts";
-import {
-  Avatar,
-  Button,
-  Card,
-  Input,
-  Overlay,
-  Typography,
-} from "../../components";
+import { AuthContext, ChatContext } from "../../contexts";
+import { Avatar, Button, Card, Input, Typography } from "../../components";
 
-export default function NewChannelCard({ onClose }) {
+export default function NewChannelCard() {
   const { currentUser } = useContext(AuthContext);
+  const { closeCard } = useContext(ChatContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [password, setPassword] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
@@ -32,7 +26,7 @@ export default function NewChannelCard({ onClose }) {
 
   // Close dialog, clear search and selected users on submit
   const handleNewChannelSubmit = () => {
-    onClose();
+    closeCard();
     setSearchTerm("");
     setSelectedUsersId([]);
     setHasPassword(false);
@@ -59,29 +53,17 @@ export default function NewChannelCard({ onClose }) {
     );
   }, [searchTerm, users]);
 
-  // Add event listener to close create channel card when clicking outside of it
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (!(e.target as Element).closest("#create-channel-card")) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [onClose]);
-
   return (
     <>
-      <Overlay />
-
       <Form method="POST" action="/channels" onSubmit={handleNewChannelSubmit}>
         <Card
           id="create-channel-card"
           className="fixed z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
         >
-          <Card.Title>
+          <Card.Title
+            hr={false}
+            className="flex items-center justify-between gap-5"
+          >
             <Typography
               variant="h6"
               customWeight="bold"
@@ -93,12 +75,11 @@ export default function NewChannelCard({ onClose }) {
               variant="info"
               size="sm"
               IconOnly={<FiX />}
-              onClick={onClose}
-              className="absolute top-0 right-0 m-3"
+              onClick={closeCard}
             />
           </Card.Title>
-          <Card.Body position="left">
-            <Typography variant="lg" className="text-left">
+          <Card.Body position="left" className="space-y-2">
+            <Typography variant="md" className="text-left">
               Select participants
             </Typography>
 
@@ -163,14 +144,14 @@ export default function NewChannelCard({ onClose }) {
                 type="checkbox"
                 name="hasPassword"
                 id="hasPassword"
-                className="mr-1 mb-3"
+                className="mr-1"
                 onChange={() => setHasPassword(!hasPassword)}
               />
               Protect with password
             </Typography>
 
             {hasPassword && (
-              <div className="mb-3">
+              <div className="">
                 <Input
                   name="password"
                   type="password"
@@ -182,7 +163,7 @@ export default function NewChannelCard({ onClose }) {
               </div>
             )}
           </Card.Body>
-          <Card.Footer>
+          <Card.Footer hr={false}>
             <Button
               className="justify-center w-full font-bold"
               type="submit"

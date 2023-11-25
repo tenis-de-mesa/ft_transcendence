@@ -8,25 +8,46 @@ export default function Home() {
   const { currentUser } = useContext(AuthContext);
   const socket = useWebSocket();
   const [invites, setInvites] = useState([]);
+  const [inGameQueue, setInGameQueue] = useState(false);
 
   useEffect(() => {
-    const getInvites = () => {
-      socket.emit("findMyInvites", currentUser.id, (invitesList) => {
-        setInvites(invitesList);
-      });
-    };
-
-    socket.on("newGameInvite", getInvites);
-    getInvites();
+    socket.on("updateInviteList", (invitesList) => {
+      setInvites(invitesList);
+    });
+    socket.emit("findMyInvites");
   }, [socket, currentUser.id]);
 
-  const acceptGameInvite = function (invite) {
-    socket.emit("acceptInvitePlayerToGame", invite.id);
-  };
+  useEffect(() => {
+    socket.emit("inFindGameQueue", (inQueue) => setInGameQueue(inQueue));
+  }, [socket, inGameQueue]);
 
   return (
     <div className="flex flex-col justify-start h-full p-5">
       <Typography variant="h5">Welcome, {currentUser.nickname} !</Typography>
+      <div className="max-w-xl">
+        <br />
+        {!inGameQueue ? (
+          <Button
+            variant="info"
+            onClick={() => {
+              socket.emit("findGame");
+              setInGameQueue(true);
+            }}
+          >
+            Join Queue
+          </Button>
+        ) : (
+          <Button
+            variant="error"
+            onClick={() => {
+              socket.emit("cancelFindGame");
+              setInGameQueue(false);
+            }}
+          >
+            Exit Queue
+          </Button>
+        )}
+      </div>
       {invites.length > 0 && (
         <Card className="max-w-xl">
           <Card.Title position="center">
@@ -41,9 +62,19 @@ export default function Home() {
                       {invite.nickname}
                       <Button
                         variant="info"
-                        onClick={() => acceptGameInvite(invite)}
+                        onClick={() =>
+                          socket.emit("acceptInvitePlayerToGame", invite.id)
+                        }
                       >
-                        Aceitar
+                        Accept
+                      </Button>
+                      <Button
+                        variant="error"
+                        onClick={() =>
+                          socket.emit("declineInvitePlayerToGame", invite.id)
+                        }
+                      >
+                        Decline
                       </Button>
                     </div>
                   </li>

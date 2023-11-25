@@ -36,6 +36,7 @@ import {
 } from './dto';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ChatsService {
@@ -54,6 +55,8 @@ export class ChatsService {
 
     @InjectQueue('chats')
     private readonly chatsQueue: Queue,
+
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(dto: CreateChatDto, creator: UserEntity): Promise<ChatEntity> {
@@ -168,9 +171,7 @@ export class ChatsService {
       .leftJoinAndSelect('chat.users', 'member')
       .leftJoinAndSelect('member.user', 'user')
       .where('member.userId = :userId', { userId })
-      .andWhere('member.status != :banned', {
-        banned: ChatMemberStatus.BANNED,
-      })
+      .andWhere('member.status != :banned', { banned: ChatMemberStatus.BANNED })
       .withDeleted();
 
     return await query.getMany();
@@ -293,6 +294,33 @@ export class ChatsService {
     return member.role;
   }
 
+  async getMembers(chatId: number): Promise<ChatMemberEntity[]> {
+    const query = this.chatMemberRepository
+      .createQueryBuilder('member')
+      .withDeleted()
+      .leftJoinAndSelect('member.user', 'user')
+      .where('member.chatId = :chatId', { chatId })
+      .andWhere('member.status != :banned', { banned: ChatMemberStatus.BANNED })
+      .andWhere('user.deletedAt IS NULL');
+
+    return await query.getMany();
+  }
+
+  async getMembersByStatus(
+    chatId: number,
+    status: ChatMemberStatus,
+  ): Promise<ChatMemberEntity[]> {
+    const query = this.chatMemberRepository
+      .createQueryBuilder('member')
+      .withDeleted()
+      .leftJoinAndSelect('member.user', 'user')
+      .where('member.chatId = :chatId', { chatId })
+      .andWhere('member.status = :status', { status })
+      .andWhere('user.deletedAt IS NULL');
+
+    return await query.getMany();
+  }
+
   async findDirectChat(
     currentUser: UserEntity,
     otherUserId: number,
@@ -381,7 +409,9 @@ export class ChatsService {
     const member = await this.getMember(chatId, userId);
 
     if (member.role === ChatMemberRole.OWNER) {
-      if (chat.users.length === 1) {
+      const members = chat.users.filter((member) => !member.user.deletedAt);
+
+      if (members.length === 1) {
         await this.chatRepository.remove(chat);
         return;
       }
@@ -390,9 +420,11 @@ export class ChatsService {
         throw new BadRequestException('A new owner must be nominated');
       }
 
-      const newOwner = await this.getMember(chatId, newOwnerId);
+      let newOwner = await this.getMember(chatId, newOwnerId);
       newOwner.role = ChatMemberRole.OWNER;
-      await this.chatMemberRepository.save(newOwner);
+      newOwner = await this.chatMemberRepository.save(newOwner);
+
+      this.eventEmitter.emit('chat.updateMemberRole', newOwner);
     }
 
     await this.chatMemberRepository.remove(member);
@@ -603,13 +635,22 @@ export class ChatsService {
       throw new BadRequestException('Chat is not a channel');
     }
 
-    const [_, updateMember] = await Promise.all([
+    const [member, updateMember] = await Promise.all([
       this.getMember(chatId, userId),
       this.getMember(chatId, updateUserId),
     ]);
 
     if (updateMember.role === ChatMemberRole.OWNER) {
       throw new BadRequestException('Owner cannot be updated');
+    }
+
+    if (role === ChatMemberRole.OWNER && member.role === ChatMemberRole.OWNER) {
+      member.role = ChatMemberRole.ADMIN;
+
+      this.eventEmitter.emit(
+        'chat.updateMemberRole',
+        await this.chatMemberRepository.save(member),
+      );
     }
 
     updateMember.role = role;

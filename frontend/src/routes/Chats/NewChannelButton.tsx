@@ -1,10 +1,12 @@
-import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { Button } from "../../components";
+
 import NewChannelCard from "./NewChannelCard";
+import { useContext } from "react";
+import { ChatContext } from "../../contexts";
 
 export default function NewChannelButton() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { setShowCard } = useContext(ChatContext);
 
   return (
     <>
@@ -12,12 +14,10 @@ export default function NewChannelButton() {
         className="flex items-center justify-center w-full"
         LeadingIcon={<FiPlus />}
         variant="info"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setShowCard(<NewChannelCard />)}
       >
         New channel
       </Button>
-
-      {isOpen && <NewChannelCard onClose={() => setIsOpen(false)} />}
     </>
   );
 }

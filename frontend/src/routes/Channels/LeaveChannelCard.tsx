@@ -1,37 +1,18 @@
-import { useEffect } from "react";
-import { Alert, Button, Card, Overlay, Typography } from "../../components";
-import { useFetcher } from "react-router-dom";
+import { Form } from "react-router-dom";
 import { FiX } from "react-icons/fi";
+import { Button, Card, Typography } from "../../components";
 
 type LeaveChannelCardProps = {
   id: number;
-  handleClose: () => void;
+  onClose: () => void;
 };
 
 export default function LeaveChannelCard({
   id,
-  handleClose,
+  onClose,
 }: LeaveChannelCardProps) {
-  const { Form, state, data: error } = useFetcher();
-
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#leave-channel-card")) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [handleClose]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="leave-channel-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 z-[1001] min-w-[27rem]"
@@ -47,7 +28,7 @@ export default function LeaveChannelCard({
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={handleClose}
+            onClick={onClose}
           ></Button>
         </Card.Title>
         <Card.Body position="left">
@@ -56,21 +37,20 @@ export default function LeaveChannelCard({
           </Typography>
         </Card.Body>
         <Card.Footer hr={false} className="space-y-3">
-          <Form className="space-y-3" action={`${id}/leave`} method="POST">
+          <Form
+            className="space-y-3"
+            action={`${id}/leave`}
+            method="POST"
+            onSubmit={onClose}
+          >
             <Button
               className="justify-center w-full font-bold"
               type="submit"
               variant="error"
             >
-              {state === "loading" ? "Loading..." : "Leave"}
+              Leave
             </Button>
           </Form>
-
-          {error?.message && state === "idle" && (
-            <Alert severity="error" className="w-full">
-              {error.message}
-            </Alert>
-          )}
         </Card.Footer>
       </Card>
     </>
