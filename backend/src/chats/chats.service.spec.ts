@@ -15,6 +15,7 @@ import {
 import { Repository } from 'typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { getQueueToken } from '@nestjs/bull';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 describe('ChatsService', () => {
   let module: TestingModule;
@@ -34,6 +35,10 @@ describe('ChatsService', () => {
 
   const mockQueue = {
     add: jest.fn(),
+  };
+
+  const mockEmitter = {
+    emit: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -59,6 +64,10 @@ describe('ChatsService', () => {
         {
           provide: getQueueToken('chats'),
           useValue: mockQueue,
+        },
+        {
+          provide: EventEmitter2,
+          useValue: mockEmitter,
         },
       ],
     }).compile();
