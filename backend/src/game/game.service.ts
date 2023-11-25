@@ -121,13 +121,17 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
-        speedX: 3,
-        speedY: 3,
+        speedX: this.getRandomElement([-3, 3]),
+        speedY: this.getRandomElement([-3, 3]),
         radius: 16,
         speedFactor: 1.075,
         verticalAdjustmentFactor: 8,
       },
     };
+  }
+
+  getRandomElement<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
   }
 
   async newGame(user1: UserEntity, user2: UserEntity) {
@@ -153,9 +157,9 @@ export class GameService {
       }
 
       if (game.ball.x <= 0) {
-        return this.gainedAPoint(game.gameId, 0);
-      } else if (game.ball.x >= this.windowWidth) {
         return this.gainedAPoint(game.gameId, 1);
+      } else if (game.ball.x >= this.windowWidth) {
+        return this.gainedAPoint(game.gameId, 0);
       }
 
       for (const player of [game.playerOne, game.playerTwo]) {
@@ -269,18 +273,20 @@ export class GameService {
         ? this.gamesInMemory[body.gameId].playerOne
         : this.gamesInMemory[body.gameId].playerTwo;
 
+    const movementfactor = 20;
+
     if (body.up) {
       if (player.paddle.y < 10) {
         player.paddle.y = 0;
       } else {
-        player.paddle.y -= 10;
+        player.paddle.y -= movementfactor;
       }
     }
     if (body.down) {
       if (player.paddle.y > this.windowHeight - 100 - 10) {
         player.paddle.y = this.windowHeight - 100;
       } else {
-        player.paddle.y += 10;
+        player.paddle.y += movementfactor;
       }
     }
 
