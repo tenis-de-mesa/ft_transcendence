@@ -1,38 +1,21 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import { ChatContext } from "../../contexts";
 import { User } from "../../types";
-import { Button, Card, Overlay, Typography } from "../../components";
+import { Button, Card, Typography } from "../../components";
 
 type ChatKickMemberCardProps = {
   user: User;
 };
 
 export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
-  const { setShowCard } = useContext(ChatContext);
+  const { closeCard, currentChat } = useContext(ChatContext);
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
 
-  const handleClose = () => setShowCard(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#kick-member-card")) {
-        setShowCard(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [setShowCard]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="kick-member-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2 z-[1001] max-w-[27rem] dark:bg-gray-900"
@@ -48,7 +31,7 @@ export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={handleClose}
+            onClick={closeCard}
           ></Button>
         </Card.Title>
         <Card.Body>
@@ -58,7 +41,7 @@ export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
           </Typography>
         </Card.Body>
         <Card.Footer className="flex justify-end items-center gap-3">
-          <div onClick={handleClose}>
+          <div onClick={closeCard}>
             <Typography
               variant="md"
               className="cursor-pointer select-none hover:decoration-solid hover:underline"
@@ -66,7 +49,11 @@ export default function ChatKickMemberCard({ user }: ChatKickMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="kick" method="POST" onSubmit={handleClose}>
+          <Form
+            action={`${currentChat?.id}/kick`}
+            method="POST"
+            onSubmit={closeCard}
+          >
             <input type="hidden" name="userId" value={user?.id} />
             <Button variant="error">
               <Typography variant="md" customWeight="bold">

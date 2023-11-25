@@ -72,7 +72,7 @@ export const Input: FC<InputProps> = ({
               {
                 "bg-gray-50 dark:bg-gray-700": props.disabled,
                 "dark:bg-gray-800": !props.disabled,
-              },
+              }
             )}
           >
             {leadingText}
@@ -100,7 +100,7 @@ export const Input: FC<InputProps> = ({
                 error,
               "bg-white dark:bg-gray-800": !props.disabled,
               "bg-gray-50 dark:bg-gray-700": props.disabled,
-            },
+            }
           )}
         />
       </div>

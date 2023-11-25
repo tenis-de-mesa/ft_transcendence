@@ -9,12 +9,19 @@ import {
   Patch,
   HttpCode,
   HttpStatus,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatsService } from './chats.service';
 import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
-import { ChatEntity, ChatMemberRole, UserEntity } from '../core/entities';
+import {
+  ChatEntity,
+  ChatMemberEntity,
+  ChatMemberRole,
+  ChatMemberStatus,
+  UserEntity,
+} from '../core/entities';
 import {
   CreateChatDto,
   ChatWithName,
@@ -225,5 +232,22 @@ export class ChatsController {
     const member = await this.chatsService.updateMemberRole(id, userId, dto);
 
     this.eventEmitter.emit('chat.updateMemberRole', member);
+  }
+
+  @Get(':id/members')
+  async getMembers(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ChatMemberEntity[]> {
+    return await this.chatsService.getMembers(id);
+  }
+
+  @Get(':id/members/:status')
+  @ChannelRoles(ChatMemberRole.OWNER, ChatMemberRole.ADMIN)
+  async getMembersByStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('status', new ParseEnumPipe(ChatMemberStatus))
+    status: ChatMemberStatus,
+  ): Promise<ChatMemberEntity[]> {
+    return await this.chatsService.getMembersByStatus(id, status);
   }
 }

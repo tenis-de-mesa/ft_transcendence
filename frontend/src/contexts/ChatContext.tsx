@@ -13,6 +13,7 @@ type ChatContextType = {
   setShowCard: React.Dispatch<React.SetStateAction<JSX.Element>>;
   userRole: ChatMemberRole;
   userStatus: ChatMemberStatus;
+  closeCard: () => void;
 };
 
 export const ChatContext = createContext({} as ChatContextType);
@@ -23,6 +24,8 @@ export const ChatContextProvider = ({ children }) => {
   const [userRole, setUserRole] = useState<ChatMemberRole>(null);
   const [userStatus, setUserStatus] = useState<ChatMemberStatus>(null);
   const [showCard, setShowCard] = useState<JSX.Element>(null);
+
+  const closeCard = () => setShowCard(null);
 
   useEffect(() => {
     socket.on("userRoleUpdated", (member: ChatMember) => {
@@ -46,7 +49,7 @@ export const ChatContextProvider = ({ children }) => {
 
   useEffect(() => {
     const currentMember = currentChat?.users.find(
-      (user) => user.userId === currentUser?.id,
+      (user) => user.userId === currentUser?.id
     );
 
     setUserRole(currentMember?.role);
@@ -62,6 +65,7 @@ export const ChatContextProvider = ({ children }) => {
         setShowCard,
         userRole,
         userStatus,
+        closeCard,
       }}
     >
       {children}
