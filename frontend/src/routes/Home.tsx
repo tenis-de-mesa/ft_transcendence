@@ -27,32 +27,43 @@ export default function Home() {
   return (
     <div className="flex flex-col justify-start h-full p-5">
       <Typography variant="h5">Welcome, {currentUser.nickname} !</Typography>
-      {invites.length > 0 && (
-        <Card className="max-w-xl">
-          <Card.Title position="center">
-            <Typography variant="h6">Game Invites</Typography>
-          </Card.Title>
-          <Card.Body className="!px-10" position="left">
-            <ul>
-              {invites.map((invite) => {
-                return (
-                  <li key={invite.id} className="text-white mb-2">
-                    <div className="flex items-center gap-2">
-                      {invite.nickname}
-                      <Button
-                        variant="info"
-                        onClick={() => acceptGameInvite(invite)}
-                      >
-                        Aceitar
-                      </Button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card.Body>
-        </Card>
-      )}
-    </div>
+      <div className="max-w-xl">
+        <br />
+        <Button
+          variant="info"
+          onClick={() => socket.emit('findGame')}
+        >
+          Join Queue
+        </Button>
+      </div>
+      {
+        invites.length > 0 && (
+          <Card className="max-w-xl">
+            <Card.Title position="center">
+              <Typography variant="h6">Game Invites</Typography>
+            </Card.Title>
+            <Card.Body className="!px-10" position="left">
+              <ul>
+                {invites.map((invite) => {
+                  return (
+                    <li key={invite.id} className="text-white mb-2">
+                      <div className="flex items-center gap-2">
+                        {invite.nickname}
+                        <Button
+                          variant="info"
+                          onClick={() => acceptGameInvite(invite)}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card.Body>
+          </Card>
+        )
+      }
+    </div >
   );
 }

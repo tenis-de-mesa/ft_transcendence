@@ -30,7 +30,7 @@ export class GameGateway
   @WebSocketServer() server: Server;
 
   queues: {
-    // all: []
+    all: UserEntity[];
     invites: {
       user: UserEntity;
       guest: UserEntity;
@@ -56,10 +56,11 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
+      this.mathmaking();
       this.gameService.updateGame();
     }, 16);
     this.queues = {
-      // all: []
+      all: [],
       invites: [],
       // open: []
     };
@@ -94,6 +95,28 @@ export class GameGateway
 
     delete this.allUsers[userId];
     delete this.allClientSockets[clientSocket.id];
+  }
+
+  async mathmaking() {
+    if (this.queues.all.length < 2) {
+      return;
+    }
+
+    const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
+
+    const game = await this.gameService.newGame(playerOne, playerTwo);
+
+    this.allUsers[playerOne.id].client.emit('gameAvailable', game.gameId);
+    this.allUsers[playerTwo.id].client.emit('gameAvailable', game.gameId);
+  }
+
+  @SubscribeMessage('findGame')
+  handleFindGame(@User() user: UserEntity) {
+    if (this.queues.all.find((u) => u.id == user.id)) {
+      return;
+    }
+
+    this.queues.all.push(user);
   }
 
   @SubscribeMessage('invitePlayerToGame')

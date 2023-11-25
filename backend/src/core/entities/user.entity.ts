@@ -133,7 +133,6 @@ export class UserEntity {
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
 
-
   @DeleteDateColumn()
   deletedAt?: Date;
 
