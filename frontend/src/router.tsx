@@ -116,7 +116,11 @@ const router = createBrowserRouter(
             element={<Profile />}
             loader={loadUserById}
           />
-          <Route path="leaderboard" element={<Leaderboard />} />
+          <Route
+            path="leaderboard"
+            element={<Leaderboard />}
+            loader={loadUsersList}
+          />
           <Route path="games" element={<Games />} loader={loadGames} />
           <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
