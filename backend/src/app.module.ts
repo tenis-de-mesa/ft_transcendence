@@ -15,6 +15,7 @@ import { GuestCleanupService } from './users/guest-cleanup/guest-cleanup.service
 import { ScheduleModule } from '@nestjs/schedule';
 import { StatusModule } from './users/status/status.module';
 import { ChatsModule } from './chats/chats.module';
+import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
 
@@ -36,6 +37,7 @@ import { BullModule } from '@nestjs/bull';
     FriendRequestModule,
     StatusModule,
     ChatsModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService, GuestCleanupService],

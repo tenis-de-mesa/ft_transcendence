@@ -1,5 +1,5 @@
 import { useContext, useMemo } from "react";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Chat } from "../../types";
 
@@ -19,15 +19,19 @@ export default function Channels() {
 
   const columns = useMemo<ColumnDef<Chat>[]>(
     () => [
-      columnHelper.accessor("createdByUser", {
+      columnHelper.accessor("id", {
+        header: "#",
+        cell: (props) => (
+          <Link to={`/chats/${props.getValue()}`}>{props.getValue()}</Link>
+        ),
+      }),
+      columnHelper.accessor("createdBy", {
         header: "Owner",
-        cell: (props) => {
-          const member = props.row.original.users.find(
-            (user) => user.userId === props.getValue()
-          );
-
-          return <span>{member?.user?.nickname ?? "Deleted user"}</span>;
-        },
+        cell: (props) => (
+          <span>
+            {props.getValue() ? props.getValue().nickname : "Deleted user"}
+          </span>
+        ),
       }),
       columnHelper.accessor("access", {
         header: "Access",
@@ -39,7 +43,7 @@ export default function Channels() {
           const users = props.row.original.users;
           const id = props.getValue();
           const access = props.row.original.access;
-          const isOwner = props.row.original.createdByUser === currentUser.id;
+          const isOwner = props.row.original.createdBy?.id == currentUser.id;
           const isMember = users.some((user) => user.userId === currentUser.id);
 
           return (
@@ -53,7 +57,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser.id]
+    [currentUser.id],
   );
 
   return (

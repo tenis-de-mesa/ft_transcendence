@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, Outlet, useLoaderData } from "react-router-dom";
+import { NavLink, Outlet, useLoaderData } from "react-router-dom";
 import { Card, Overlay, Typography } from "../../components";
 import { Chat } from "../../types";
 import { socket } from "../../socket";
@@ -33,31 +33,33 @@ export default function Chats() {
 
   return (
     <div className="flex flex-row justify-between h-full gap-3">
-      <div className="w-1/6">
-        <Card className="h-full">
-          <Card.Title>
-            <Typography variant="h6">Chats</Typography>
-          </Card.Title>
-          <Card.Body className="h-full">
-            <div className="flex flex-col justify-between h-[calc(100%-4rem)]">
-              <div className="flex flex-col gap-2 text-left">
+      <div className="w-1/4">
+        <div className="flex flex-col h-full relative">
+          <Card className="h-full">
+            <Card.Title>
+              <Typography variant="h6">Chats</Typography>
+            </Card.Title>
+            <Card.Body position="left">
+              <div className="flex flex-col justify-between">
                 {chatList.map((chat) => (
-                  <Link
+                  <NavLink
                     key={chat.id}
                     to={`/chats/${chat.id}`}
                     state={{ id: chat.id }}
                   >
                     <Typography variant="sm">{chat.name}</Typography>
-                  </Link>
+                  </NavLink>
                 ))}
               </div>
-              <NewChannelButton />
-            </div>
-          </Card.Body>
-        </Card>
+            </Card.Body>
+          </Card>
+          <span className="absolute bottom-0 left-0 right-0 p-3">
+            <NewChannelButton />
+          </span>
+        </div>
       </div>
 
-      <div className="w-5/6 h-full">
+      <div className="w-full h-full">
         <Outlet />
       </div>
 

@@ -112,7 +112,7 @@ export class ChatsService {
       type: ChatType.CHANNEL,
       access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
       password: password ? await argon2.hash(password) : undefined,
-      createdByUser: creator.id,
+      createdBy: creator,
     });
 
     users.map(async (user) => {

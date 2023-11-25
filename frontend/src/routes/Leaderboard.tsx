@@ -1,16 +1,22 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 import { Typography } from "../components/Typography";
-import { Data, tableData } from "../data";
 
 import Table from "../components/Table";
+import { User } from "../types";
+import { useLoaderData } from "react-router-dom";
+import { UserWithStatus } from "../components";
 
-const columnHelper = createColumnHelper<Data>();
+const columnHelper = createColumnHelper<User>();
 
 const Leaderboard = () => {
-  const columns = useMemo<ColumnDef<Data>[]>(
+  const users: User[] = (useLoaderData() as User[]).sort(
+    (a, b) => b.winCount - a.winCount,
+  );
+
+  const columns = useMemo<ColumnDef<User>[]>(
     () => [
       columnHelper.accessor("id", {
         cell: (info) => (
@@ -21,45 +27,28 @@ const Leaderboard = () => {
         header: () => <span>Nickname</span>,
         cell: (info) => <i>{info.getValue()}</i>,
       }),
-      columnHelper.accessor("email", {
-        header: () => "Email",
-        cell: (info) => info.renderValue(),
-      }),
-      columnHelper.accessor("total_games", {
-        header: () => <span>Total games</span>,
-      }),
-      columnHelper.accessor("wins", {
+      columnHelper.accessor("winCount", {
         header: "Wins",
       }),
-      columnHelper.accessor("online", {
+      columnHelper.accessor("loseCount", {
+        header: "Loses",
+      }),
+      columnHelper.accessor("status", {
         header: "Status",
         cell: (info) => {
-          const isOnline = info.getValue();
-          return isOnline ? (
-            <div className="flex items-center">
-              <div className="h-2.5 w-2.5 rounded-full bg-success-500 mr-2"></div>
-              <span className="text-success-500">Online</span>
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <div className="h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></div>
-              <span className="text-gray-500">Offline</span>
-            </div>
-          );
+          return <UserWithStatus user={info.row.original} />;
         },
       }),
     ],
     [],
   );
 
-  const [data] = useState(() => [...tableData]);
-
   return (
     <>
       <Typography variant="h5">Leaderboard</Typography>
 
       <div className="h-[92%] mt-6">
-        <Table columns={columns} data={data} />
+        <Table columns={columns as ColumnDef<unknown>[]} data={users} />
       </div>
     </>
   );

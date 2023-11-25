@@ -115,8 +115,8 @@ export default function ChatChangePasswordCard({
               {state !== "idle"
                 ? "Loading..."
                 : currentChat.access === "protected"
-                ? "Change password"
-                : "Set password"}
+                  ? "Change password"
+                  : "Set password"}
             </Button>
 
             {currentChat.access === "protected" && (

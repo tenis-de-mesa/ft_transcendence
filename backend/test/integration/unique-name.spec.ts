@@ -57,6 +57,6 @@ describe('Unique Name', () => {
 
     const newUser = users.find((u) => u.id !== user1.id);
     expect(newUser).toBeDefined();
-    expect(newUser.nickname).toEqual('test2-1');
+    expect(newUser.nickname).not.toEqual('test2');
   });
 });

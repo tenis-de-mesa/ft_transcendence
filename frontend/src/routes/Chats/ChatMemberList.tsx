@@ -113,7 +113,7 @@ export default function ChatMemberList({
   }, []);
 
   return (
-    <Card className="w-1/4">
+    <Card className="w-1/3">
       <Card.Title>
         <Typography variant="h6">Members - {users?.length}</Typography>
       </Card.Title>

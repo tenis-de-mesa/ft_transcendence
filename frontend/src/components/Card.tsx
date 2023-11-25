@@ -17,7 +17,7 @@ const CardWrapper: FC<CardWrapperProps> = ({
       "rounded-xl",
       "bg-white dark:bg-gray-800",
       "shadow-xl",
-      className
+      className,
     )}
     {...props}
   >

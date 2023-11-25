@@ -14,6 +14,8 @@ import {
   loadUserById,
   redirectToChat,
   loadAllChats,
+  loadGame,
+  loadGames,
 } from "./loaders";
 
 import {
@@ -43,12 +45,13 @@ import {
   Home,
   ChatNew,
   Leaderboard,
-  Games,
   Settings,
   ErrorBoundary,
   Channels,
   Friends,
   Login,
+  Games,
+  Game,
 } from "./routes";
 
 const router = createBrowserRouter(
@@ -110,8 +113,13 @@ const router = createBrowserRouter(
             element={<Profile />}
             loader={loadUserById}
           />
-          <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="games" element={<Games />} />
+          <Route
+            path="leaderboard"
+            element={<Leaderboard />}
+            loader={loadUsersList}
+          />
+          <Route path="games" element={<Games />} loader={loadGames} />
+          <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
