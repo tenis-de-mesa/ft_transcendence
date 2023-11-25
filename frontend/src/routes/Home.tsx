@@ -11,14 +11,10 @@ export default function Home() {
   const [inGameQueue, setInGameQueue] = useState(false);
 
   useEffect(() => {
-    const getInvites = () => {
-      socket.emit("findMyInvites", currentUser.id, (invitesList) => {
-        setInvites(invitesList);
-      });
-    };
-
-    socket.on("newGameInvite", getInvites);
-    getInvites();
+    socket.on("updateInviteList", (invitesList) => {
+      setInvites(invitesList);
+    });
+    socket.emit("findMyInvites");
   }, [socket, currentUser.id]);
 
   useEffect(() => {
@@ -71,6 +67,14 @@ export default function Home() {
                         }
                       >
                         Accept
+                      </Button>
+                      <Button
+                        variant="error"
+                        onClick={() =>
+                          socket.emit("declineInvitePlayerToGame", invite.id)
+                        }
+                      >
+                        Decline
                       </Button>
                     </div>
                   </li>

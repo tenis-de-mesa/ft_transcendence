@@ -145,7 +145,7 @@ export class GameGateway
       user,
     });
 
-    this.allUsers[guest.id]?.client.emit('newGameInvite', user);
+    this.sendUpdateInviteList(guest.id);
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
@@ -170,11 +170,29 @@ export class GameGateway
     clientSocket.emit('gameAvailable', game.gameId);
   }
 
-  @SubscribeMessage('findMyInvites')
-  handleFindMyInvites(@User('id') userId: number) {
-    return this.queues.invites
+  @SubscribeMessage('declineInvitePlayerToGame')
+  handleDeclineInvitePlayerToGame(
+    @User('id') userId: number,
+    @MessageBody() userIdInvitation: number,
+  ) {
+    this.queues.invites = this.queues.invites.filter(
+      (i) => !(i.guest.id == userId && i.user.id == userIdInvitation),
+    );
+
+    this.sendUpdateInviteList(userId);
+  }
+
+  sendUpdateInviteList(userId: number) {
+    const inviteList = this.queues.invites
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
+
+    this.allUsers[userId]?.client.emit('updateInviteList', inviteList);
+  }
+
+  @SubscribeMessage('findMyInvites')
+  handleFindMyInvites(@User('id') userId: number) {
+    this.sendUpdateInviteList(userId);
   }
 
   private async validate(client: Socket) {
