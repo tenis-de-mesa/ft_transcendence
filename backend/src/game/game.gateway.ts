@@ -181,6 +181,6 @@ export class GameGateway
 
   @SubscribeMessage('getGameHistory')
   async handleGetGameHistory(@MessageBody() userId: number) {
-    return await this.gameService.getGameHistory(userId);
+    return await this.gameService.getAllGames(userId);
   }
 }
