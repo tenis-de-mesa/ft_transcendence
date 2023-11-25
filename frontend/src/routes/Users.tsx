@@ -1,36 +1,19 @@
 import { Link, useLoaderData } from "react-router-dom";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { User } from "../types";
-
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
-import { Data } from "../data";
-import { AddFriendButton } from "../components/AddFriendButton";
-import { AuthContext } from "../contexts";
+import { AddFriendButton, ChatButton, InviteGameButton } from "../components";
 import { UserWithStatus } from "../components/UserWithStatus";
 
 const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
-  const { currentUser } = useContext(AuthContext);
   const loadedUsers: User[] = useLoaderData() as User[];
   const [users, setUsers] = useState(loadedUsers);
 
   useEffect(() => setUsers(loadedUsers), [loadedUsers]);
-
-  useEffect(() => {
-    // The current user is online by default
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => {
-        if (user.id === currentUser.id) {
-          return { ...user, status: "online" };
-        }
-        return user;
-      })
-    );
-  }, [currentUser.id]);
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
@@ -43,22 +26,26 @@ export default function Users() {
         ),
       }),
       columnHelper.accessor("id", {
-        header: "Action",
-        cell: (info) => <AddFriendButton user={info.row.original} />,
+        header: "Actions",
+        cell: (info) => {
+          return (
+            <div className="flex space-x-1">
+              <ChatButton user={info.row.original} />
+              <AddFriendButton user={info.row.original} />
+              <InviteGameButton user={info.row.original} />
+            </div>
+          );
+        },
       }),
     ],
-    []
+    [],
   );
 
   return (
     <>
       <Typography variant="h5">Users</Typography>
-
-      <div className="h-[92%] mt-6">
-        <Table
-          columns={columns as unknown as ColumnDef<Data>[]}
-          data={users as unknown as Data[]}
-        />
+      <div className="mt-6">
+        <Table columns={columns as ColumnDef<unknown>[]} data={users} />
       </div>
     </>
   );

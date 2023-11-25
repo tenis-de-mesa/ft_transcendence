@@ -15,6 +15,8 @@ import {
   redirectToChat,
   loadAllChats,
   generateTFASecret,
+  loadGame,
+  loadGames,
 } from "./loaders";
 
 import {
@@ -22,9 +24,6 @@ import {
   createChat,
   updateChat,
   sendChatMessage,
-  setChannelPassword,
-  changeChannelPassword,
-  removeChannelPassword,
   joinChannel,
   leaveChannel,
   kickChatMember,
@@ -37,6 +36,7 @@ import {
   disableTFA,
   regenerateTFACodes,
   loginTFACheck,
+  manageChannelPassword,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -50,7 +50,6 @@ import {
   Home,
   ChatNew,
   Leaderboard,
-  Games,
   Settings,
   ErrorBoundary,
   Channels,
@@ -60,6 +59,8 @@ import {
   DisableTFA,
   RegenerateTFACodes,
   LoginTFACheck,
+  Games,
+  Game,
 } from "./routes";
 
 const router = createBrowserRouter(
@@ -110,14 +111,13 @@ const router = createBrowserRouter(
               action={sendChatMessage}
             />
             <Route path="update/:id" action={updateChat} />
-            <Route path=":id/set-password" action={setChannelPassword} />
-            <Route path=":id/change-password" action={changeChannelPassword} />
-            <Route path=":id/remove-password" action={removeChannelPassword} />
+            <Route path=":id/manage-password" action={manageChannelPassword} />
             <Route path=":id/kick" action={kickChatMember} />
             <Route path=":id/mute" action={muteChatMember} />
             <Route path=":id/unmute" action={unmuteChatMember} />
             <Route path=":id/ban" action={banChatMember} />
             <Route path=":id/unban" action={unbanChatMember} />
+            <Route path=":id/leave" action={leaveChannel} />
             <Route
               path=":id/update-member-role"
               action={updateChatMemberRole}
@@ -128,8 +128,13 @@ const router = createBrowserRouter(
             element={<Profile />}
             loader={loadUserById}
           />
-          <Route path="leaderboard" element={<Leaderboard />} />
-          <Route path="games" element={<Games />} />
+          <Route
+            path="leaderboard"
+            element={<Leaderboard />}
+            loader={loadUsersList}
+          />
+          <Route path="games" element={<Games />} loader={loadGames} />
+          <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
           <Route path="tfa">
             <Route

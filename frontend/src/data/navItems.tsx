@@ -2,7 +2,8 @@ import { INavitem } from "../@interfaces";
 
 import {
   LuBarChart2,
-  LuGlobe,
+  LuGamepad2,
+  LuHeart,
   LuHome,
   LuMessagesSquare,
   LuSettings,
@@ -28,14 +29,14 @@ export const navitems: INavitem[] = [
   {
     order: 2,
     path: "users",
-    label: "All users",
+    label: "Users",
     icon: <LuUsers />,
   },
   {
     order: 3,
     path: "friends",
     label: "Friends",
-    icon: <LuUsers />,
+    icon: <LuHeart />,
   },
   {
     order: 4,
@@ -47,7 +48,7 @@ export const navitems: INavitem[] = [
     order: 5,
     path: "games",
     label: "Games",
-    icon: <LuGlobe />,
+    icon: <LuGamepad2 />,
   },
   {
     order: 6,

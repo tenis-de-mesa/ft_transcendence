@@ -102,9 +102,12 @@ export class UsersService {
 
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     let nickname = dto.login;
+    if (dto.provider === AuthProvider.GUEST) {
+      nickname = 'Guest';
+    }
 
     while (!(await this.checkNicknameAvailable(nickname))) {
-      nickname = dto.login + '-1';
+      nickname += Math.floor(Math.random() * 10);
     }
 
     return await this.userRepository.save({ ...dto, nickname });

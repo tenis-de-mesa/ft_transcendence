@@ -1,9 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Typography, UserWithStatus } from "../../components";
+import { Card, Typography } from "../../components";
 import { ChatMember, User } from "../../types";
 import { AuthContext } from "../../contexts";
 import { socket } from "../../socket";
+
+import ChatMemberItem from "./ChatMemberItem";
 import ChatContextMenu from "./ChatContextMenu";
 
 const defaultProps = {
@@ -11,7 +13,6 @@ const defaultProps = {
   position: { top: 0, left: 0 },
   isOpen: false,
 };
-
 
 type ChatMemberListProps = {
   initialMembers: ChatMember[];
@@ -112,7 +113,7 @@ export default function ChatMemberList({
   }, []);
 
   return (
-    <Card className="w-1/4">
+    <Card className="w-1/3">
       <Card.Title>
         <Typography variant="h6">Members - {users?.length}</Typography>
       </Card.Title>
@@ -123,7 +124,7 @@ export default function ChatMemberList({
               key={user.id}
               onContextMenu={(e) => handleContextMenu(e, user)}
             >
-              <UserWithStatus key={user.id} user={user} />
+              <ChatMemberItem user={user} />
             </div>
           ))}
         </div>

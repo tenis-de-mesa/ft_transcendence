@@ -1,6 +1,6 @@
 export type UserStatus = {
   id: number;
-  status: string;
+  status: "online" | "offline" | "in_game";
 };
 
 export type User = {
@@ -16,6 +16,8 @@ export type User = {
   blockedUsers: number[];
   friends: User[];
   deletedAt?: Date;
+  winCount: number;
+  loseCount: number;
 };
 
 export type Message = {
@@ -42,10 +44,18 @@ export type Chat = {
   newMessage: string;
   access: "public" | "protected" | "private";
   type: "direct" | "channel";
-  createdByUser: number;
+  createdBy: User;
 };
 
 export type NewChatMessage = {
   chatId: number;
   message: string;
+};
+
+export type Game = {
+  id: number,
+  playerOneScore: number,
+  playerTwoScore: number,
+  playerOne: User,
+  playerTwo: User
 };

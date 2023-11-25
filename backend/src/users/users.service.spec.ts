@@ -91,7 +91,7 @@ describe('UsersService', () => {
       // Arrange
       const dataUser = {
         login: 'test',
-        provider: AuthProvider.GUEST,
+        provider: AuthProvider.INTRA,
         intraId: 1,
       };
 
@@ -112,7 +112,7 @@ describe('UsersService', () => {
       // Arrange
       const dataUser = {
         login: 'test',
-        provider: AuthProvider.GUEST,
+        provider: AuthProvider.INTRA,
         intraId: 1,
       };
 
@@ -132,7 +132,7 @@ describe('UsersService', () => {
       const result = await usersService.createUser(user);
 
       // Assert
-      expect(result).toEqual({ ...dataUser, nickname: dataUser.login + '-1' });
+      expect(result.nickname).not.toEqual(dataUser.login);
     });
   });
 

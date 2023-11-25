@@ -3,11 +3,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
-import { SessionEntity, UserStatus } from '../../core/entities';
+import { SessionEntity, UserEntity, UserStatus } from '../../core/entities';
+import { User } from '../../core/decorators';
 
 @WebSocketGateway({
   cors: {
@@ -65,6 +67,22 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await Promise.all([updateSessionPromise, updateUserPromise]);
 
     this.emitUserStatus(session.userId, UserStatus.OFFLINE);
+  }
+
+  @SubscribeMessage('playerInGame')
+  async handlePlayerInGame(@User() user: UserEntity) {
+    this.userService.updateUser(user.id, {
+      status: UserStatus.IN_GAME,
+    });
+    this.emitUserStatus(user.id, UserStatus.IN_GAME);
+  }
+
+  @SubscribeMessage('playerLeftGame')
+  async handlePlayerLeftGame(@User() user: UserEntity) {
+    this.userService.updateUser(user.id, {
+      status: UserStatus.ONLINE,
+    });
+    this.emitUserStatus(user.id, UserStatus.ONLINE);
   }
 
   // Emit user status to all clients connected via websocket

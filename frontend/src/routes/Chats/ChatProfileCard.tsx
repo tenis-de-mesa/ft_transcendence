@@ -1,22 +1,19 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { FiX } from "react-icons/fi";
 import { User } from "../../types";
-import { AuthContext } from "../../contexts";
+import { AuthContext, ChatContext } from "../../contexts";
 import { blockUser, unblockUser } from "../../actions/blockUser";
-import { Avatar, Button, Card, Overlay, Typography } from "../../components";
+import { Avatar, Button, Card, Typography } from "../../components";
 
 type ChatProfileCardProps = {
   user: User;
-  handleClose: () => void;
 };
 
-export default function ChatProfileCard({
-  user,
-  handleClose,
-}: ChatProfileCardProps) {
+export default function ChatProfileCard({ user }: ChatProfileCardProps) {
   const { currentUser } = useContext(AuthContext);
+  const { closeCard } = useContext(ChatContext);
 
   // TODO: Auto update blocked users to display proper buttons
 
@@ -32,25 +29,8 @@ export default function ChatProfileCard({
     unblockUser(user?.id);
   };
 
-  // Add event listener to close profile card when clicking outside of it
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#profile-card")) {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [handleClose]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="profile-card"
         className="absolute z-[1001] w-1/3 transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 dark:bg-gray-900"
@@ -97,7 +77,7 @@ export default function ChatProfileCard({
               size="md"
               variant="info"
               title="Close"
-              onClick={handleClose}
+              onClick={closeCard}
             />
           </div>
         </Card.Title>

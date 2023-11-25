@@ -15,3 +15,5 @@ export * from "./UserForm";
 export * from "./UserUpdateAvatar";
 export * from "./UserWithStatus";
 export * from "./StateAlerts";
+export * from "./InviteGameButton";
+export * from "./ChatButton";

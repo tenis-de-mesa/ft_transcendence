@@ -1,15 +1,13 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { Message, User } from "../../types";
+import { Message } from "../../types";
 import { Avatar, Typography } from "../../components";
 import { ChatContext } from "../../contexts";
 import { socket } from "../../socket";
 
-type ChatMessagesProps = {
-  handleClick: (user: User) => void;
-};
+import ChatProfileCard from "./ChatProfileCard";
 
-export default function ChatMessages({ handleClick }: ChatMessagesProps) {
-  const { currentChat } = useContext(ChatContext);
+export default function ChatMessages() {
+  const { currentChat, setShowCard } = useContext(ChatContext);
   const [messages, setMessages] = useState<Message[]>([]);
   const refMessages = useRef<HTMLDivElement>(null);
 
@@ -39,7 +37,7 @@ export default function ChatMessages({ handleClick }: ChatMessagesProps) {
   const mapMessages = (
     message: Message,
     index: number,
-    messages: Message[]
+    messages: Message[],
   ) => {
     const currentMessage = messages[index];
     const lastMessage = messages[index - 1];
@@ -58,7 +56,9 @@ export default function ChatMessages({ handleClick }: ChatMessagesProps) {
               size="sm"
             />
             <div
-              onClick={() => handleClick(message.sender)}
+              onClick={() =>
+                setShowCard(<ChatProfileCard user={message?.sender} />)
+              }
               className="cursor-pointer"
             >
               <Typography variant="h6">
