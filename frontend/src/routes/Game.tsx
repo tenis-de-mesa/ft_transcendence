@@ -12,8 +12,6 @@ const Game = () => {
   const [players, setPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
 
-  console.log(players)
-
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
