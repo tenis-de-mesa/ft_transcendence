@@ -222,26 +222,38 @@ export class GameService {
   async finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
 
-    const game = this.gamesInMemory[gameId];
-
-    delete this.gamesInMemory[gameId];
-
     let winner: UserEntity;
     let loser: UserEntity;
-    if (game.playerOne.score > game.playerTwo.score) {
+    let playerOneMatchPoints: number;
+    let playerTwoMatchPoints: number;
+
+    const game = this.gamesInMemory[gameId];
+    delete this.gamesInMemory[gameId];
+
+    const status = GameStatus.FINISH;
+    const playerOneScore = game.playerOne.score;
+    const playerTwoScore = game.playerTwo.score;
+
+    if (playerOneScore > playerTwoScore) {
       winner = game.playerOne.user;
       loser = game.playerTwo.user;
+      playerOneMatchPoints = playerOneScore * 10 + 30;
+      playerTwoMatchPoints = playerTwoScore * 10 - 20;
     } else {
       winner = game.playerTwo.user;
       loser = game.playerOne.user;
+      playerTwoMatchPoints = playerTwoScore * 10 + 30;
+      playerOneMatchPoints = playerOneScore * 10 - 20;
     }
 
     await this.gameRepository.update(gameId, {
-      playerOneScore: game.playerOne.score,
-      playerTwoScore: game.playerTwo.score,
-      winner: winner,
-      loser: loser,
-      status: GameStatus.FINISH,
+      status,
+      winner,
+      loser,
+      playerOneScore,
+      playerTwoScore,
+      playerOneMatchPoints,
+      playerTwoMatchPoints,
     });
   }
 
