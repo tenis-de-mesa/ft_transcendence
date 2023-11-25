@@ -298,11 +298,11 @@ export class GameService {
       ]);
   }
 
-  async getGameHistory(userId: number) {
-    const history = await this.gameRepository.find({
+  async getAllGames(userId: number) {
+    const games = await this.gameRepository.find({
       relations: { playerOne: true, playerTwo: true },
       where: [{ playerOne: { id: userId } }, { playerTwo: { id: userId } }],
     });
-    return history;
+    return games;
   }
 }
