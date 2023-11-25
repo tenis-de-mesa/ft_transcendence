@@ -24,7 +24,7 @@ export default function ChatManageMutedMembersCard({
     const fetchMutedMembers = async () => {
       const { data, error } = await makeRequest<ChatMember[]>(
         `/chats/${currentChat?.id}/members/muted`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
       if (error) {
@@ -40,7 +40,7 @@ export default function ChatManageMutedMembersCard({
   useEffect(() => {
     socket.on("userUnmuted", (unmuteUserId: number) => {
       setMutedMembers((prev) =>
-        prev.filter((member) => member?.userId !== unmuteUserId)
+        prev.filter((member) => member?.userId !== unmuteUserId),
       );
     });
   }, []);

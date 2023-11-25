@@ -37,7 +37,7 @@ export default function ActionChannelButton({
             size="sm"
             onClick={() =>
               setShowCard(
-                <LeaveChannelCard id={id} onClose={() => setShowCard(null)} />
+                <LeaveChannelCard id={id} onClose={() => setShowCard(null)} />,
               )
             }
           >
@@ -58,7 +58,7 @@ export default function ActionChannelButton({
             TrailingIcon={<FiLock />}
             onClick={() =>
               setShowCard(
-                <JoinChannelCard id={id} onClose={() => setShowCard(null)} />
+                <JoinChannelCard id={id} onClose={() => setShowCard(null)} />,
               )
             }
           >

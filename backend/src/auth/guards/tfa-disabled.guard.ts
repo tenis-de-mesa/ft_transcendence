@@ -13,7 +13,9 @@ export class TwoFactorDisabledGuard implements CanActivate {
     const user: UserEntity = request.user;
 
     if (user.tfaEnabled) {
-      throw new ForbiddenException('Two factor authentication is enabled');
+      throw new ForbiddenException(
+        'Two factor authentication is already enabled',
+      );
     }
 
     return true;

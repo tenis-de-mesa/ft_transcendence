@@ -14,6 +14,7 @@ import {
   loadUserById,
   redirectToChat,
   loadAllChats,
+  generateTFASecret,
   loadGame,
   loadGames,
 } from "./loaders";
@@ -31,6 +32,10 @@ import {
   banChatMember,
   unbanChatMember,
   updateChatMemberRole,
+  enableTFA,
+  disableTFA,
+  regenerateTFACodes,
+  loginTFACheck,
   manageChannelPassword,
 } from "./actions";
 
@@ -50,6 +55,10 @@ import {
   Channels,
   Friends,
   Login,
+  EnableTFA,
+  DisableTFA,
+  RegenerateTFACodes,
+  LoginTFACheck,
   Games,
   Game,
 } from "./routes";
@@ -59,6 +68,12 @@ const router = createBrowserRouter(
     <Route>
       {/* Public routes */}
       <Route path="/login" element={<Login />} />,
+      <Route
+        path="/login/tfa-check"
+        element={<LoginTFACheck />}
+        action={loginTFACheck}
+      />
+      ,
       <Route path="/login/:provider" loader={providerLogin} />,
       <Route path="/logout" loader={logout} />,
       <Route element={<RequireAuth />}>
@@ -121,10 +136,29 @@ const router = createBrowserRouter(
           <Route path="games" element={<Games />} loader={loadGames} />
           <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
+          <Route path="tfa">
+            <Route
+              path="enable"
+              loader={generateTFASecret}
+              action={enableTFA}
+              element={<EnableTFA />}
+              shouldRevalidate={() => false}
+            />
+            <Route
+              path="disable"
+              action={disableTFA}
+              element={<DisableTFA />}
+            />
+            <Route
+              path="regenerate-codes"
+              action={regenerateTFACodes}
+              element={<RegenerateTFACodes />}
+            />
+          </Route>
         </Route>
       </Route>
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;
