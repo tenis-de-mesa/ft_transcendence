@@ -56,7 +56,7 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.mathmaking();
+      this.matchmaking();
       this.gameService.updateGame();
     }, 16);
     this.queues = {
@@ -97,7 +97,7 @@ export class GameGateway
     delete this.allClientSockets[clientSocket.id];
   }
 
-  async mathmaking() {
+  async matchmaking() {
     if (this.queues.all.length < 2) {
       return;
     }
