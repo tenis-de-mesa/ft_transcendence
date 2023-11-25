@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GameRoom } from './game.interface';
+import { GameRoom, Player } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,7 +8,7 @@ import { Server } from 'socket.io';
 
 @Injectable()
 export class GameService {
-  games: Record<number, GameRoom>;
+  gamesInMemory: Record<number, GameRoom>;
 
   server: Server;
 
@@ -18,14 +18,26 @@ export class GameService {
   constructor(
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {
-    this.games = {};
+    this.gamesInMemory = {};
 
     this.loadGames();
   }
 
   setServer(server: Server) {
     this.server = server;
+  }
+  async findAll(): Promise<GameEntity[]> {
+    return await this.gameRepository.find({
+      relations: {
+        playerOne: true,
+        playerTwo: true,
+        winner: true,
+        loser: true,
+      },
+    });
   }
 
   async findOne(id: number): Promise<GameEntity> {
@@ -34,7 +46,8 @@ export class GameService {
         id,
       },
       relations: {
-        users: true,
+        playerOne: true,
+        playerTwo: true,
       },
     });
 
@@ -48,68 +61,86 @@ export class GameService {
   async loadGames() {
     const games = await this.gameRepository.find({
       where: {
-        status: GameStatus.START || GameStatus.STOP,
+        status: GameStatus.START,
       },
       relations: {
-        users: true,
+        playerOne: true,
+        playerTwo: true,
       },
     });
 
     for (const game of games) {
-      this.games[game.id] = this.resetDataGame(
+      this.gamesInMemory[game.id] = this.resetDataGame(
         game.id,
-        game.users[0],
-        game.users[1],
-        game.score1,
-        game.score2,
+        game.playerOne,
+        game.playerTwo,
       );
     }
   }
 
   resetDataGame(
     gameId: number,
-    user1: UserEntity,
-    user2: UserEntity,
-    score1: number,
-    score2: number,
+    userOne: UserEntity,
+    userTwo: UserEntity,
   ): GameRoom {
+    const maxScore = this.gamesInMemory[gameId]?.maxScore ?? 10;
+    const playerOneScore = this.gamesInMemory[gameId]?.playerOne.score ?? 0;
+    const playerTwoScore = this.gamesInMemory[gameId]?.playerTwo.score ?? 0;
+
+    const windowWidth = 700;
+    const windowHeight = 600;
+
     return {
       gameId,
-      players: [
-        {
-          playerType: 'left',
+      maxScore,
+      windowWidth,
+      windowHeight,
+      playerOne: {
+        playerType: 'left',
+        score: playerOneScore,
+        user: userOne,
+        paddle: {
+          x: 10,
           y: this.windowHeight / 2,
-          score: score1,
-          user: user1,
+          width: 10,
+          height: 100,
         },
-        {
-          playerType: 'rigth',
+      },
+      playerTwo: {
+        playerType: 'rigth',
+        score: playerTwoScore,
+        user: userTwo,
+        paddle: {
+          x: windowWidth - 20,
           y: this.windowHeight / 2,
-          score: score2,
-          user: user2,
+          width: 10,
+          height: 100,
         },
-      ],
+      },
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
-        speedX: 2,
-        speedY: 2,
+        speedX: 3,
+        speedY: 3,
         radius: 16,
       },
     };
   }
 
   async newGame(user1: UserEntity, user2: UserEntity) {
-    const game = await this.gameRepository.save({ users: [user1, user2] });
+    const game = await this.gameRepository.save({
+      playerOne: user1,
+      playerTwo: user2,
+    });
 
-    this.games[game.id] = this.resetDataGame(game.id, user1, user2, 0, 0);
+    this.gamesInMemory[game.id] = this.resetDataGame(game.id, user1, user2);
 
-    return this.games[game.id];
+    return this.gamesInMemory[game.id];
   }
 
-  updateGame() {
-    Object.keys(this.games).forEach((gameId) => {
-      const game = this.games[gameId];
+  async updateGame() {
+    Object.keys(this.gamesInMemory).forEach((gameId) => {
+      const game: GameRoom = this.gamesInMemory[gameId];
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
@@ -128,30 +159,22 @@ export class GameService {
         return this.gainedAPoint(game.gameId, 1);
       }
 
-      for (const player of game.players) {
-        if (player) {
-          let playerX: number;
-          if (player.playerType === 'left') {
-            playerX = 10;
-          } else if (player.playerType === 'right') {
-            playerX = this.windowWidth - 20;
-          }
-          const playerY = player.y;
+      for (const player of [game.playerOne, game.playerTwo]) {
+        if (!player) {
+          continue;
+        }
+        const paddle = player.paddle;
 
-          const playerWidth = 10;
-          const playerHeight = 100;
+        const ballInXRange =
+          game.ball.x + game.ball.radius > paddle.x &&
+          game.ball.x - game.ball.radius < paddle.x + paddle.width;
 
-          const ballInXRange =
-            game.ball.x + game.ball.radius > playerX &&
-            game.ball.x - game.ball.radius < playerX + playerWidth;
+        const ballInYRange =
+          game.ball.y + game.ball.radius > paddle.y &&
+          game.ball.y - game.ball.radius < paddle.y + paddle.height;
 
-          const ballInYRange =
-            game.ball.y + game.ball.radius > playerY &&
-            game.ball.y - game.ball.radius < playerY + playerHeight;
-
-          if (ballInXRange && ballInYRange) {
-            game.ball.speedX = -game.ball.speedX;
-          }
+        if (ballInXRange && ballInYRange) {
+          game.ball.speedX = -game.ball.speedX;
         }
       }
 
@@ -161,35 +184,65 @@ export class GameService {
     });
   }
 
-  gainedAPoint(gameId: number, player: 0 | 1) {
-    const { players } = this.games[gameId];
+  async gainedAPoint(gameId: number, player: 0 | 1) {
+    const { playerOne, playerTwo, maxScore } = this.gamesInMemory[gameId];
 
-    players[player].score++;
-
-    if (players[player].score >= 10) {
-      return this.finishGame(gameId);
+    if (player == 0) {
+      playerOne.score++;
+    } else {
+      playerTwo.score++;
     }
 
-    this.games[gameId] = this.resetDataGame(
+    if (playerOne.score >= maxScore || playerTwo.score >= maxScore) {
+      await this.finishGame(gameId);
+      this.updatePlayerStats(playerOne.user.id);
+      this.updatePlayerStats(playerTwo.user.id);
+      return;
+    }
+
+    this.gamesInMemory[gameId] = this.resetDataGame(
       gameId,
-      players[0].user,
-      players[1].user,
-      players[0].score,
-      players[1].score,
+      playerOne.user,
+      playerTwo.user,
     );
 
     this.emitUpdatePlayerPosition(gameId);
   }
 
-  finishGame(gameId: number) {
+  async updatePlayerStats(userId: number) {
+    const winCount = await this.gameRepository.countBy({
+      winner: { id: userId },
+    });
+    const loseCount = await this.gameRepository.countBy({
+      loser: { id: userId },
+    });
+    await this.userRepository.update({ id: userId }, { winCount, loseCount });
+  }
+
+  async finishGame(gameId: number) {
     this.emitUpdatePlayerPosition(gameId);
-    const game = this.games[gameId];
-    this.gameRepository.update(gameId, {
-      score1: game.players[0].score,
-      score2: game.players[1].score,
+
+    const game = this.gamesInMemory[gameId];
+
+    delete this.gamesInMemory[gameId];
+
+    let winner: UserEntity;
+    let loser: UserEntity;
+    if (game.playerOne.score > game.playerTwo.score) {
+      winner = game.playerOne.user;
+      loser = game.playerTwo.user;
+    } else {
+      winner = game.playerTwo.user;
+      loser = game.playerOne.user;
+    }
+
+    await this.gameRepository.update(gameId, {
+      playerOneScore: game.playerOne.score,
+      playerTwoScore: game.playerTwo.score,
+      winner: winner,
+      loser: loser,
       status: GameStatus.FINISH,
     });
-    delete this.games[gameId];
   }
 
   movePlayers(
@@ -200,25 +253,37 @@ export class GameService {
       gameId: number;
     },
   ) {
+    if (!this.gamesInMemory[body.gameId]) {
+      return;
+    }
+
     const position =
-      this.games[body.gameId].players[0].user.id == userId ? 0 : 1;
+      this.gamesInMemory[body.gameId].playerOne.user.id == userId ? 0 : 1;
+
+    const player =
+      position == 0
+        ? this.gamesInMemory[body.gameId].playerOne
+        : this.gamesInMemory[body.gameId].playerTwo;
 
     if (body.up) {
-      if (this.games[body.gameId].players[position].y < 10) {
-        this.games[body.gameId].players[position].y = 0;
+      if (player.paddle.y < 10) {
+        player.paddle.y = 0;
       } else {
-        this.games[body.gameId].players[position].y -= 10;
+        player.paddle.y -= 10;
       }
     }
     if (body.down) {
-      if (
-        this.games[body.gameId].players[position].y >
-        this.windowHeight - 100 - 10
-      ) {
-        this.games[body.gameId].players[position].y = this.windowHeight - 100;
+      if (player.paddle.y > this.windowHeight - 100 - 10) {
+        player.paddle.y = this.windowHeight - 100;
       } else {
-        this.games[body.gameId].players[position].y += 10;
+        player.paddle.y += 10;
       }
+    }
+
+    if (position == 0) {
+      this.gamesInMemory[body.gameId].playerOne = player;
+    } else {
+      this.gamesInMemory[body.gameId].playerTwo = player;
     }
 
     this.emitUpdatePlayerPosition(body.gameId);
@@ -227,6 +292,17 @@ export class GameService {
   emitUpdatePlayerPosition(gameId: number) {
     this.server
       ?.to(`game:${gameId}`)
-      .emit('updatePlayerPosition', this.games[gameId].players);
+      .emit('updatePlayerPosition', [
+        this.gamesInMemory[gameId].playerOne,
+        this.gamesInMemory[gameId].playerTwo,
+      ]);
+  }
+
+  async getAllGames(userId: number) {
+    const games = await this.gameRepository.find({
+      relations: { playerOne: true, playerTwo: true },
+      where: [{ playerOne: { id: userId } }, { playerTwo: { id: userId } }],
+    });
+    return games;
   }
 }

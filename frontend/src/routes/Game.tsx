@@ -23,17 +23,14 @@ const Game = () => {
 
     if (players) {
       players.forEach((player, index) => {
+        const { paddle } = player;
+        rc.rectangle(paddle.x, paddle.y, paddle.width, paddle.height, {
+          stroke: "white",
+          fill: "white",
+        });
         if (index === 0) {
-          rc.rectangle(10, player.y, 10, 100, {
-            stroke: "white",
-            fill: "white",
-          });
           ctx.fillText(player.score, (canvas.width * 1) / 4 - 10, 50);
         } else if (index === 1) {
-          rc.rectangle(canvas.width - 20, player.y, 10, 100, {
-            stroke: "white",
-            fill: "white",
-          });
           ctx.fillText(player.score, (canvas.width * 3) / 4 - 10, 50);
         }
       });
@@ -70,7 +67,7 @@ const Game = () => {
     window.addEventListener("keydown", handleKeyDown);
 
     socket.emit(`joinGame`, id, (game) => {
-      setPlayers(game.players);
+      setPlayers([game.playerOne, game.playerTwo]);
     });
 
     socket.on("updatePlayerPosition", (players) => {

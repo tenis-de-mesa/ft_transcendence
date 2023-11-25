@@ -72,6 +72,12 @@ export class UserEntity {
   @Column({ nullable: true })
   tfaSecret: string;
 
+  @Column({ default: 0 })
+  winCount: number;
+
+  @Column({ default: 0 })
+  loseCount: number;
+
   @Column('varchar', {
     array: true,
     nullable: true,
@@ -127,8 +133,6 @@ export class UserEntity {
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
 
-  @ManyToMany(() => GameEntity)
-  games: GameEntity[];
 
   @DeleteDateColumn()
   deletedAt?: Date;

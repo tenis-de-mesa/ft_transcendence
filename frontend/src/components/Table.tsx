@@ -11,15 +11,14 @@ import {
   Table,
 } from "@tanstack/react-table";
 
-import { Data } from "../data";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import classNames from "classnames";
 import { Typography } from ".";
 
 export interface TableProps {
-  columns: ColumnDef<Data>[];
-  data: Data[];
+  columns: ColumnDef<unknown>[];
+  data: unknown[];
 }
 
 const Table = ({ columns, data }: TableProps) => {
@@ -114,7 +113,7 @@ const Table = ({ columns, data }: TableProps) => {
   );
 };
 
-const Pagination = ({ table }: { table: Table<Data> }) => {
+const Pagination = ({ table }: { table: Table<unknown> }) => {
   return (
     <div className="w-full py-3 text-gray-700 bg-gray-200 dark:bg-gray-900 dark:text-gray-400">
       <div className="flex justify-center gap-5 pl-5 text-sm select-none">
