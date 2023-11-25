@@ -120,8 +120,8 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
-        speedX: 2,
-        speedY: 2,
+        speedX: 3,
+        speedY: 3,
         radius: 16,
       },
     };
@@ -140,7 +140,7 @@ export class GameService {
 
   async updateGame() {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
-      const game = this.gamesInMemory[gameId];
+      const game: GameRoom = this.gamesInMemory[gameId];
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
@@ -160,29 +160,21 @@ export class GameService {
       }
 
       for (const player of [game.playerOne, game.playerTwo]) {
-        if (player) {
-          let playerX: number;
-          if (player.playerType === 'left') {
-            playerX = 10;
-          } else if (player.playerType === 'right') {
-            playerX = this.windowWidth - 20;
-          }
-          const playerY = player.y;
+        if (!player) {
+          continue;
+        }
+        const paddle = player.paddle;
 
-          const playerWidth = 10;
-          const playerHeight = 100;
+        const ballInXRange =
+          game.ball.x + game.ball.radius > paddle.x &&
+          game.ball.x - game.ball.radius < paddle.x + paddle.width;
 
-          const ballInXRange =
-            game.ball.x + game.ball.radius > playerX &&
-            game.ball.x - game.ball.radius < playerX + playerWidth;
+        const ballInYRange =
+          game.ball.y + game.ball.radius > paddle.y &&
+          game.ball.y - game.ball.radius < paddle.y + paddle.height;
 
-          const ballInYRange =
-            game.ball.y + game.ball.radius > playerY &&
-            game.ball.y - game.ball.radius < playerY + playerHeight;
-
-          if (ballInXRange && ballInYRange) {
-            game.ball.speedX = -game.ball.speedX;
-          }
+        if (ballInXRange && ballInYRange) {
+          game.ball.speedX = -game.ball.speedX;
         }
       }
 
