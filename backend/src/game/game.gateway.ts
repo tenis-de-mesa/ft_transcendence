@@ -30,7 +30,7 @@ export class GameGateway
   @WebSocketServer() server: Server;
 
   queues: {
-    // all: []
+    all: UserEntity[];
     invites: {
       user: UserEntity;
       guest: UserEntity;
@@ -56,10 +56,11 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
+      this.matchmaking();
       this.gameService.updateGame();
     }, 16);
     this.queues = {
-      // all: []
+      all: [],
       invites: [],
       // open: []
     };
@@ -96,6 +97,38 @@ export class GameGateway
     delete this.allClientSockets[clientSocket.id];
   }
 
+  async matchmaking() {
+    if (this.queues.all.length < 2) {
+      return;
+    }
+
+    const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
+
+    const game = await this.gameService.newGame(playerOne, playerTwo);
+
+    this.allUsers[playerOne.id].client.emit('gameAvailable', game.gameId);
+    this.allUsers[playerTwo.id].client.emit('gameAvailable', game.gameId);
+  }
+
+  @SubscribeMessage('findGame')
+  handleFindGame(@User() user: UserEntity) {
+    if (this.queues.all.find((u) => u.id == user.id)) {
+      return;
+    }
+
+    this.queues.all.push(user);
+  }
+
+  @SubscribeMessage('cancelFindGame')
+  handleCancelFindGame(@User() user: UserEntity) {
+    this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+  }
+
+  @SubscribeMessage('inFindGameQueue')
+  handleFindGameQueue(@User() user: UserEntity): boolean {
+    return Boolean(this.queues.all.find((u) => u.id == user.id));
+  }
+
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
     @MessageBody() guestId: number,
@@ -112,7 +145,7 @@ export class GameGateway
       user,
     });
 
-    this.allUsers[guest.id]?.client.emit('newGameInvite', user);
+    this.sendUpdateInviteList(guest.id);
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
@@ -137,11 +170,29 @@ export class GameGateway
     clientSocket.emit('gameAvailable', game.gameId);
   }
 
-  @SubscribeMessage('findMyInvites')
-  handleFindMyInvites(@User('id') userId: number) {
-    return this.queues.invites
+  @SubscribeMessage('declineInvitePlayerToGame')
+  handleDeclineInvitePlayerToGame(
+    @User('id') userId: number,
+    @MessageBody() userIdInvitation: number,
+  ) {
+    this.queues.invites = this.queues.invites.filter(
+      (i) => !(i.guest.id == userId && i.user.id == userIdInvitation),
+    );
+
+    this.sendUpdateInviteList(userId);
+  }
+
+  sendUpdateInviteList(userId: number) {
+    const inviteList = this.queues.invites
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
+
+    this.allUsers[userId]?.client.emit('updateInviteList', inviteList);
+  }
+
+  @SubscribeMessage('findMyInvites')
+  handleFindMyInvites(@User('id') userId: number) {
+    this.sendUpdateInviteList(userId);
   }
 
   private async validate(client: Socket) {
