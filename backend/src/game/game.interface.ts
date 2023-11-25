@@ -20,6 +20,8 @@ export interface Ball {
   speedX: number;
   speedY: number;
   radius: number;
+  speedFactor: number;
+  verticalAdjustmentFactor: number;
 }
 
 export type Direction = {

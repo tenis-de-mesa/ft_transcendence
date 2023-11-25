@@ -29,6 +29,7 @@ export class GameService {
   setServer(server: Server) {
     this.server = server;
   }
+
   async findAll(): Promise<GameEntity[]> {
     return await this.gameRepository.find({
       relations: {
@@ -107,7 +108,7 @@ export class GameService {
         },
       },
       playerTwo: {
-        playerType: 'rigth',
+        playerType: 'right',
         score: playerTwoScore,
         user: userTwo,
         paddle: {
@@ -123,6 +124,8 @@ export class GameService {
         speedX: 3,
         speedY: 3,
         radius: 16,
+        speedFactor: 1.075,
+        verticalAdjustmentFactor: 8,
       },
     };
   }
@@ -144,10 +147,6 @@ export class GameService {
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
-
-      // if (game.ball.x <= 0 || game.ball.x >= this.windowWidth) {
-      //   game.ball.speedX = -game.ball.speedX;
-      // }
 
       if (game.ball.y <= 0 || game.ball.y >= this.windowHeight) {
         game.ball.speedY = -game.ball.speedY;
@@ -175,6 +174,11 @@ export class GameService {
 
         if (ballInXRange && ballInYRange) {
           game.ball.speedX = -game.ball.speedX;
+          game.ball.speedX *= game.ball.speedFactor;
+
+          const relativeCollision = (game.ball.y - paddle.y) / paddle.height - 0.5;
+          game.ball.speedY = relativeCollision * game.ball.verticalAdjustmentFactor;
+          game.ball.speedY *= game.ball.speedFactor;
         }
       }
 
