@@ -153,9 +153,11 @@ export class GameService {
       }
 
       if (game.ball.x <= 0) {
-        return this.gainedAPoint(game.gameId, 0);
+        game.playerTwo.score++;
+        return this.gainedAPoint(game.gameId);
       } else if (game.ball.x >= this.windowWidth) {
-        return this.gainedAPoint(game.gameId, 1);
+        game.playerOne.score++;
+        return this.gainedAPoint(game.gameId);
       }
 
       for (const player of [game.playerOne, game.playerTwo]) {
@@ -188,14 +190,8 @@ export class GameService {
     });
   }
 
-  async gainedAPoint(gameId: number, player: 0 | 1) {
+  async gainedAPoint(gameId: number) {
     const { playerOne, playerTwo, maxScore } = this.gamesInMemory[gameId];
-
-    if (player == 0) {
-      playerOne.score++;
-    } else {
-      playerTwo.score++;
-    }
 
     if (playerOne.score >= maxScore || playerTwo.score >= maxScore) {
       await this.finishGame(gameId);
