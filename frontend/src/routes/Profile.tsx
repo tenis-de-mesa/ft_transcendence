@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import { Game, User } from "../types";
 import UserForm from "../components/UserForm";
 
@@ -22,7 +22,7 @@ export default function Profile() {
   const { currentUser } = useContext(AuthContext);
   const profileUser = useLoaderData() as User; // loadUserById
   const socket = useWebSocket();
-  const [gameHistory, setGameHistory] = useState([]);
+  const [games, setGames] = useState([]);
 
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
@@ -72,7 +72,7 @@ export default function Profile() {
 
   useEffect(() => {
     socket.emit("getGameHistory", profileUser.id, (response) => {
-      setGameHistory(response);
+      setGames(response);
     });
   }, [socket, profileUser.id]);
 
@@ -160,7 +160,7 @@ export default function Profile() {
         </div>
       </div>
       <div>
-        <Table columns={columns as any} data={gameHistory as any} />
+        <Table columns={columns as ColumnDef<unknown>[]} data={games} />
       </div>
     </div>
   );

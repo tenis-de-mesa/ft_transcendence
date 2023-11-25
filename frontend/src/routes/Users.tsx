@@ -4,7 +4,6 @@ import { User } from "../types";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Typography } from "../components/Typography";
 import Table from "../components/Table";
-import { Data } from "../data";
 import { AddFriendButton, ChatButton, InviteGameButton } from "../components";
 import { UserWithStatus } from "../components/UserWithStatus";
 
@@ -46,10 +45,7 @@ export default function Users() {
     <>
       <Typography variant="h5">Users</Typography>
       <div className="mt-6">
-        <Table
-          columns={columns as unknown as ColumnDef<Data>[]}
-          data={users as unknown as Data[]}
-        />
+        <Table columns={columns as ColumnDef<unknown>[]} data={users} />
       </div>
     </>
   );

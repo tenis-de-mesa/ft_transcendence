@@ -1,5 +1,5 @@
 import { Typography } from "../components/Typography";
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { useLoaderData } from "react-router-dom";
 import { Game } from "../types";
 import Table from "../components/Table";
@@ -47,7 +47,7 @@ const Games = () => {
       <Typography variant="h4" className="mb-10">
         Games
       </Typography>
-      <Table columns={columns as any} data={games as any} />
+      <Table columns={columns as ColumnDef<unknown>[]} data={games} />
     </div>
   );
 };
