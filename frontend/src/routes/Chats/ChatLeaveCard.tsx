@@ -32,7 +32,7 @@ export default function ChatLeaveCard({ onBack }: ChatLeaveCardProps) {
     const fetchMembers = async () => {
       const { data, error } = await makeRequest<ChatMember[]>(
         `/chats/${currentChat?.id}/members`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
       if (error) {

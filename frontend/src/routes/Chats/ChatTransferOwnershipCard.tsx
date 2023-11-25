@@ -34,7 +34,7 @@ export default function ChatTransferOwnershipCard({
     const fetchMembers = async () => {
       const { data, error } = await makeRequest<ChatMember[]>(
         `/chats/${currentChat?.id}/members`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
       if (error) {

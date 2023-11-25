@@ -24,7 +24,7 @@ export default function ChatManageBannedMembersCard({
     const fetchBannedMembers = async () => {
       const { data, error } = await makeRequest<ChatMember[]>(
         `/chats/${currentChat?.id}/members/banned`,
-        { method: "GET" }
+        { method: "GET" },
       );
 
       if (error) {
@@ -40,7 +40,7 @@ export default function ChatManageBannedMembersCard({
   useEffect(() => {
     socket.on("userUnbanned", (unbanUserId: number) => {
       setBannedMembers((prev) =>
-        prev.filter((member) => member?.userId !== unbanUserId)
+        prev.filter((member) => member?.userId !== unbanUserId),
       );
     });
   }, []);

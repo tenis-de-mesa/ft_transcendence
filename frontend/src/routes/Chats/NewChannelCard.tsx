@@ -60,7 +60,10 @@ export default function NewChannelCard() {
           id="create-channel-card"
           className="fixed z-[1001] transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-[calc(100%-4rem)] max-w-[30rem] dark:bg-gray-900"
         >
-          <Card.Title hr={false} className="flex items-center justify-between gap-5">
+          <Card.Title
+            hr={false}
+            className="flex items-center justify-between gap-5"
+          >
             <Typography
               variant="h6"
               customWeight="bold"

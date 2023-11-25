@@ -30,7 +30,7 @@ export default function ChatMemberList({
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    user: User
+    user: User,
   ) => {
     e.preventDefault();
 
@@ -55,7 +55,7 @@ export default function ChatMemberList({
   useEffect(() => {
     const nonDeletedUsers = members
       .filter(
-        (member) => !member?.user.deletedAt && member?.status !== "banned"
+        (member) => !member?.user.deletedAt && member?.status !== "banned",
       )
       .map((member) => member?.user);
 
@@ -64,7 +64,7 @@ export default function ChatMemberList({
 
   useEffect(() => {
     socket.on("userAdded", (member: ChatMember) =>
-      setMembers((members) => [...members, member])
+      setMembers((members) => [...members, member]),
     );
 
     socket.on("userRemoved", (id: number) => {
