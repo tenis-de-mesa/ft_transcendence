@@ -17,6 +17,10 @@ export default function Channels() {
   const chats = useLoaderData() as Chat[];
   const channels = chats.filter((chat) => chat.type !== "direct");
 
+  const capitalizeFirstLetter = (s: string) => {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
   const columns = useMemo<ColumnDef<Chat>[]>(
     () => [
       columnHelper.accessor("id", {
@@ -25,26 +29,49 @@ export default function Channels() {
           <Link to={`/chats/${props.getValue()}`}>{props.getValue()}</Link>
         ),
       }),
-      columnHelper.accessor("createdBy", {
+      columnHelper.accessor("owner", {
         header: "Owner",
-        cell: (props) => (
-          <span>
-            {props.getValue() ? props.getValue().nickname : "Deleted user"}
-          </span>
-        ),
+        cell: (props) => {
+          const owner = props.getValue();
+
+          return (
+            <>
+              {owner ? (
+                <Link
+                  to={`/profile/${owner.id}`}
+                  className="hover:text-info-500"
+                >
+                  {owner.nickname}
+                </Link>
+              ) : (
+                <span className="text-gray-500">Deleted user</span>
+              )}
+            </>
+          );
+        },
       }),
       columnHelper.accessor("access", {
         header: "Access",
-        cell: (props) => <span>{props.getValue()}</span>,
+        cell: (props) => <span>{capitalizeFirstLetter(props.getValue())}</span>,
       }),
-      columnHelper.accessor("id", {
+      columnHelper.accessor("users", {
+        header: "Your Role",
+        cell: (props) => {
+          const members = props.getValue();
+          const current = members.find((m) => m.userId === currentUser.id);
+          const role = current?.role ?? "--";
+
+          return <span>{capitalizeFirstLetter(role)}</span>;
+        },
+      }),
+      columnHelper.display({
         header: "Actions",
         cell: (props) => {
-          const users = props.row.original.users;
-          const id = props.getValue();
+          const members = props.row.original.users;
+          const id = props.row.original.id;
           const access = props.row.original.access;
-          const isOwner = props.row.original.createdBy?.id == currentUser.id;
-          const isMember = users.some((user) => user.userId === currentUser.id);
+          const isOwner = props.row.original.owner?.id == currentUser.id;
+          const isMember = members.some((m) => m.userId === currentUser.id);
 
           return (
             <ActionChannelButton
@@ -57,7 +84,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser.id],
+    [currentUser?.id]
   );
 
   return (
