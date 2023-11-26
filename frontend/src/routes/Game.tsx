@@ -11,6 +11,7 @@ const Game = () => {
 
   const [players, setPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
+  const [powerUp, setPowerUp] = useState(null);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -37,12 +38,21 @@ const Game = () => {
     }
 
     if (ballPosition) {
-      rc.circle(ballPosition.x, ballPosition.y, 16, {
+      rc.circle(ballPosition.x, ballPosition.y, ballPosition.radius, {
         stroke: "white",
         fill: "white",
       });
     }
-  }, [players, ballPosition]);
+
+    if (powerUp) {
+      if (!powerUp.active) {
+        rc.circle(powerUp.x, powerUp.y, 24, {
+          stroke: "cyan",
+          fill: "cyan",
+        });
+      }
+    }
+  }, [players, ballPosition, powerUp]);
 
   useEffect(() => {
     if (!socket) return;
@@ -74,8 +84,16 @@ const Game = () => {
       setPlayers(players);
     });
 
-    socket.on("updateBallPosition", ({ x, y }) => {
-      setBallPosition({ x, y });
+    socket.on("updateBallPosition", ({ x, y, radius }) => {
+      setBallPosition({ x, y, radius });
+    });
+
+    socket.on("updatePowerUp", ({ x, y, active }) => {
+      setPowerUp({x, y, active});
+    });
+
+    socket.on("pup", () => {
+      console.log("got power up");
     });
 
     socket.emit("playerInGame");
@@ -83,6 +101,8 @@ const Game = () => {
     return () => {
       socket.off("updatePlayerPosition");
       socket.off("updateBallPosition");
+      socket.off("updatePowerUp");
+      socket.off("pup");
       window.removeEventListener("keydown", handleKeyDown);
       socket.emit("playerLeftGame");
     };
