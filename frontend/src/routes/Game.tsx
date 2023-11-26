@@ -89,7 +89,7 @@ const Game = () => {
     });
 
     socket.on("updatePowerUp", ({ x, y, active }) => {
-      setPowerUp({x, y, active});
+      setPowerUp({ x, y, active });
     });
 
     socket.on("pup", () => {
@@ -112,14 +112,18 @@ const Game = () => {
     <>
       <Typography variant="h5">Games</Typography>
       <div className="flex justify-center mt-10">
-        <Typography className="m-2" variant="sm">{players[0]?.user?.nickname ?? ''}</Typography>
+        <Typography className="m-2" variant="sm">
+          {players[0]?.user?.nickname ?? ""}
+        </Typography>
         <canvas
           ref={canvasRef}
           width={700}
           height={600}
           className="dark:bg-gray-900"
         />
-        <Typography className="m-2" variant="sm">{players[1]?.user?.nickname ?? ''}</Typography>
+        <Typography className="m-2" variant="sm">
+          {players[1]?.user?.nickname ?? ""}
+        </Typography>
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import { GameRoom } from "./game.interface";
+import { GameRoom } from './game.interface';
 
 export class PowerUp {
   x: number;
@@ -29,6 +29,7 @@ export class PowerUp {
   }
 
   spawnRandom(game: GameRoom) {
-    this.y = Math.random() * (game.windowHeight - 2 * this.radius) + this.radius;
+    this.y =
+      Math.random() * (game.windowHeight - 2 * this.radius) + this.radius;
   }
 }
