@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { FiX } from "react-icons/fi";
-import { Button, Card, Overlay, Typography } from "../../components";
+import { Button, Card, Typography } from "../../components";
 import { ChatContext } from "../../contexts";
 import { User } from "../../types";
 
@@ -10,35 +10,18 @@ type ChatMuteMemberCardProps = {
 };
 
 export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
-  const { setShowCard } = useContext(ChatContext);
+  const { closeCard, currentChat } = useContext(ChatContext);
   const [selectedTime, setSelectedTime] = useState(60000);
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
-
-  const handleClose = () => setShowCard(null);
 
   const getTimeBoxStyle = (time: number) => {
     return `bg-gray-700 px-2 py-1 rounded select-none
     ${selectedTime === time ? "bg-info-700" : "bg-gray-700"}`;
   };
 
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-
-      if (!target.closest("#mute-member-card")) {
-        setShowCard(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
-  }, [setShowCard]);
-
   return (
     <>
-      <Overlay />
-
       <Card
         id="mute-member-card"
         className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/3 left-1/2 z-[1001] max-w-[27rem] dark:bg-gray-900"
@@ -54,7 +37,7 @@ export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
             variant="info"
             size="sm"
             IconOnly={<FiX />}
-            onClick={handleClose}
+            onClick={closeCard}
           ></Button>
         </Card.Title>
         <Card.Body className="space-y-4">
@@ -111,7 +94,7 @@ export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
           </div>
         </Card.Body>
         <Card.Footer className="flex justify-end items-center gap-3">
-          <div onClick={handleClose}>
+          <div onClick={closeCard}>
             <Typography
               variant="md"
               className="cursor-pointer select-none hover:decoration-solid hover:underline"
@@ -119,7 +102,11 @@ export default function ChatMuteMemberCard({ user }: ChatMuteMemberCardProps) {
               Cancel
             </Typography>
           </div>
-          <Form action="mute" method="POST" onSubmit={handleClose}>
+          <Form
+            action={`${currentChat?.id}/mute`}
+            method="POST"
+            onSubmit={closeCard}
+          >
             <input type="hidden" name="userId" value={user?.id} />
             <input type="hidden" name="muteDuration" value={selectedTime} />
             <Button variant="error">

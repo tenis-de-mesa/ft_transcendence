@@ -14,6 +14,7 @@ import {
   loadUserById,
   redirectToChat,
   loadAllChats,
+  generateTFASecret,
   loadGame,
   loadGames,
 } from "./loaders";
@@ -23,9 +24,6 @@ import {
   createChat,
   updateChat,
   sendChatMessage,
-  setChannelPassword,
-  changeChannelPassword,
-  removeChannelPassword,
   joinChannel,
   leaveChannel,
   kickChatMember,
@@ -34,6 +32,11 @@ import {
   banChatMember,
   unbanChatMember,
   updateChatMemberRole,
+  enableTFA,
+  disableTFA,
+  regenerateTFACodes,
+  loginTFACheck,
+  manageChannelPassword,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -52,6 +55,10 @@ import {
   Channels,
   Friends,
   Login,
+  EnableTFA,
+  DisableTFA,
+  RegenerateTFACodes,
+  LoginTFACheck,
   Games,
   Game,
 } from "./routes";
@@ -61,6 +68,12 @@ const router = createBrowserRouter(
     <Route>
       {/* Public routes */}
       <Route path="/login" element={<Login />} />,
+      <Route
+        path="/login/tfa-check"
+        element={<LoginTFACheck />}
+        action={loginTFACheck}
+      />
+      ,
       <Route path="/login/:provider" loader={providerLogin} />,
       <Route path="/logout" loader={logout} />,
       <Route element={<RequireAuth />}>
@@ -98,14 +111,13 @@ const router = createBrowserRouter(
               action={sendChatMessage}
             />
             <Route path="update/:id" action={updateChat} />
-            <Route path=":id/set-password" action={setChannelPassword} />
-            <Route path=":id/change-password" action={changeChannelPassword} />
-            <Route path=":id/remove-password" action={removeChannelPassword} />
+            <Route path=":id/manage-password" action={manageChannelPassword} />
             <Route path=":id/kick" action={kickChatMember} />
             <Route path=":id/mute" action={muteChatMember} />
             <Route path=":id/unmute" action={unmuteChatMember} />
             <Route path=":id/ban" action={banChatMember} />
             <Route path=":id/unban" action={unbanChatMember} />
+            <Route path=":id/leave" action={leaveChannel} />
             <Route
               path=":id/update-member-role"
               action={updateChatMemberRole}
@@ -124,6 +136,25 @@ const router = createBrowserRouter(
           <Route path="games" element={<Games />} loader={loadGames} />
           <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
+          <Route path="tfa">
+            <Route
+              path="enable"
+              loader={generateTFASecret}
+              action={enableTFA}
+              element={<EnableTFA />}
+              shouldRevalidate={() => false}
+            />
+            <Route
+              path="disable"
+              action={disableTFA}
+              element={<DisableTFA />}
+            />
+            <Route
+              path="regenerate-codes"
+              action={regenerateTFACodes}
+              element={<RegenerateTFACodes />}
+            />
+          </Route>
         </Route>
       </Route>
     </Route>,

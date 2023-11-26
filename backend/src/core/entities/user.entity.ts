@@ -14,10 +14,8 @@ import {
   FriendRequestEntity,
   MessageEntity,
   ChatMemberEntity,
-  ChatEntity,
+  BlockListEntity,
 } from '.';
-import { BlockListEntity } from './blockList.entity';
-import { GameEntity } from './game.entity';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -121,9 +119,6 @@ export class UserEntity {
   @OneToMany(() => ChatMemberEntity, (member) => member.user)
   chats: ChatMemberEntity[];
 
-  @OneToMany(() => ChatEntity, (chat) => chat.createdBy)
-  createdChats: ChatEntity[];
-
   @OneToMany(() => MessageEntity, (message) => message.sender)
   messages: MessageEntity[];
 
@@ -132,7 +127,6 @@ export class UserEntity {
 
   @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
   blockedUsers: BlockListEntity[];
-
 
   @DeleteDateColumn()
   deletedAt?: Date;

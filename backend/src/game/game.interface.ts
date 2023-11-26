@@ -1,4 +1,5 @@
 import { UserEntity } from '../core/entities';
+import { PowerUp } from './PowerUp';
 
 export type Paddle = {
   x: number;
@@ -20,6 +21,8 @@ export interface Ball {
   speedX: number;
   speedY: number;
   radius: number;
+  speedFactor: number;
+  verticalAdjustmentFactor: number;
 }
 
 export type Direction = {
@@ -35,4 +38,5 @@ export interface GameRoom {
   maxScore: number;
   windowWidth: number;
   windowHeight: number;
+  powerUp: PowerUp;
 }

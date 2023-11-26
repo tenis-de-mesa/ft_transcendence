@@ -8,7 +8,7 @@ export async function leaveChannel({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   const { method } = request;
   const body = {
-    newOwnerId: formData.get("new-owner-id"),
+    newOwnerId: Number(formData.get("newOwnerId")),
   };
 
   const conditions = [
