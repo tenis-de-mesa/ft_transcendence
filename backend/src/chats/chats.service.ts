@@ -109,10 +109,10 @@ export class ChatsService {
     creator: UserEntity,
   ): Promise<ChatEntity> {
     const chat = await this.chatRepository.save({
+      owner: creator,
       type: ChatType.CHANNEL,
       access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
       password: password ? await argon2.hash(password) : undefined,
-      createdBy: creator,
     });
 
     users.map(async (user) => {
@@ -200,6 +200,7 @@ export class ChatsService {
     // that were found in the subquery
     const query = this.chatRepository
       .createQueryBuilder('chat')
+      .leftJoinAndSelect('chat.owner', 'owner')
       .leftJoinAndSelect('chat.users', 'member')
       .leftJoinAndSelect('member.user', 'user')
       .where('chat.type = :type', { type: ChatType.CHANNEL })
@@ -647,10 +648,12 @@ export class ChatsService {
     if (role === ChatMemberRole.OWNER && member.role === ChatMemberRole.OWNER) {
       member.role = ChatMemberRole.ADMIN;
 
-      this.eventEmitter.emit(
-        'chat.updateMemberRole',
-        await this.chatMemberRepository.save(member),
-      );
+      const [_, oldOwner] = await Promise.all([
+        this.chatRepository.update(chatId, { owner: updateMember.user }),
+        this.chatMemberRepository.save(member),
+      ]);
+
+      this.eventEmitter.emit('chat.updateMemberRole', oldOwner);
     }
 
     updateMember.role = role;

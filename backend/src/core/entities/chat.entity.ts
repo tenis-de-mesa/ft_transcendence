@@ -4,6 +4,8 @@ import {
   OneToMany,
   Column,
   ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { MessageEntity, ChatMemberEntity, UserEntity } from '.';
 
@@ -40,8 +42,9 @@ export class ChatEntity {
   @Column({ nullable: true })
   password: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.createdChats)
-  createdBy: UserEntity;
+  @OneToOne(() => UserEntity)
+  @JoinColumn()
+  owner: UserEntity;
 
   @OneToMany(() => ChatMemberEntity, (member) => member.chat)
   users: ChatMemberEntity[];
@@ -56,6 +59,5 @@ export class ChatEntity {
     this.password = chat?.password;
     this.users = chat?.users;
     this.messages = chat?.messages;
-    this.createdBy = chat?.createdBy;
   }
 }
