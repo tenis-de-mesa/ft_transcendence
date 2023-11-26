@@ -44,7 +44,7 @@ export type Chat = {
   newMessage: string;
   access: "public" | "protected" | "private";
   type: "direct" | "channel";
-  createdBy: User;
+  owner: User;
 };
 
 export type NewChatMessage = {
@@ -53,9 +53,9 @@ export type NewChatMessage = {
 };
 
 export type Game = {
-  id: number,
-  playerOneScore: number,
-  playerTwoScore: number,
-  playerOne: User,
-  playerTwo: User
+  id: number;
+  playerOneScore: number;
+  playerTwoScore: number;
+  playerOne: User;
+  playerTwo: User;
 };
