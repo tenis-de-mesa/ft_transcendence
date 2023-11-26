@@ -84,7 +84,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser?.id]
+    [currentUser?.id],
   );
 
   return (

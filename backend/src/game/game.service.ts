@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GameRoom, Player } from './game.interface';
+import { GameRoom } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../core/entities';
 import { Server } from 'socket.io';
+import { PowerUp } from './PowerUp';
 
 @Injectable()
 export class GameService {
@@ -121,13 +122,20 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
+        // speedX: this.getRandomElement([-3, 3]),
+        // speedY: this.getRandomElement([-3, 3]),
         speedX: 3,
         speedY: 3,
         radius: 16,
         speedFactor: 1.075,
         verticalAdjustmentFactor: 8,
       },
+      powerUp: new PowerUp(windowWidth),
     };
+  }
+
+  getRandomElement<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
   }
 
   async newGame(user1: UserEntity, user2: UserEntity) {
@@ -145,10 +153,18 @@ export class GameService {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game: GameRoom = this.gamesInMemory[gameId];
 
+      let shouldSpawnPowerUp: boolean = Math.random() < 0.005;
+      if (shouldSpawnPowerUp && !game.powerUp.active) {
+        game.powerUp.spawnRandom(game);
+      }
+
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
 
-      if (game.ball.y <= 0 || game.ball.y >= this.windowHeight) {
+      if (
+        game.ball.y < 0 + game.ball.radius ||
+        game.ball.y > this.windowHeight - game.ball.radius
+      ) {
         game.ball.speedY = -game.ball.speedY;
       }
 
@@ -178,15 +194,40 @@ export class GameService {
           game.ball.speedX = -game.ball.speedX;
           game.ball.speedX *= game.ball.speedFactor;
 
-          const relativeCollision = (game.ball.y - paddle.y) / paddle.height - 0.5;
-          game.ball.speedY = relativeCollision * game.ball.verticalAdjustmentFactor;
+          const relativeCollision =
+            (game.ball.y - paddle.y) / paddle.height - 0.5;
+          game.ball.speedY =
+            relativeCollision * game.ball.verticalAdjustmentFactor;
           game.ball.speedY *= game.ball.speedFactor;
         }
       }
 
+      const powerUpHit =
+        Math.sqrt(
+          Math.pow(game.ball.x - game.powerUp.x, 2) +
+            Math.pow(game.ball.y - game.powerUp.y, 2),
+        ) <
+        game.ball.radius + game.powerUp.radius;
+      if (powerUpHit) {
+        game.powerUp.activate(game);
+        this.server?.to(`game:${gameId}`).emit('pup');
+      }
+
       this.server
         ?.to(`game:${gameId}`)
-        .emit('updateBallPosition', { x: game.ball.x, y: game.ball.y });
+        .emit('updateBallPosition', {
+          x: game.ball.x,
+          y: game.ball.y,
+          radius: game.ball.radius,
+        });
+
+      this.server
+        ?.to(`game:${gameId}`)
+        .emit('updatePowerUp', {
+          x: game.powerUp.x,
+          y: game.powerUp.y,
+          active: game.powerUp.active,
+        });
     });
   }
 
@@ -265,18 +306,20 @@ export class GameService {
         ? this.gamesInMemory[body.gameId].playerOne
         : this.gamesInMemory[body.gameId].playerTwo;
 
+    const movementfactor = 20;
+
     if (body.up) {
       if (player.paddle.y < 10) {
         player.paddle.y = 0;
       } else {
-        player.paddle.y -= 10;
+        player.paddle.y -= movementfactor;
       }
     }
     if (body.down) {
       if (player.paddle.y > this.windowHeight - 100 - 10) {
         player.paddle.y = this.windowHeight - 100;
       } else {
-        player.paddle.y += 10;
+        player.paddle.y += movementfactor;
       }
     }
 
