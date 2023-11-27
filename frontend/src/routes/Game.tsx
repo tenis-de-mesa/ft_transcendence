@@ -136,7 +136,6 @@ const Game = () => {
         Game {game.id}
       </Typography>
       <div className="grid items-center justify-center">
-        {/* Add a message that you are watching as spectator if you are not a player */}
         {!isPlayer && (
           <Alert severity="info" className="mb-3">
             You are watching as a spectator
