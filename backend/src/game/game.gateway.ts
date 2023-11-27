@@ -208,6 +208,14 @@ export class GameGateway
     return this.gameService.gamesInMemory[gameId];
   }
 
+  @SubscribeMessage('leaveGame')
+  async handleLeaveGame(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameId: number,
+  ) {
+    client.leave(`game:${gameId}`);
+  }
+
   @SubscribeMessage('movePlayer')
   async handlePlayerMovement(
     @User('id') userId: number,
