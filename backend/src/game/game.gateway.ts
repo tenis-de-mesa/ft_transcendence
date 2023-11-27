@@ -78,6 +78,18 @@ export class GameGateway
 
   handleDisconnect(clientSocket: Socket) {}
 
+  private async validate(client: Socket) {
+    const cookies = cookie.parse(client.handshake.headers.cookie);
+    const sid = cookies['connect.sid'].split('.')[0].slice(2);
+
+    try {
+      const session = await this.sessionService.getSessionById(sid);
+      return await this.userService.getUserById(session.userId);
+    } catch (error) {
+      throw new WsException('Unauthorized connection');
+    }
+  }
+
   async matchmaking() {
     if (this.queues.all.length < 2) {
       return;
@@ -121,10 +133,7 @@ export class GameGateway
 
     const guest = await this.userService.getUserById(guestId);
 
-    this.queues.invites.push({
-      guest,
-      user,
-    });
+    this.queues.invites.push({ guest, user });
 
     this.sendUpdateInviteList(guest.id);
   }
@@ -176,26 +185,13 @@ export class GameGateway
     this.sendUpdateInviteList(userId);
   }
 
-  private async validate(client: Socket) {
-    const cookies = cookie.parse(client.handshake.headers.cookie);
-    const sid = cookies['connect.sid'].split('.')[0].slice(2);
-
-    try {
-      const session = await this.sessionService.getSessionById(sid);
-      return await this.userService.getUserById(session.userId);
-    } catch (error) {
-      throw new WsException('Unauthorized connection');
-    }
-  }
-
   @SubscribeMessage('joinGame')
   async handleJoinGame(
     @ConnectedSocket() client: Socket,
     @MessageBody() gameId: number,
   ) {
     client.join(`game:${gameId}`);
-    const game = this.gameService.gamesInMemory[gameId];
-    return game;
+    return this.gameService.gamesInMemory[gameId];
   }
 
   @SubscribeMessage('movePlayer')
