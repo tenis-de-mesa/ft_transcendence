@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { FaGear } from "react-icons/fa6";
 import { Chat } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
@@ -15,16 +15,21 @@ export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
   const { setCurrentChat, userStatus, setShowCard } = useContext(ChatContext);
+  const navigate = useNavigate();
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
 
   useEffect(() => {
     socket.emit("joinChat", chat.id);
 
+    socket.on("chatDeleted", (chatId: number) => {
+      return navigate("/chats", { replace: true });
+    });
+
     return () => {
       socket.emit("leaveChat", chat.id);
     };
-  }, [chat, currentUser?.id]);
+  }, [chat, currentUser?.id, navigate]);
 
   const members = chat.users.map((user) => user.userId);
 

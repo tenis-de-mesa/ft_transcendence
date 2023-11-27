@@ -8,6 +8,7 @@ import ChatManageMutedMembersCard from "./ChatManageMutedMembersCard";
 import ChatManageBannedMembersCard from "./ChatManageBannedMembersCard";
 import ChatLeaveCard from "./ChatLeaveCard";
 import ChatTransferOwnershipCard from "./ChatTransferOwnershipCard";
+import ChatDeleteChannelCard from "./ChatDeleteChannelCard";
 
 export default function ChatSettingsCard() {
   const { setShowCard, closeCard, userRole } = useContext(ChatContext);
@@ -36,7 +37,6 @@ export default function ChatSettingsCard() {
       <Card.Body className="flex flex-col gap-3 [&>*]:font-bold [&>*]:justify-center">
         {isAdmin && (
           <>
-            {" "}
             <Button
               variant="info"
               onClick={() =>
@@ -61,15 +61,27 @@ export default function ChatSettingsCard() {
             >
               Manage banned members
             </Button>
+
             {userRole === "owner" && (
-              <Button
-                variant="info"
-                onClick={() =>
-                  setShowCard(<ChatTransferOwnershipCard onBack={onBack} />)
-                }
-              >
-                Transfer ownership
-              </Button>
+              <>
+                <Button
+                  variant="info"
+                  onClick={() =>
+                    setShowCard(<ChatTransferOwnershipCard onBack={onBack} />)
+                  }
+                >
+                  Transfer ownership
+                </Button>
+
+                <Button
+                  variant="error"
+                  onClick={() =>
+                    setShowCard(<ChatDeleteChannelCard onBack={onBack} />)
+                  }
+                >
+                  Delete channel
+                </Button>
+              </>
             )}
           </>
         )}

@@ -98,6 +98,11 @@ export class ChatsGateway implements OnGatewayInit {
     this.server.to(`chat:${chatId}`).emit('userRemoved', userId);
   }
 
+  @OnEvent('chat.delete')
+  async handleDeleteEvent(chatId: number) {
+    this.server.to(`chat:${chatId}`).emit('chatDeleted', chatId);
+  }
+
   @OnEvent('chat.kick')
   handleKickEvent(payload: GatewayChatEventDto) {
     const { userId, chatId } = payload;
