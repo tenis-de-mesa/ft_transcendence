@@ -7,6 +7,7 @@ import ChatContextMenuItem from "./ChatContextMenuItem";
 import ChatBanMemberCard from "../ChatBanMemberCard";
 import ChatKickMemberCard from "../ChatKickMemberCard";
 import ChatMuteMemberCard from "../ChatMuteMemberCard";
+import { useWebSocket } from "../../../hooks";
 
 type ChatContextMenuProps = {
   member: ChatMember;
@@ -26,6 +27,7 @@ export default function ChatContextMenu({
   const { role, user } = member;
   const navigate = useNavigate();
   const { submit } = useFetcher();
+  const socket = useWebSocket();
 
   return (
     <menu
@@ -46,6 +48,14 @@ export default function ChatContextMenu({
       >
         Send message
       </ChatContextMenuItem>
+
+    {member.userId !== currentUser?.id && (
+      <ChatContextMenuItem
+        onClick={() => socket.emit("invitePlayerToGame", member.userId)}
+      >
+        Invite to play pong
+      </ChatContextMenuItem>
+    )}
 
       {user?.id !== currentUser?.id && userRole !== "member" && (
         <>
