@@ -38,16 +38,6 @@ export class GameGateway
     // open: []
   };
 
-  allUsers: Record<
-    number,
-    {
-      user: UserEntity;
-      client: Socket;
-    }
-  >;
-
-  allClientSockets: Record<string, number>;
-
   interval: NodeJS.Timeout;
 
   constructor(
@@ -64,9 +54,6 @@ export class GameGateway
       invites: [],
       // open: []
     };
-
-    this.allUsers = {};
-    this.allClientSockets = {};
   }
 
   afterInit() {
@@ -82,20 +69,14 @@ export class GameGateway
   }
 
   handleConnection(clientSocket: Socket) {
-    // TODO: not exists user?
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    this.allUsers[user.id] = { client: clientSocket, user: user };
-
-    this.allClientSockets[clientSocket.id] = user.id;
+    if (user) {
+      clientSocket.join(`user:${user.id}`);
+    }
   }
 
-  handleDisconnect(clientSocket: Socket) {
-    const userId = this.allClientSockets[clientSocket.id];
-
-    delete this.allUsers[userId];
-    delete this.allClientSockets[clientSocket.id];
-  }
+  handleDisconnect(clientSocket: Socket) {}
 
   async matchmaking() {
     if (this.queues.all.length < 2) {
@@ -106,8 +87,8 @@ export class GameGateway
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
 
-    this.allUsers[playerOne.id].client.emit('gameAvailable', game.gameId);
-    this.allUsers[playerTwo.id].client.emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('findGame')
@@ -166,8 +147,8 @@ export class GameGateway
 
     const game = await this.gameService.newGame(match.user, match.guest);
 
-    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId);
-    clientSocket.emit('gameAvailable', game.gameId);
+    this.server.to(`user:${match.user.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${userId}`).emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('declineInvitePlayerToGame')
@@ -187,7 +168,7 @@ export class GameGateway
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
 
-    this.allUsers[userId]?.client.emit('updateInviteList', inviteList);
+    this.server.to(`user:${userId}`).emit('updateInviteList', inviteList);
   }
 
   @SubscribeMessage('findMyInvites')
