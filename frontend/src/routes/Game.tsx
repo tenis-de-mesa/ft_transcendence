@@ -1,21 +1,31 @@
 import { Typography } from "../components/Typography";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import rough from "roughjs";
 import { useWebSocket } from "../hooks";
 import { Link, useLoaderData } from "react-router-dom";
 import { Game } from "../types";
-import { Avatar, Button, Card, Overlay } from "../components";
+import { Alert, Avatar, Button, Card, Overlay } from "../components";
+import { AuthContext } from "../contexts";
 
 const Game = () => {
-  const loaderGame = useLoaderData() as Game;
-  const [game, setGame] = useState(loaderGame);
-  const canvasRef = useRef(null);
+  const { currentUser } = useContext(AuthContext);
   const socket = useWebSocket();
+  const loaderGame = useLoaderData() as Game;
 
+  const canvasRef = useRef(null);
+  const [game, setGame] = useState(loaderGame);
   const [players, setPlayers] = useState([]);
   const [ballPosition, setBallPosition] = useState(null);
   const [powerUp, setPowerUp] = useState(null);
   const [gameOver, setGameOver] = useState(game.status === "finish");
+  const isPlayer =
+    game.playerOne.id == currentUser.id || game.playerTwo.id == currentUser.id;
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -78,7 +88,10 @@ const Game = () => {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    // Only add event listener if the current user is a player in the game
+    if (isPlayer) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
 
     socket.emit(`joinGame`, game.id, (game) => {
       setPlayers([game.playerOne, game.playerTwo]);
@@ -115,25 +128,35 @@ const Game = () => {
       window.removeEventListener("keydown", handleKeyDown);
       socket.emit("playerLeftGame");
     };
-  }, [socket, game]);
+  }, [socket, game, isPlayer]);
 
   return (
     <>
-      <Typography variant="h5">Games</Typography>
-      <div className="flex justify-center mt-10">
-        <Typography className="m-2" variant="sm">
-          {players[0]?.user?.nickname ?? ""}
-        </Typography>
+      <Typography variant="h5" className="text-center mb-3">
+        Game {game.id}
+      </Typography>
+      <div className="grid items-center justify-center">
+        {!isPlayer && (
+          <Alert severity="info" className="mb-3">
+            You are watching as a spectator
+          </Alert>
+        )}
+        <div className="flex justify-around">
+          <Typography className="m-2" variant="sm">
+            {game.playerOne.nickname}
+          </Typography>
+          <Typography className="m-2" variant="sm">
+            {game.playerTwo.nickname}
+          </Typography>
+        </div>
         <canvas
           ref={canvasRef}
           width={700}
           height={600}
           className="dark:bg-gray-900"
         />
-        <Typography className="m-2" variant="sm">
-          {players[1]?.user?.nickname ?? ""}
-        </Typography>
       </div>
+
       {gameOver && (
         <>
           <Overlay />

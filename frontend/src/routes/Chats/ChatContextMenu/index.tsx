@@ -49,13 +49,13 @@ export default function ChatContextMenu({
         Send message
       </ChatContextMenuItem>
 
-    {member.userId !== currentUser?.id && (
-      <ChatContextMenuItem
-        onClick={() => socket.emit("invitePlayerToGame", member.userId)}
-      >
-        Invite to play pong
-      </ChatContextMenuItem>
-    )}
+      {member.userId !== currentUser?.id && (
+        <ChatContextMenuItem
+          onClick={() => socket.emit("invitePlayerToGame", member.userId)}
+        >
+          Invite to play pong
+        </ChatContextMenuItem>
+      )}
 
       {user?.id !== currentUser?.id && userRole !== "member" && (
         <>
