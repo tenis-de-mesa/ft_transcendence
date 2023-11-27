@@ -13,7 +13,7 @@ const columnHelper = createColumnHelper<User>();
 
 const Leaderboard = () => {
   const users: User[] = (useLoaderData() as User[]).sort(
-    (a, b) => b.winCount - a.winCount
+    (a, b) => b.winCount - a.winCount,
   );
 
   const columns = useMemo<ColumnDef<User>[]>(
@@ -38,7 +38,7 @@ const Leaderboard = () => {
         header: "Loses",
       }),
     ],
-    []
+    [],
   );
 
   return (

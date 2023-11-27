@@ -128,7 +128,7 @@ const Game = () => {
       window.removeEventListener("keydown", handleKeyDown);
       socket.emit("playerLeftGame");
     };
-  }, [socket, game]);
+  }, [socket, game, isPlayer]);
 
   return (
     <>
