@@ -74,6 +74,12 @@ export class GameGateway
     if (user) {
       clientSocket.join(`user:${user.id}`);
     }
+
+    const game = this.gameService.getRunningGame(user.id);
+
+    if (game) {
+      clientSocket.emit('gameAvailable', game.gameId);
+    }
   }
 
   handleDisconnect(clientSocket: Socket) {
@@ -112,6 +118,10 @@ export class GameGateway
     const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
+
+    if (!game) {
+      return;
+    }
 
     this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
     this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
@@ -170,6 +180,10 @@ export class GameGateway
 
     const game = await this.gameService.newGame(match.user, match.guest);
 
+    if (!game) {
+      return;
+    }
+
     this.server.to(`user:${match.user.id}`).emit('gameAvailable', game.gameId);
     this.server.to(`user:${userId}`).emit('gameAvailable', game.gameId);
   }
@@ -211,9 +225,15 @@ export class GameGateway
   @SubscribeMessage('leaveGame')
   async handleLeaveGame(
     @ConnectedSocket() client: Socket,
+    @User('id') userId: number,
     @MessageBody() gameId: number,
   ) {
-    client.leave(`game:${gameId}`);
+    const game = this.gameService.getRunningGame(userId);
+    if (game) {
+      client.emit('gameAvailable', game.gameId);
+    } else {
+      client.leave(`game:${gameId}`);
+    }
   }
 
   @SubscribeMessage('movePlayer')
