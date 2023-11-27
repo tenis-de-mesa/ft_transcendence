@@ -38,6 +38,12 @@ export class GameEntity {
   @ManyToOne(() => UserEntity)
   playerTwo: UserEntity;
 
+  @Column({ default: 0 })
+  playerOneMatchPoints: number;
+
+  @Column({ default: 0 })
+  playerTwoMatchPoints: number;
+
   @ManyToOne(() => UserEntity)
   winner?: UserEntity;
 
