@@ -76,6 +76,9 @@ export class UserEntity {
   @Column({ default: 0 })
   loseCount: number;
 
+  @Column({ default: 0 })
+  totalMatchPoints: number;
+
   @Column('varchar', {
     array: true,
     nullable: true,

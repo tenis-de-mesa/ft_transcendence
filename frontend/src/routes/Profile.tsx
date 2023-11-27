@@ -36,7 +36,7 @@ export default function Profile() {
   const columns = useMemo<ColumnDef<Game>[]>(
     () => [
       columnHelper.accessor("id", {
-        header: "ID",
+        header: "#",
         cell: (info) => info.getValue(),
       }),
       columnHelper.accessor("playerOne", {
@@ -67,7 +67,7 @@ export default function Profile() {
         },
       }),
     ],
-    [],
+    []
   );
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function Profile() {
   }, [socket, profileUser.id]);
 
   return (
-    <div className="grid justify-center align-center h-full">
+    <div className="grid justify-center align-center gap-3 mt-5 h-full">
       <div className="grid justify-center align-center flip-card">
         <div className="wrapper self-center">
           <Card className="card front">
@@ -119,12 +119,8 @@ export default function Profile() {
               <>
                 <Typography customWeight="regular" variant="md">
                   <span className="flex justify-between gap-1">
-                    <strong>Login:</strong>
-                    {profileUser.login}
-                  </span>
-                  <span className="flex justify-between gap-1">
-                    <strong>Nickname:</strong>
-                    {profileUser.nickname}
+                    <strong>Score:</strong>
+                    {profileUser.totalMatchPoints}
                   </span>
                   <span className="flex justify-between gap-1">
                     <strong>Wins:</strong>
@@ -159,7 +155,7 @@ export default function Profile() {
           </Card>
         </div>
       </div>
-      <div>
+      <div className="max-w-md">
         <Table columns={columns as ColumnDef<unknown>[]} data={games} />
       </div>
     </div>
