@@ -22,7 +22,7 @@ export default function Chat() {
   useEffect(() => {
     socket.emit("joinChat", chat.id);
 
-    socket.on("chatDeleted", (chatId: number) => {
+    socket.on("chatDeleted", () => {
       return navigate("/chats", { replace: true });
     });
 

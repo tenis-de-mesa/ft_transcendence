@@ -155,7 +155,7 @@ export class GameService {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game: GameRoom = this.gamesInMemory[gameId];
 
-      let shouldSpawnPowerUp: boolean = Math.random() < 0.005;
+      const shouldSpawnPowerUp: boolean = Math.random() < 0.005;
       if (shouldSpawnPowerUp && !game.powerUp.active) {
         game.powerUp.spawnRandom(game);
       }
