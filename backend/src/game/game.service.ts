@@ -122,15 +122,18 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
+
         // speedX: this.getRandomElement([-3, 3]),
         // speedY: this.getRandomElement([-3, 3]),
+
         speedX: 3,
         speedY: 3,
         radius: 16,
         speedFactor: 1.075,
         verticalAdjustmentFactor: 8,
       },
-      powerUp: new PowerUp(windowWidth),
+      powerUpState: false,
+      powerUp: new PowerUp(windowWidth, windowHeight),
     };
   }
 
@@ -153,7 +156,12 @@ export class GameService {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game: GameRoom = this.gamesInMemory[gameId];
 
-      let shouldSpawnPowerUp: boolean = Math.random() < 0.005;
+      let shouldSpawnPowerUp: boolean;
+      if (!game.powerUpState && !game.powerUp.active) {
+        shouldSpawnPowerUp = Math.random() < 0.005;
+        game.powerUpState = true;
+      }
+
       if (shouldSpawnPowerUp && !game.powerUp.active) {
         game.powerUp.spawnRandom(game);
       }

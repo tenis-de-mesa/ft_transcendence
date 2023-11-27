@@ -38,5 +38,6 @@ export interface GameRoom {
   maxScore: number;
   windowWidth: number;
   windowHeight: number;
+  powerUpState: boolean;
   powerUp: PowerUp;
 }

@@ -1,16 +1,16 @@
 import { GameRoom } from './game.interface';
 
 export class PowerUp {
+  active: boolean;
+  radius: number;
   x: number;
   y: number;
-  radius: number;
-  active: boolean;
 
-  constructor(windowWidth: number) {
-    this.x = windowWidth / 2;
-    this.y = 0;
-    this.radius = 24;
+  constructor(windowWidth: number, windowHeight: number) {
     this.active = false;
+    this.radius = 24;
+    this.x = windowWidth / 2;
+    this.y = Math.random() * ((windowHeight - this.radius) - this.radius) + this.radius;
   }
 
   activate(game: GameRoom) {
@@ -25,6 +25,7 @@ export class PowerUp {
 
   deactivate(game: GameRoom) {
     this.active = false;
+    game.powerUpState = false;
     game.ball.radius = 16;
   }
 
