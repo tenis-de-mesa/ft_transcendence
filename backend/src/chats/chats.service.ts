@@ -223,6 +223,12 @@ export class ChatsService {
     await this.chatRepository.save(chat);
   }
 
+  async delete(id: number): Promise<void> {
+    const chat = await this.findOne(id);
+
+    await this.chatRepository.remove(chat);
+  }
+
   async changePassword(id: number, dto: ChangePasswordDto): Promise<void> {
     const chat = await this.findOne(id);
 
