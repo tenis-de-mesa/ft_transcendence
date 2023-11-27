@@ -50,6 +50,8 @@ export class GameService {
       relations: {
         playerOne: true,
         playerTwo: true,
+        winner: true,
+        loser: true,
       },
     });
 
@@ -213,21 +215,17 @@ export class GameService {
         this.server?.to(`game:${gameId}`).emit('pup');
       }
 
-      this.server
-        ?.to(`game:${gameId}`)
-        .emit('updateBallPosition', {
-          x: game.ball.x,
-          y: game.ball.y,
-          radius: game.ball.radius,
-        });
+      this.server?.to(`game:${gameId}`).emit('updateBallPosition', {
+        x: game.ball.x,
+        y: game.ball.y,
+        radius: game.ball.radius,
+      });
 
-      this.server
-        ?.to(`game:${gameId}`)
-        .emit('updatePowerUp', {
-          x: game.powerUp.x,
-          y: game.powerUp.y,
-          active: game.powerUp.active,
-        });
+      this.server?.to(`game:${gameId}`).emit('updatePowerUp', {
+        x: game.powerUp.x,
+        y: game.powerUp.y,
+        active: game.powerUp.active,
+      });
     });
   }
 
@@ -235,7 +233,8 @@ export class GameService {
     const { playerOne, playerTwo, maxScore } = this.gamesInMemory[gameId];
 
     if (playerOne.score >= maxScore || playerTwo.score >= maxScore) {
-      await this.finishGame(gameId);
+      const finishedGame = await this.finishGame(gameId);
+      this.server?.to(`game:${gameId}`).emit('gameOver', finishedGame);
       this.updatePlayerStats(playerOne.user.id);
       this.updatePlayerStats(playerTwo.user.id);
       return;
@@ -257,7 +256,19 @@ export class GameService {
     const loseCount = await this.gameRepository.countBy({
       loser: { id: userId },
     });
-    await this.userRepository.update({ id: userId }, { winCount, loseCount });
+    const totalMatchPointsAsOne = await this.gameRepository.sum(
+      'playerOneMatchPoints',
+      { playerOne: { id: userId } },
+    );
+    const totalMatchPointsAsTwo = await this.gameRepository.sum(
+      'playerTwoMatchPoints',
+      { playerTwo: { id: userId } },
+    );
+    const totalMatchPoints = totalMatchPointsAsOne + totalMatchPointsAsTwo;
+    await this.userRepository.update(
+      { id: userId },
+      { winCount, loseCount, totalMatchPoints },
+    );
   }
 
   async finishGame(gameId: number) {
@@ -296,6 +307,7 @@ export class GameService {
       playerOneMatchPoints,
       playerTwoMatchPoints,
     });
+    return await this.findOne(gameId);
   }
 
   movePlayers(

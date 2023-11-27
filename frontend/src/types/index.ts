@@ -18,6 +18,7 @@ export type User = {
   deletedAt?: Date;
   winCount: number;
   loseCount: number;
+  totalMatchPoints: number;
 };
 
 export type Message = {
@@ -54,8 +55,14 @@ export type NewChatMessage = {
 
 export type Game = {
   id: number;
-  playerOneScore: number;
-  playerTwoScore: number;
+  status: "start" | "finish";
   playerOne: User;
   playerTwo: User;
+  playerOneScore: number;
+  playerTwoScore: number;
+  playerOneMatchPoints: number;
+  playerTwoMatchPoints: number;
+  winner: User;
+  loser: User;
+  createdAt: Date;
 };
