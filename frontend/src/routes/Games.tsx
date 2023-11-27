@@ -1,6 +1,6 @@
 import { Typography } from "../components/Typography";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { Game } from "../types";
 import Table from "../components/Table";
 
@@ -10,8 +10,14 @@ const Games = () => {
 
   const columns = [
     columnHelper.accessor("id", {
-      header: "ID",
-      cell: (info) => info.getValue(),
+      header: "#",
+      cell: (info) => {
+        return (
+          <Link to={`/games/${info.getValue()}`} className="flex space-x-1">
+            {info.getValue()}
+          </Link>
+        );
+      },
     }),
     columnHelper.accessor("playerOne", {
       header: "Player One",
