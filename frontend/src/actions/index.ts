@@ -16,3 +16,4 @@ export * from "./enableTFA";
 export * from "./disableTFA";
 export * from "./regenerateTFACodes";
 export * from "./loginTFACheck";
+export * from "./loginTFARecover";
