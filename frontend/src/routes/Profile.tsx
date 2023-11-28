@@ -29,7 +29,7 @@ export default function Profile() {
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
-    const alternate = document.querySelector(".flip-card .wrapper");
+    const alternate = document.querySelector(".wrapper");
     if (alternate) {
       alternate.classList.toggle("flipped");
     }
@@ -94,7 +94,7 @@ export default function Profile() {
 
   return (
     <div className="grid justify-center align-center gap-3 mt-5 h-full">
-      <div className="grid justify-center align-center flip-card">
+      <div className="grid justify-center align-center w-full h-full flip-card">
         <div className="wrapper self-center">
           <Card className="card front">
             <Card.Title>
