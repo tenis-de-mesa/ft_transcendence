@@ -1,16 +1,29 @@
-import { Link, useRouteError } from "react-router-dom";
+import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Typography } from "../components/Typography";
 import classNames from "classnames";
 import { isDark } from "./Root";
 
 export default function ErrorBoundary() {
-  const error: Response = useRouteError() as Response;
+  const error = useRouteError();
 
+  // FIXME: Remove this log
   console.error("ErrorBoundary: ", error);
 
-  const status = error?.status ?? "?";
-  const statusText = error?.statusText ?? "Internal Error";
+  let status = 500;
+  let statusText: string;
+
+  if (isRouteErrorResponse(error)) {
+    status = error.status;
+    statusText = error.statusText;
+  } else if (error instanceof Error) {
+    statusText = error.message;
+  } else if (typeof error === "string") {
+    statusText = error;
+  } else {
+    status = 404;
+    statusText = "Not Found";
+  }
 
   return (
     <>
@@ -19,16 +32,11 @@ export default function ErrorBoundary() {
           dark: isDark,
         })}
       >
-        <div className="grid h-screen place-content-center text-center bg-gray-300 dark:bg-gray-700">
-          <Typography customWeight="regular" variant="h1">
-            {status}
-          </Typography>
-          <Typography customWeight="regular" variant="h4">
-            {statusText}
-          </Typography>
-          <br></br>
-          <Link to={"/"} className="flex justify-center">
-            <Button size="md" variant="info">
+        <div className="grid h-screen place-content-center text-center space-y-2 bg-gray-300 dark:bg-gray-700">
+          <Typography variant="h1">{status}</Typography>
+          <Typography variant="h4">{statusText}</Typography>
+          <Link to="/" className="flex">
+            <Button size="md" variant="info" className="w-full justify-center">
               Home
             </Button>
           </Link>

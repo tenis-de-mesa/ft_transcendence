@@ -14,7 +14,11 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatsService } from './chats.service';
-import { AuthenticatedGuard, ChannelRoleGuard } from '../auth/guards';
+import {
+  AuthenticatedGuard,
+  ChannelMemberGuard,
+  ChannelRoleGuard,
+} from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
 import {
   ChatEntity,
@@ -112,6 +116,7 @@ export class ChatsController {
   }
 
   @Get(':id')
+  @UseGuards(ChannelMemberGuard)
   async show(@Param('id', ParseIntPipe) id: number): Promise<ChatEntity> {
     return await this.chatsService.findOne(id);
   }
@@ -126,6 +131,7 @@ export class ChatsController {
   }
 
   @Post(':id/leave')
+  @UseGuards(ChannelMemberGuard)
   async leaveChat(
     @Param('id', ParseIntPipe) chatId: number,
     @User('id') userId: number,
@@ -135,6 +141,7 @@ export class ChatsController {
   }
 
   @Get(':id/role')
+  @UseGuards(ChannelMemberGuard)
   async getMemberRole(
     @Param('id', ParseIntPipe) id: number,
     @User('id') userId: number,
@@ -245,6 +252,7 @@ export class ChatsController {
   }
 
   @Get(':id/members')
+  @UseGuards(ChannelMemberGuard)
   async getMembers(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ChatMemberEntity[]> {
