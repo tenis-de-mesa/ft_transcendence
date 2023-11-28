@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFetcher } from "react-router-dom";
 import { Alert, Button, Card, Input, Typography } from "../components";
 import { FiLock } from "react-icons/fi";
@@ -11,14 +11,15 @@ const DisableTFA = () => {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const [tfaCode, setTfaCode] = useState("");
 
-  if (fetcher.data?.status === "success") {
-    setCurrentUser({
-      ...currentUser,
-      tfaEnabled: false,
-    });
-    // Navigate to settings page with the success message
-    navigate("/settings", { state: { success: "TFA Disabled" } });
-  }
+  useEffect(() => {
+    if (fetcher.data?.status === "success") {
+      setCurrentUser({
+        ...currentUser,
+        tfaEnabled: false,
+      });
+      navigate("/settings", { state: { success: "TFA Disabled" } });
+    }
+  }, [currentUser, fetcher.data, navigate, setCurrentUser]);
 
   return (
     <div className="h-full grid justify-center items-center">
