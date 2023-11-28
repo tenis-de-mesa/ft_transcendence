@@ -104,15 +104,20 @@ export class ChatsService {
   }
 
   private async createChannelChat(
-    { password }: CreateChatDto,
+    { password, access }: CreateChatDto,
     users: UserEntity[],
     creator: UserEntity,
   ): Promise<ChatEntity> {
+    if (access === ChatAccess.PROTECTED && !password) {
+      throw new BadRequestException('Missing password for protected channel');
+    }
+
     const chat = await this.chatRepository.save({
+      access,
       owner: creator,
       type: ChatType.CHANNEL,
-      access: password ? ChatAccess.PROTECTED : ChatAccess.PUBLIC,
-      password: password ? await argon2.hash(password) : undefined,
+      password:
+        access === 'protected' ? await argon2.hash(password) : undefined,
     });
 
     users.map(async (user) => {

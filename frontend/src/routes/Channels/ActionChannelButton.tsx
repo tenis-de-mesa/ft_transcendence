@@ -5,10 +5,11 @@ import { Alert, Badge, Button, Overlay } from "../../components";
 
 import JoinChannelCard from "./JoinChannelCard";
 import LeaveChannelCard from "./LeaveChannelCard";
+import { ChatAccess } from "../../types";
 
 type ActionChannelButtonProps = {
   id: number;
-  access: "public" | "protected" | "private";
+  access: ChatAccess;
   isOwner: boolean;
   isMember: boolean;
 };
