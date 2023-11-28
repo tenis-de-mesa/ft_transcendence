@@ -11,7 +11,6 @@ export * from "./Paginate";
 export * from "./Select";
 export * from "./Table";
 export * from "./Typography";
-export * from "./UserForm";
 export * from "./UserUpdateAvatar";
 export * from "./UserWithStatus";
 export * from "./StateAlerts";
