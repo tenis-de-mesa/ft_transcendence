@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useFetcher } from "react-router-dom";
-import { Alert, Button, Card, Hr, Input, Typography } from "../components";
+import { Alert, Button, Card, Input, Typography } from "../components";
 import { FiLock } from "react-icons/fi";
 
 const LoginTFACheck = () => {

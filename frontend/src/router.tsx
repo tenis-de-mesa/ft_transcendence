@@ -166,8 +166,8 @@ const router = createBrowserRouter(
           </Route>
         </Route>
       </Route>
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;
