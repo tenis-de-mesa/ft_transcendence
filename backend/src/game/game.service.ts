@@ -138,7 +138,24 @@ export class GameService {
     return array[Math.floor(Math.random() * array.length)];
   }
 
+  getRunningGame(userId: number): GameRoom {
+    const exists = Object.keys(this.gamesInMemory).find((gameId) => {
+      const { playerOne, playerTwo }: GameRoom = this.gamesInMemory[gameId];
+      return playerOne.user.id == userId || playerTwo.user.id == userId;
+    });
+
+    if (exists) {
+      return this.gamesInMemory[exists];
+    }
+
+    return null;
+  }
+
   async newGame(user1: UserEntity, user2: UserEntity) {
+    if (this.getRunningGame(user1.id) ?? this.getRunningGame(user2.id)) {
+      return null;
+    }
+
     const game = await this.gameRepository.save({
       playerOne: user1,
       playerTwo: user2,

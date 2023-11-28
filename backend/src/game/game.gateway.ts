@@ -38,16 +38,6 @@ export class GameGateway
     // open: []
   };
 
-  allUsers: Record<
-    number,
-    {
-      user: UserEntity;
-      client: Socket;
-    }
-  >;
-
-  allClientSockets: Record<string, number>;
-
   interval: NodeJS.Timeout;
 
   constructor(
@@ -64,9 +54,6 @@ export class GameGateway
       invites: [],
       // open: []
     };
-
-    this.allUsers = {};
-    this.allClientSockets = {};
   }
 
   afterInit() {
@@ -82,19 +69,45 @@ export class GameGateway
   }
 
   handleConnection(clientSocket: Socket) {
-    // TODO: not exists user?
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    this.allUsers[user.id] = { client: clientSocket, user: user };
+    if (user) {
+      clientSocket.join(`user:${user.id}`);
+    }
 
-    this.allClientSockets[clientSocket.id] = user.id;
+    const game = this.gameService.getRunningGame(user.id);
+
+    if (game) {
+      clientSocket.emit('gameAvailable', game.gameId);
+    }
   }
 
   handleDisconnect(clientSocket: Socket) {
-    const userId = this.allClientSockets[clientSocket.id];
+    const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    delete this.allUsers[userId];
-    delete this.allClientSockets[clientSocket.id];
+    if (user) {
+      this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+      this.queues.invites = this.queues.invites.filter((u) => {
+        if (u.user.id == user.id) {
+          this.sendUpdateInviteList(u.guest.id);
+        } else if (u.guest.id == user.id) {
+          this.sendUpdateInviteList(u.user.id);
+        }
+        return u.user.id != user.id && u.guest.id != user.id;
+      });
+    }
+  }
+
+  private async validate(client: Socket) {
+    const cookies = cookie.parse(client.handshake.headers.cookie);
+    const sid = cookies['connect.sid'].split('.')[0].slice(2);
+
+    try {
+      const session = await this.sessionService.getSessionById(sid);
+      return await this.userService.getUserById(session.userId);
+    } catch (error) {
+      throw new WsException('Unauthorized connection');
+    }
   }
 
   async matchmaking() {
@@ -106,8 +119,12 @@ export class GameGateway
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
 
-    this.allUsers[playerOne.id].client.emit('gameAvailable', game.gameId);
-    this.allUsers[playerTwo.id].client.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('findGame')
@@ -140,10 +157,7 @@ export class GameGateway
 
     const guest = await this.userService.getUserById(guestId);
 
-    this.queues.invites.push({
-      guest,
-      user,
-    });
+    this.queues.invites.push({ guest, user });
 
     this.sendUpdateInviteList(guest.id);
   }
@@ -166,8 +180,12 @@ export class GameGateway
 
     const game = await this.gameService.newGame(match.user, match.guest);
 
-    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId);
-    clientSocket.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${match.user.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${userId}`).emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('declineInvitePlayerToGame')
@@ -187,24 +205,12 @@ export class GameGateway
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
 
-    this.allUsers[userId]?.client.emit('updateInviteList', inviteList);
+    this.server.to(`user:${userId}`).emit('updateInviteList', inviteList);
   }
 
   @SubscribeMessage('findMyInvites')
   handleFindMyInvites(@User('id') userId: number) {
     this.sendUpdateInviteList(userId);
-  }
-
-  private async validate(client: Socket) {
-    const cookies = cookie.parse(client.handshake.headers.cookie);
-    const sid = cookies['connect.sid'].split('.')[0].slice(2);
-
-    try {
-      const session = await this.sessionService.getSessionById(sid);
-      return await this.userService.getUserById(session.userId);
-    } catch (error) {
-      throw new WsException('Unauthorized connection');
-    }
   }
 
   @SubscribeMessage('joinGame')
@@ -213,8 +219,21 @@ export class GameGateway
     @MessageBody() gameId: number,
   ) {
     client.join(`game:${gameId}`);
-    const game = this.gameService.gamesInMemory[gameId];
-    return game;
+    return this.gameService.gamesInMemory[gameId];
+  }
+
+  @SubscribeMessage('leaveGame')
+  async handleLeaveGame(
+    @ConnectedSocket() client: Socket,
+    @User('id') userId: number,
+    @MessageBody() gameId: number,
+  ) {
+    const game = this.gameService.getRunningGame(userId);
+    if (game) {
+      client.emit('gameAvailable', game.gameId);
+    } else {
+      client.leave(`game:${gameId}`);
+    }
   }
 
   @SubscribeMessage('movePlayer')

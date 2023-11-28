@@ -127,6 +127,7 @@ const Game = () => {
       socket.off("pup");
       window.removeEventListener("keydown", handleKeyDown);
       socket.emit("playerLeftGame");
+      socket.emit("leaveGame", game.id);
     };
   }, [socket, game, isPlayer]);
 
