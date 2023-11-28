@@ -3,18 +3,20 @@ import { User } from "../types";
 import { Avatar } from "./Avatar";
 import { FaPencilAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts";
+import { Alert } from ".";
 
 interface UserFormProps {
   user: User;
 }
 
-export default function UserUpdateAvatar({ user }: UserFormProps) {
+export const UserUpdateAvatar = ({ user }: UserFormProps) => {
   const { setCurrentUser } = useContext(AuthContext);
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleImageSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -29,9 +31,10 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
       credentials: "include",
     });
     if (!response.ok) {
-      console.error("Failed to upload image");
+      setError(response.statusText);
       return;
     }
+    setError(null);
     const data = await response.json();
     setAvatarUrl(data.avatarUrl);
     setCurrentUser((prevUser) => ({ ...prevUser, avatarUrl: data.avatarUrl }));
@@ -56,6 +59,11 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
           </span>
         </div>
       </div>
+      {error && (
+        <Alert severity="error" className="w-full my-5">
+          {error}
+        </Alert>
+      )}
       <input
         type="file"
         accept="image/*"
@@ -66,4 +74,4 @@ export default function UserUpdateAvatar({ user }: UserFormProps) {
       />
     </>
   );
-}
+};
