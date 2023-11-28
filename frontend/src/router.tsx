@@ -37,6 +37,7 @@ import {
   disableTFA,
   regenerateTFACodes,
   loginTFACheck,
+  loginTFARecover,
   manageChannelPassword,
 } from "./actions";
 
@@ -60,6 +61,7 @@ import {
   DisableTFA,
   RegenerateTFACodes,
   LoginTFACheck,
+  LoginTFARecover,
   Games,
   Game,
 } from "./routes";
@@ -73,6 +75,11 @@ const router = createBrowserRouter(
         path="/login/tfa-check"
         element={<LoginTFACheck />}
         action={loginTFACheck}
+      />
+      <Route
+        path="/login/tfa-recover"
+        element={<LoginTFARecover />}
+        action={loginTFARecover}
       />
       ,
       <Route path="/login/:provider" loader={providerLogin} />,
@@ -138,7 +145,7 @@ const router = createBrowserRouter(
           <Route path="games" element={<Games />} loader={loadGames} />
           <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
-          <Route path="tfa">
+          <Route path="tfa" index={false}>
             <Route
               path="enable"
               loader={generateTFASecret}
@@ -159,8 +166,8 @@ const router = createBrowserRouter(
           </Route>
         </Route>
       </Route>
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 export default router;
