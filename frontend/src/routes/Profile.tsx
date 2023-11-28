@@ -190,7 +190,9 @@ export default function Profile() {
         </div>
       </div>
       <div className="max-w-md">
-        <Table columns={columns as ColumnDef<unknown>[]} data={games} />
+        {games.length > 0 && (
+          <Table columns={columns as ColumnDef<unknown>[]} data={games} />
+        )}
       </div>
     </div>
   );
