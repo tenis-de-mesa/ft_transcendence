@@ -166,13 +166,21 @@ export class ChatsService {
    * @returns All chats that the user is a member of
    */
   async findAll(userId: number): Promise<ChatEntity[]> {
+    const subquery = this.chatRepository
+      .createQueryBuilder('sub')
+      .leftJoinAndSelect('sub.users', 'member')
+      .select('sub.id')
+      .where('member.userId = :userId')
+      .andWhere('member.status != :banned');
+
     const query = this.chatRepository
       .createQueryBuilder('chat')
+      .withDeleted()
       .leftJoinAndSelect('chat.users', 'member')
       .leftJoinAndSelect('member.user', 'user')
-      .where('member.userId = :userId', { userId })
-      .andWhere('member.status != :banned', { banned: ChatMemberStatus.BANNED })
-      .withDeleted();
+      .where(`chat.id IN (${subquery.getQuery()})`)
+      .setParameter('userId', userId)
+      .setParameter('banned', ChatMemberStatus.BANNED);
 
     return await query.getMany();
   }
@@ -697,7 +705,7 @@ export class ChatsService {
       return self.deletedAt ? 'Deleted user' : self.nickname;
     }
 
-    const nicknames: string[] = [`${currentUser.nickname} (You)`];
+    const nicknames: string[] = [currentUser.nickname];
 
     otherMembers.forEach((member) => {
       if (!member.deletedAt) {
