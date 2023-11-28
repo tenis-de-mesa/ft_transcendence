@@ -695,7 +695,11 @@ export class ChatsService {
 
     // When a user creates a chat with himself
     if (otherMembers.length === 0) {
-      return `${currentUser.nickname} (You)`;
+      if (type === ChatType.DIRECT) {
+        return `${currentUser.nickname} (You)`;
+      }
+
+      return currentUser.nickname;
     }
 
     // Direct chats only have two users, so no need to map nicknames

@@ -429,6 +429,9 @@ describe('ChatsService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         withDeleted: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getQuery: jest.fn().mockReturnThis(),
+        setParameter: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValueOnce(mockChats),
       } as any);
 
@@ -446,6 +449,9 @@ describe('ChatsService', () => {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
         withDeleted: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getQuery: jest.fn().mockReturnThis(),
+        setParameter: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValueOnce([]),
       } as any);
 
@@ -616,7 +622,7 @@ describe('ChatsService', () => {
       expect(result[0].name).toStrictEqual('Deleted user');
     });
 
-    it('channel chat with self should have name "user.nickname (You)"', () => {
+    it('channel chat with self should have name "user.nickname"', () => {
       // Arrange
       const mockUser = new UserEntity({
         id: 1,
@@ -640,10 +646,10 @@ describe('ChatsService', () => {
 
       // Assert
       expect(result.length).toStrictEqual(1);
-      expect(result[0].name).toStrictEqual(`${mockUser.nickname} (You)`);
+      expect(result[0].name).toStrictEqual(mockUser.nickname);
     });
 
-    it('channel chat with other user should have name "user.nickname (You) and otherUser.nickname"', () => {
+    it('channel chat with other user should have name "user.nickname and otherUser.nickname"', () => {
       // Arrange
       const mockUser = new UserEntity({
         id: 1,
@@ -679,11 +685,11 @@ describe('ChatsService', () => {
       // Assert
       expect(result.length).toStrictEqual(1);
       expect(result[0].name).toStrictEqual(
-        `${mockUser.nickname} (You) and ${mockOtherUser.nickname}`,
+        `${mockUser.nickname} and ${mockOtherUser.nickname}`,
       );
     });
 
-    it('channel chat with many users should have name "user.nickname (You), otherUser.nickname and otherOtherUser.nickname"', () => {
+    it('channel chat with many users should have name "user.nickname, otherUser.nickname and otherOtherUser.nickname"', () => {
       // Arrange
       const mockUser = new UserEntity({
         id: 1,
@@ -730,11 +736,11 @@ describe('ChatsService', () => {
       // Assert
       expect(result.length).toStrictEqual(1);
       expect(result[0].name).toStrictEqual(
-        `${mockUser.nickname} (You), ${mockOtherUser.nickname} and ${mockOtherOtherUser.nickname}`,
+        `${mockUser.nickname}, ${mockOtherUser.nickname} and ${mockOtherOtherUser.nickname}`,
       );
     });
 
-    it('channel chat with deleted user should omit deleted users\' name "user.nickname (You)"', () => {
+    it('channel chat with deleted user should omit deleted users\' name "user.nickname"', () => {
       // Arrange
       const mockUser = new UserEntity({
         id: 1,
@@ -770,10 +776,10 @@ describe('ChatsService', () => {
 
       // Assert
       expect(result.length).toStrictEqual(1);
-      expect(result[0].name).toStrictEqual(`${mockUser.nickname} (You)`);
+      expect(result[0].name).toStrictEqual(mockUser.nickname);
     });
 
-    it('channel chat with many users should omit deleted users\' name "user.nickname (You) and otherOtherUser.nickname"', () => {
+    it('channel chat with many users should omit deleted users\' name "user.nickname and otherOtherUser.nickname"', () => {
       // Arrange
       const mockUser = new UserEntity({
         id: 1,
@@ -821,7 +827,7 @@ describe('ChatsService', () => {
       // Assert
       expect(result.length).toStrictEqual(1);
       expect(result[0].name).toStrictEqual(
-        `${mockUser.nickname} (You) and ${mockOtherOtherUser.nickname}`,
+        `${mockUser.nickname} and ${mockOtherOtherUser.nickname}`,
       );
     });
   });
