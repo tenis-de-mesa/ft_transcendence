@@ -23,6 +23,7 @@ import {
   createChannel,
   createChat,
   updateChat,
+  deleteChat,
   sendChatMessage,
   joinChannel,
   leaveChannel,
@@ -118,6 +119,7 @@ const router = createBrowserRouter(
             <Route path=":id/ban" action={banChatMember} />
             <Route path=":id/unban" action={unbanChatMember} />
             <Route path=":id/leave" action={leaveChannel} />
+            <Route path=":id/delete" action={deleteChat} />
             <Route
               path=":id/update-member-role"
               action={updateChatMemberRole}

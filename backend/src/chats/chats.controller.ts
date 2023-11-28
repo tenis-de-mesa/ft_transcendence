@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseEnumPipe,
+  Delete,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ChatsService } from './chats.service';
@@ -80,6 +81,15 @@ export class ChatsController {
     @Body() dto: UpdateChatDto,
   ): Promise<void> {
     return await this.chatsService.update(id, dto);
+  }
+
+  @Delete(':id/delete')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ChannelRoles(ChatMemberRole.OWNER)
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.chatsService.delete(id);
+
+    this.eventEmitter.emit('chat.delete', id);
   }
 
   @Post(':id/verify')

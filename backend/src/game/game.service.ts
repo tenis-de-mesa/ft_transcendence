@@ -124,12 +124,8 @@ export class GameService {
       ball: {
         x: this.windowWidth / 2,
         y: this.windowHeight / 2,
-
-        // speedX: this.getRandomElement([-3, 3]),
-        // speedY: this.getRandomElement([-3, 3]),
-
-        speedX: 3,
-        speedY: 3,
+        speedX: this.getRandomElement([-3, 3]),
+        speedY: this.getRandomElement([-3, 3]),
         radius: 16,
         speedFactor: 1.075,
         verticalAdjustmentFactor: 8,
