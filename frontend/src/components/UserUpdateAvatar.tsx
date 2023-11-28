@@ -16,7 +16,7 @@ export const UserUpdateAvatar = ({ user }: UserFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleImageSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = event.target.files?.[0];
     if (!file) {
