@@ -15,7 +15,21 @@ const columnHelper = createColumnHelper<Chat>();
 export default function Channels() {
   const { currentUser } = useContext(AuthContext);
   const chats = useLoaderData() as Chat[];
-  const channels = chats.filter((chat) => chat.type !== "direct");
+  const channels = chats.filter((chat) => {
+    if (chat.type !== "channel") {
+      return null;
+    }
+
+    if (chat.access === "private") {
+      const isMember = chat.users.find((m) => m.userId === currentUser?.id);
+
+      if (!isMember) {
+        return null;
+      }
+    }
+
+    return chat;
+  });
 
   const capitalizeFirstLetter = (s: string) => {
     return s.charAt(0).toUpperCase() + s.slice(1);
@@ -84,7 +98,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser?.id],
+    [currentUser?.id]
   );
 
   return (

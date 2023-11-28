@@ -1,25 +1,44 @@
 import { ActionFunctionArgs, redirect } from "react-router-dom";
+import { makeRequest } from "../api";
+import { Chat } from "../types";
 
 export async function createChannel({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const userIds: number[] = formData.getAll("users[]").map((id) => Number(id));
-  const password: string = formData.get("password") as string;
-  const url = "http://localhost:3001/chats";
+  const { method } = request;
+
   const body = {
-    userIds,
+    userIds: formData.getAll("userId").map((id) => Number(id)),
+    password: (formData.get("password") as string) ?? undefined,
+    access: formData.get("access") as string,
     type: "channel",
-    password: password ?? undefined,
   };
 
-  const result = await fetch(url, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
+  const conditions = [
+    [!method, "Missing form method"],
+    [!body.access, "Missing chat access"],
+    [body.access === "protected" && !body.password, "Missing chat password"],
+  ];
+
+  const fail = conditions.find(([condition]) => condition);
+
+  if (fail) {
+    return {
+      status: "error",
+      message: fail[1] as string,
+    };
+  }
+
+  const { data, error } = await makeRequest<Chat>("/chats", {
+    method,
     body: JSON.stringify(body),
   });
 
-  const chat = await result.json();
-  return redirect(`/chats/${chat.id}`);
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
+  }
+
+  return redirect(`/chats/${data.id}`);
 }

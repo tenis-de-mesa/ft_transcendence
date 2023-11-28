@@ -54,7 +54,7 @@ export default function Chat() {
             Chat {chat.id}
           </Typography>
 
-          {chat.access !== "private" && (
+          {chat.type === "channel" && (
             <Button
               className="absolute right-[16px]"
               IconOnly={<FaGear />}
@@ -62,7 +62,7 @@ export default function Chat() {
               size="sm"
               variant="info"
               onClick={() => setShowCard(<ChatSettingsCard />)}
-            ></Button>
+            />
           )}
         </Card.Title>
         <Card.Body position="left" className="pt-0 h-5/6">
