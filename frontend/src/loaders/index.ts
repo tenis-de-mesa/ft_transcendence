@@ -1,4 +1,3 @@
-export * from "./loadRootUser";
 export * from "./loadUsersList";
 export * from "./loadChatList";
 export * from "./loadChat";
@@ -11,4 +10,3 @@ export * from "./loadAllChats";
 export * from "./generateTFASecret";
 export * from "./loadGame";
 export * from "./loadGames";
-

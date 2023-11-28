@@ -17,8 +17,8 @@ export class ChannelMemberGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const userId = request.user?.id;
-    const chatId = request.params?.id;
+    const userId = Number(request.user?.id);
+    const chatId = Number(request.params?.id);
 
     if (!userId || !chatId) {
       throw new UnauthorizedException('Member or chat not found');
