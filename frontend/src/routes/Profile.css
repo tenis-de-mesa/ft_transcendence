@@ -1,47 +1,24 @@
-.profile {
-  align-self: center;
-  display: grid;
-  justify-content: center;
-  align-items: center;
-}
-
 .flip-card {
   perspective: 40rem;
-  width: 100%;
-  height: 100%;
+}
 
-  .wrapper {
-    display: grid;
-    grid-template-columns: 1fr;
-    transition: transform 0.7s;
-    transform-style: preserve-3d;
-  }
+.flip-card .wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: transform 0.7s;
+  transform-style: preserve-3d;
+}
 
-  .wrapper.flipped {
-    transform: rotateY(180deg);
-  }
+.flip-card .wrapper.flipped {
+  transform: rotateY(180deg);
+}
 
-  .card {
-    backface-visibility: hidden;
-    grid-row-start: 1;
-    grid-column-start: 1;
-  }
+.flip-card .card {
+  backface-visibility: hidden;
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
 
-  .back {
-    transform: rotateY(180deg);
-  }
-
-  .edit-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px;
-  }
-
-  .back-button {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px;
-  }
+.flip-card .back {
+  transform: rotateY(180deg);
 }
