@@ -50,7 +50,7 @@ const Games = () => {
 
   return (
     <div>
-      <Typography variant="h4" className="mb-10">
+      <Typography variant="h5" className="mb-5">
         Games
       </Typography>
       <Table columns={columns as ColumnDef<unknown>[]} data={games} />

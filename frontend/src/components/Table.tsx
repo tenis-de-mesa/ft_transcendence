@@ -20,9 +20,10 @@ export interface TableProps {
   columns: ColumnDef<unknown>[];
   data: unknown[];
   sortBy?: string;
+  pageSize?: number;
 }
 
-const Table = ({ columns, data, sortBy }: TableProps) => {
+const Table = ({ columns, data, sortBy, pageSize = 9 }: TableProps) => {
   const [sorting, setSorting] = useState<SortingState>(
     sortBy ? [{ id: sortBy, desc: false }] : []
   );
@@ -30,6 +31,11 @@ const Table = ({ columns, data, sortBy }: TableProps) => {
   const table = useReactTable({
     columns,
     data,
+    initialState: {
+      pagination: {
+        pageSize,
+      },
+    },
     state: {
       sorting,
     },
