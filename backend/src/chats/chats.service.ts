@@ -378,15 +378,23 @@ export class ChatsService {
   }
 
   async findSelfChat(user: UserEntity): Promise<ChatEntity | null> {
-    return await this.chatRepository
+    const subquery = this.chatRepository
+      .createQueryBuilder('sub')
+      .leftJoin('sub.users', 'member')
+      .select('sub.id')
+      .where('member.userId = :userId')
+      .andWhere('chat.type = :type');
+
+    const query = this.chatRepository
       .createQueryBuilder('chat')
-      .innerJoin('chat.users', 'member')
-      .select('chat.id')
-      .where('chat.type = :type', { type: ChatType.DIRECT })
-      .andWhere('member.userId = :id', { id: user.id })
+      .leftJoin('chat.users', 'member')
+      .where(`chat.id IN (${subquery.getQuery()})`)
       .groupBy('chat.id')
-      .having('COUNT(member.userId) = 1')
-      .getOne();
+      .having('COUNT(DISTINCT member.userId) = 1')
+      .setParameter('userId', user.id)
+      .setParameter('type', ChatType.DIRECT);
+
+    return await query.getOne();
   }
 
   async joinChat(
