@@ -47,14 +47,14 @@ export class TfaService {
   }
 
   async tfaEnable(user: UserEntity): Promise<string[]> {
-    const recoveryCodes = await this.tfaGenerateRecoveryCodes();
+    const { plain, hashed } = await this.tfaGenerateRecoveryCodes();
 
     await this.usersService.updateUser(user.id, {
       tfaEnabled: true,
-      tfaRecoveryCodes: recoveryCodes.hashed,
+      tfaRecoveryCodes: hashed,
     });
 
-    return recoveryCodes.plain;
+    return plain;
   }
 
   async tfaDisable(user: UserEntity): Promise<void> {
