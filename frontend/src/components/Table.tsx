@@ -25,7 +25,7 @@ export interface TableProps {
 
 const Table = ({ columns, data, sortBy, pageSize = 9 }: TableProps) => {
   const [sorting, setSorting] = useState<SortingState>(
-    sortBy ? [{ id: sortBy, desc: false }] : []
+    sortBy ? [{ id: sortBy, desc: false }] : [],
   );
 
   const table = useReactTable({
@@ -68,7 +68,7 @@ const Table = ({ columns, data, sortBy, pageSize = 9 }: TableProps) => {
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                       {header.column.getCanSort() && (
                         <>
@@ -133,7 +133,7 @@ const Pagination = ({ table }: { table: Table<unknown> }) => {
             "flex items-center text-gray-500 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none",
             {
               "opacity-25": !table.getCanPreviousPage(),
-            }
+            },
           )}
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
@@ -153,7 +153,7 @@ const Pagination = ({ table }: { table: Table<unknown> }) => {
             "flex items-center text-gray-500 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none",
             {
               "opacity-25": !table.getCanNextPage(),
-            }
+            },
           )}
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
