@@ -81,7 +81,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="grid justify-center align-center gap-3 mt-5 h-full">
+    <div className="grid justify-center align-center gap-3 h-full">
       <div className="grid justify-center align-center w-full h-full flip-card">
         <div className="wrapper self-center">
           <Card className="card front">
