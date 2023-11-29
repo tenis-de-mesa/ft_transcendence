@@ -166,6 +166,7 @@ const router = createBrowserRouter(
           </Route>
         </Route>
       </Route>
+      <Route path="*" element={<ErrorBoundary />} />
     </Route>,
   ),
 );
