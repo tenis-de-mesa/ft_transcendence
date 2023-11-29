@@ -46,7 +46,7 @@ export const ChatContextProvider = ({ children }) => {
 
   useEffect(() => {
     const currentMember = currentChat?.users.find(
-      (user) => user.userId === currentUser?.id
+      (user) => user.userId === currentUser?.id,
     );
 
     setUserRole(currentMember?.role);

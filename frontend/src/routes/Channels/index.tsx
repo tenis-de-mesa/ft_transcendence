@@ -98,7 +98,7 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser?.id]
+    [currentUser?.id],
   );
 
   return (
@@ -108,6 +108,7 @@ export default function Channels() {
         <Table
           columns={columns as unknown as ColumnDef<Data>[]}
           data={channels as unknown as Data[]}
+          sortBy="id"
         />
       </div>
     </>

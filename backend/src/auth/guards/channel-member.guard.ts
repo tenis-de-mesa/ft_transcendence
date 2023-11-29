@@ -17,6 +17,7 @@ export class ChannelMemberGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
     const userId = Number(request.user?.id);
     const chatId = Number(request.params?.id);
 
