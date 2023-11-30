@@ -39,6 +39,7 @@ import {
   loginTFACheck,
   loginTFARecover,
   manageChannelPassword,
+  blockOrUnblockUser,
 } from "./actions";
 
 import { RequireAuth, ChatContextProvider } from "./contexts";
@@ -88,7 +89,10 @@ const router = createBrowserRouter(
         {/* Protected routes */}
         <Route path="/" element={<Root />} errorElement={<ErrorBoundary />}>
           <Route index element={<Home />} />
-          <Route path="users" element={<Users />} loader={loadUsersList} />
+          <Route path="users" element={<Users />} loader={loadUsersList}>
+            <Route path=":id/block" action={blockOrUnblockUser} />
+            <Route path=":id/unblock" action={blockOrUnblockUser} />
+          </Route>
           <Route
             path="friends"
             element={<Friends />}
@@ -167,8 +171,8 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="*" element={<ErrorBoundary />} />
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 export default router;

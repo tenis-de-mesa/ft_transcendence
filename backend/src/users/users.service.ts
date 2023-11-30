@@ -168,14 +168,40 @@ export class UsersService {
     if (blockedById === blockedUserId) {
       return null;
     }
-    return await this.blockListRepository.save({ blockedById, blockedUserId });
+
+    const [_blockedUser, _blockedBy] = await Promise.all([
+      await this.getUserById(blockedUserId),
+      await this.getUserById(blockedById),
+    ]);
+
+    return await this.blockListRepository.save({
+      blockedById,
+      blockedUserId,
+    });
   }
 
   async unblockUserById(
     blockedById: number,
     blockedUserId: number,
   ): Promise<void> {
-    await this.blockListRepository.delete({ blockedById, blockedUserId });
+    if (blockedById === blockedUserId) {
+      return null;
+    }
+
+    const [block, _blockedUser, _blockedBy] = await Promise.all([
+      await this.blockListRepository.findOne({
+        where: { blockedById, blockedUserId },
+      }),
+
+      await this.getUserById(blockedUserId),
+      await this.getUserById(blockedById),
+    ]);
+
+    if (!block) {
+      return null;
+    }
+
+    await this.blockListRepository.remove(block);
   }
 
   async getBlockedUsers(blockedById: number): Promise<number[]> {

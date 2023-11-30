@@ -18,10 +18,14 @@ import { User } from '../core/decorators';
 import { UpdateUserDto, AddFriendDto } from './dto';
 import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   @Get('/')
   async findAll() {
@@ -86,21 +90,31 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('block/:id')
+  @Post(':blockUserId/block')
   async blockUser(
-    @User() user: UserEntity,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return await this.usersService.blockUserById(user.id, id);
+    @User('id') userId: number,
+    @Param('blockUserId', ParseIntPipe) blockUserId: number,
+  ): Promise<void> {
+    await this.usersService.blockUserById(userId, blockUserId);
+
+    this.eventEmitter.emit('user.blocked', {
+      blockedUserId: blockUserId,
+      blockingUserId: userId,
+    });
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('unblock/:id')
+  @Post(':unblockUserId/unblock')
   async unblockUser(
-    @User() user: UserEntity,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return await this.usersService.unblockUserById(user.id, id);
+    @User('id') userId: number,
+    @Param('unblockUserId', ParseIntPipe) unblockUserId: number,
+  ): Promise<void> {
+    await this.usersService.unblockUserById(userId, unblockUserId);
+
+    this.eventEmitter.emit('user.unblocked', {
+      unblockedUserId: unblockUserId,
+      unblockingUserId: userId,
+    });
   }
 
   @UseGuards(AuthenticatedGuard)

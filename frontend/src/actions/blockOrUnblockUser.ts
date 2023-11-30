@@ -1,14 +1,21 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { makeRequest } from "../api";
 
-export async function blockUser({ request }: ActionFunctionArgs) {
+export async function blockOrUnblockUser({
+  request,
+  params,
+}: ActionFunctionArgs) {
   const formData = await request.formData();
-  const id = formData.get("id");
+  const intent = formData.get("intent");
+  const { id } = params;
   const { method } = request;
+
+  console.log({ params, request });
 
   const conditions = [
     [!method, "Missing form method"],
     [!id, "Missing ID of user to block"],
+    [!intent, "Missing intent"],
   ];
 
   const fail = conditions.find(([condition]) => condition);
@@ -20,7 +27,7 @@ export async function blockUser({ request }: ActionFunctionArgs) {
     };
   }
 
-  const { error } = await makeRequest(`/users/${id}/block`, {
+  const { error } = await makeRequest(`/users/${id}/${intent}`, {
     method,
   });
 
@@ -33,6 +40,6 @@ export async function blockUser({ request }: ActionFunctionArgs) {
 
   return {
     status: "success",
-    message: `User blocked successfully`,
+    message: `User ${intent}ed successfully`,
   };
 }
