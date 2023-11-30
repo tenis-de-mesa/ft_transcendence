@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { GameRoom } from './game.interface';
 import { GameEntity, GameStatus } from '../core/entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { UserEntity } from '../core/entities';
 import { Server } from 'socket.io';
 import { PowerUp } from './PowerUp';
@@ -386,5 +386,22 @@ export class GameService {
       where: [{ playerOne: { id: userId } }, { playerTwo: { id: userId } }],
     });
     return games;
+  }
+
+  async seedGames(user: UserEntity, gamesCount: number): Promise<void> {
+    const loser = await this.userRepository.findOne({
+      where: { id: Not(user.id) },
+    });
+    for (let i = 0; i < gamesCount; i++) {
+      const game = new GameEntity();
+      game.status = GameStatus.FINISH;
+      game.playerOne = user;
+      game.playerTwo = loser;
+      game.playerOneScore = Math.floor(Math.random() * 10);
+      game.playerTwoScore = Math.floor(Math.random() * 10);
+      game.winner = user;
+      game.loser = loser;
+      await this.gameRepository.save(game);
+    }
   }
 }
