@@ -151,12 +151,26 @@ export class GameGateway
   }
 
   @SubscribeMessage('findGame')
-  handleFindGame(@User() user: UserEntity) {
-    if (this.queues.matchPowerUp.find((u) => u.id == user.id)) {
-      return;
-    }
+  handleFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      if (this.queues.matchVanilla.find((u) => u.id == user.id)) {
+        return;
+      }
 
-    this.queues.matchPowerUp.push(user);
+      this.queues.matchVanilla.push(user);
+    } else {
+      if (this.queues.matchPowerUp.find((u) => u.id == user.id)) {
+        return;
+      }
+
+      this.queues.matchPowerUp.push(user);
+    }
   }
 
   @SubscribeMessage('cancelFindGame')
@@ -169,15 +183,6 @@ export class GameGateway
   @SubscribeMessage('inFindGame')
   handleFindGameQueue(@User() user: UserEntity): boolean {
     return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
-  }
-
-  @SubscribeMessage('findGameVanilla')
-  handleFindGameVanilla(@User() user: UserEntity) {
-    if (this.queues.matchVanilla.find((u) => u.id == user.id)) {
-      return;
-    }
-
-    this.queues.matchVanilla.push(user);
   }
 
   @SubscribeMessage('cancelFindGameVanilla')

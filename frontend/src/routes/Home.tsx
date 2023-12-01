@@ -61,7 +61,7 @@ export default function Home() {
           <Button
             variant="info"
             onClick={() => {
-              socket.emit("findGameVanilla");
+              socket.emit("findGame", { vanilla: true });
               setInGameQueueVanilla(true);
             }}
           >
