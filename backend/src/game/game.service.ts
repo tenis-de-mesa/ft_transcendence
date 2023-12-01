@@ -13,9 +13,6 @@ export class GameService {
 
   server: Server;
 
-  windowWidth = 700;
-  windowHeight = 600;
-
   constructor(
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
@@ -79,6 +76,9 @@ export class GameService {
         game.playerOne,
         game.playerTwo,
       );
+      if (!game.isVanilla) {
+        this.configurePowerUps(game.id);
+      }
     }
   }
 
@@ -90,6 +90,7 @@ export class GameService {
     const maxScore = this.gamesInMemory[gameId]?.maxScore ?? 10;
     const playerOneScore = this.gamesInMemory[gameId]?.playerOne.score ?? 0;
     const playerTwoScore = this.gamesInMemory[gameId]?.playerTwo.score ?? 0;
+    const powerUp = this.gamesInMemory[gameId]?.powerUp;
 
     const windowWidth = 700;
     const windowHeight = 600;
@@ -105,7 +106,7 @@ export class GameService {
         user: userOne,
         paddle: {
           x: 10,
-          y: this.windowHeight / 2,
+          y: windowHeight / 2,
           width: 10,
           height: 100,
         },
@@ -116,22 +117,28 @@ export class GameService {
         user: userTwo,
         paddle: {
           x: windowWidth - 20,
-          y: this.windowHeight / 2,
+          y: windowHeight / 2,
           width: 10,
           height: 100,
         },
       },
       ball: {
-        x: this.windowWidth / 2,
-        y: this.windowHeight / 2,
+        x: windowWidth / 2,
+        y: windowHeight / 2,
         speedX: this.getRandomElement([-3, 3]),
         speedY: this.getRandomElement([-3, 3]),
         radius: 16,
         speedFactor: 1.075,
         verticalAdjustmentFactor: 8,
       },
-      powerUp: new PowerUp(windowWidth),
+      powerUp,
     };
+  }
+
+  configurePowerUps(gameId: number) {
+    this.gamesInMemory[gameId].powerUp = new PowerUp(
+      this.gamesInMemory[gameId].windowWidth,
+    );
   }
 
   getRandomElement<T>(array: T[]): T {
@@ -151,17 +158,26 @@ export class GameService {
     return null;
   }
 
-  async newGame(user1: UserEntity, user2: UserEntity) {
+  async newGame(
+    user1: UserEntity,
+    user2: UserEntity,
+    isVanilla: boolean = false,
+  ) {
     if (this.getRunningGame(user1.id) ?? this.getRunningGame(user2.id)) {
       return null;
     }
 
     const game = await this.gameRepository.save({
+      isVanilla,
       playerOne: user1,
       playerTwo: user2,
     });
 
     this.gamesInMemory[game.id] = this.resetDataGame(game.id, user1, user2);
+
+    if (!isVanilla) {
+      this.configurePowerUps(game.id);
+    }
 
     return this.gamesInMemory[game.id];
   }
@@ -170,17 +186,12 @@ export class GameService {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game: GameRoom = this.gamesInMemory[gameId];
 
-      const shouldSpawnPowerUp: boolean = Math.random() < 0.005;
-      if (shouldSpawnPowerUp && !game.powerUp.active) {
-        game.powerUp.spawnRandom(game);
-      }
-
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
 
       if (
         game.ball.y < 0 + game.ball.radius ||
-        game.ball.y > this.windowHeight - game.ball.radius
+        game.ball.y > game.windowHeight - game.ball.radius
       ) {
         game.ball.speedY = -game.ball.speedY;
       }
@@ -188,7 +199,7 @@ export class GameService {
       if (game.ball.x <= 0) {
         game.playerTwo.score++;
         return this.gainedAPoint(game.gameId);
-      } else if (game.ball.x >= this.windowWidth) {
+      } else if (game.ball.x >= game.windowWidth) {
         game.playerOne.score++;
         return this.gainedAPoint(game.gameId);
       }
@@ -219,28 +230,35 @@ export class GameService {
         }
       }
 
-      const powerUpHit =
-        Math.sqrt(
-          Math.pow(game.ball.x - game.powerUp.x, 2) +
-            Math.pow(game.ball.y - game.powerUp.y, 2),
-        ) <
-        game.ball.radius + game.powerUp.radius;
-      if (powerUpHit) {
-        game.powerUp.activate(game);
-        this.server?.to(`game:${gameId}`).emit('pup');
-      }
-
       this.server?.to(`game:${gameId}`).emit('updateBallPosition', {
         x: game.ball.x,
         y: game.ball.y,
         radius: game.ball.radius,
       });
 
-      this.server?.to(`game:${gameId}`).emit('updatePowerUp', {
-        x: game.powerUp.x,
-        y: game.powerUp.y,
-        active: game.powerUp.active,
-      });
+      if (game.powerUp) {
+        const shouldSpawnPowerUp: boolean = Math.random() < 0.005;
+        if (shouldSpawnPowerUp && !game.powerUp.active) {
+          game.powerUp.spawnRandom(game);
+        }
+
+        const powerUpHit =
+          Math.sqrt(
+            Math.pow(game.ball.x - game.powerUp.x, 2) +
+              Math.pow(game.ball.y - game.powerUp.y, 2),
+          ) <
+          game.ball.radius + game.powerUp.radius;
+        if (powerUpHit) {
+          game.powerUp.activate(game);
+          this.server?.to(`game:${gameId}`).emit('pup');
+        }
+
+        this.server?.to(`game:${gameId}`).emit('updatePowerUp', {
+          x: game.powerUp.x,
+          y: game.powerUp.y,
+          active: game.powerUp.active,
+        });
+      }
     });
   }
 
@@ -337,6 +355,8 @@ export class GameService {
       return;
     }
 
+    const { windowHeight } = this.gamesInMemory[body.gameId];
+
     const position =
       this.gamesInMemory[body.gameId].playerOne.user.id == userId ? 0 : 1;
 
@@ -355,8 +375,8 @@ export class GameService {
       }
     }
     if (body.down) {
-      if (player.paddle.y > this.windowHeight - 100 - 10) {
-        player.paddle.y = this.windowHeight - 100;
+      if (player.paddle.y > windowHeight - 100 - 10) {
+        player.paddle.y = windowHeight - 100;
       } else {
         player.paddle.y += movementfactor;
       }

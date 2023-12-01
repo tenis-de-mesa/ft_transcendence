@@ -9,6 +9,7 @@ export default function Home() {
   const socket = useWebSocket();
   const [invites, setInvites] = useState([]);
   const [inGameQueue, setInGameQueue] = useState(false);
+  const [inGameQueueVanilla, setInGameQueueVanilla] = useState(false);
 
   useEffect(() => {
     socket.on("updateInviteList", (invitesList) => {
@@ -20,6 +21,12 @@ export default function Home() {
   useEffect(() => {
     socket.emit("inFindGameQueue", (inQueue) => setInGameQueue(inQueue));
   }, [socket, inGameQueue]);
+
+  useEffect(() => {
+    socket.emit("inFindGameQueue", { vanilla: true }, (inQueue) =>
+      setInGameQueueVanilla(inQueue),
+    );
+  }, [socket, inGameQueueVanilla]);
 
   return (
     <div className="flex flex-col justify-start h-full p-5">
@@ -45,6 +52,30 @@ export default function Home() {
             }}
           >
             Exit Queue
+          </Button>
+        )}
+      </div>
+      <div className="max-w-xl">
+        <br />
+        {!inGameQueueVanilla ? (
+          <Button
+            variant="info"
+            onClick={() => {
+              socket.emit("findGame", { vanilla: true });
+              setInGameQueueVanilla(true);
+            }}
+          >
+            Join Queue Vanilla
+          </Button>
+        ) : (
+          <Button
+            variant="error"
+            onClick={() => {
+              socket.emit("cancelFindGame", { vanilla: true });
+              setInGameQueueVanilla(false);
+            }}
+          >
+            Exit Queue Vanilla
           </Button>
         )}
       </div>
