@@ -62,7 +62,7 @@ export class GameService {
   async loadGames() {
     const games = await this.gameRepository.find({
       where: {
-        status: GameStatus.START,
+        status: GameStatus.START || GameStatus.PAUSE,
       },
       relations: {
         playerOne: true,
@@ -76,6 +76,7 @@ export class GameService {
         game.playerOne,
         game.playerTwo,
       );
+      this.gamesInMemory[game.id].status = game.status;
       if (!game.isVanilla) {
         this.configurePowerUps(game.id);
       }
@@ -91,12 +92,14 @@ export class GameService {
     const playerOneScore = this.gamesInMemory[gameId]?.playerOne.score ?? 0;
     const playerTwoScore = this.gamesInMemory[gameId]?.playerTwo.score ?? 0;
     const powerUp = this.gamesInMemory[gameId]?.powerUp;
+    const status = this.gamesInMemory[gameId]?.status ?? GameStatus.START;
 
     const windowWidth = 700;
     const windowHeight = 600;
 
     return {
       gameId,
+      status,
       maxScore,
       windowWidth,
       windowHeight,
@@ -178,6 +181,68 @@ export class GameService {
     return this.gamesInMemory[game.id];
   }
 
+  checkUserDisconnect(user: UserEntity) {
+    const sockets = this.server.sockets.adapter.rooms.get(`user:${user.id}`);
+
+    if (!sockets) {
+      return true;
+    }
+
+    return sockets.size == 0;
+  }
+
+  async pauseGame(gameId: number) {
+    this.gamesInMemory[gameId].status = GameStatus.PAUSE;
+
+    const playerOneUser = this.gamesInMemory[gameId].playerOne.user;
+    const playerTwoUser = this.gamesInMemory[gameId].playerTwo.user;
+
+    await this.gameRepository.update(gameId, { status: GameStatus.PAUSE });
+
+    const maxTime = 1000 * 15;
+    const intervalTime = 1000;
+    let currentTime = 0;
+
+    this.server
+      .to(`game:${gameId}`)
+      .emit('gamePause', (maxTime - currentTime) / 1000);
+
+    const interval = setInterval(() => {
+      if (this.gamesInMemory[gameId].status != GameStatus.PAUSE) {
+        clearInterval(interval);
+        return;
+      }
+
+      currentTime += intervalTime;
+
+      if (currentTime >= maxTime) {
+        clearInterval(interval);
+
+        const checkPlayerOne = this.checkUserDisconnect(playerOneUser);
+        const checkPlayerTwo = this.checkUserDisconnect(playerTwoUser);
+
+        if (checkPlayerOne && checkPlayerTwo) {
+          this.abandonedGame(gameId);
+        } else if (checkPlayerOne) {
+          this.walkoverGame(gameId, playerTwoUser);
+        } else if (checkPlayerTwo) {
+          this.walkoverGame(gameId, playerOneUser);
+        } else {
+          this.unpauseGame(gameId);
+        }
+      } else {
+        this.server
+          .to(`game:${gameId}`)
+          .emit('gamePause', (maxTime - currentTime) / 1000);
+      }
+    }, intervalTime);
+  }
+
+  async unpauseGame(gameId: number) {
+    this.gamesInMemory[gameId].status = GameStatus.START;
+    await this.gameRepository.update(gameId, { status: GameStatus.START });
+  }
+
   async emitCurrentGames() {
     const currentLiveGames = Object.values(this.gamesInMemory).map((game) => {
       return {
@@ -190,8 +255,18 @@ export class GameService {
   }
 
   async updateGame() {
-    Object.keys(this.gamesInMemory).forEach((gameId) => {
-      const game: GameRoom = this.gamesInMemory[gameId];
+    Object.values(this.gamesInMemory).forEach((game) => {
+      if (game.status == GameStatus.PAUSE) {
+        return;
+      }
+
+      if (
+        this.checkUserDisconnect(game.playerOne.user) ||
+        this.checkUserDisconnect(game.playerTwo.user)
+      ) {
+        this.pauseGame(game.gameId);
+        return;
+      }
 
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
@@ -237,7 +312,7 @@ export class GameService {
         }
       }
 
-      this.server?.to(`game:${gameId}`).emit('updateBallPosition', {
+      this.server?.to(`game:${game.gameId}`).emit('updateBallPosition', {
         x: game.ball.x,
         y: game.ball.y,
         radius: game.ball.radius,
@@ -257,10 +332,10 @@ export class GameService {
           game.ball.radius + game.powerUp.radius;
         if (powerUpHit) {
           game.powerUp.activate(game);
-          this.server?.to(`game:${gameId}`).emit('pup');
+          this.server?.to(`game:${game.gameId}`).emit('pup');
         }
 
-        this.server?.to(`game:${gameId}`).emit('updatePowerUp', {
+        this.server?.to(`game:${game.gameId}`).emit('updatePowerUp', {
           x: game.powerUp.x,
           y: game.powerUp.y,
           active: game.powerUp.active,
@@ -273,8 +348,8 @@ export class GameService {
     const { playerOne, playerTwo, maxScore } = this.gamesInMemory[gameId];
 
     if (playerOne.score >= maxScore || playerTwo.score >= maxScore) {
-      const finishedGame = await this.finishGame(gameId);
-      this.server?.to(`game:${gameId}`).emit('gameOver', finishedGame);
+      await this.finishGame(gameId);
+      this.emitGameOver(gameId);
       this.updatePlayerStats(playerOne.user.id);
       this.updatePlayerStats(playerTwo.user.id);
       return;
@@ -347,7 +422,53 @@ export class GameService {
       playerOneMatchPoints,
       playerTwoMatchPoints,
     });
-    return await this.findOne(gameId);
+  }
+
+  async abandonedGame(gameId: number) {
+    await this.gameRepository.update(gameId, {
+      status: GameStatus.FINISH,
+    });
+
+    await this.emitGameOver(gameId);
+  }
+
+  async walkoverGame(gameId: number, winner: UserEntity) {
+    const game = this.gamesInMemory[gameId];
+
+    if (!game) {
+      return;
+    }
+
+    delete this.gamesInMemory[gameId];
+
+    const status = GameStatus.FINISH;
+    const playerOneMatchPoints = 0;
+    const playerTwoMatchPoints = 0;
+    const playerOneScore = game.playerOne.score;
+    const playerTwoScore = game.playerTwo.score;
+
+    const loser =
+      game.playerOne.user.id == winner.id
+        ? game.playerTwo.user
+        : game.playerOne.user;
+
+    await this.gameRepository.update(gameId, {
+      status,
+      winner,
+      loser,
+      playerOneScore,
+      playerTwoScore,
+      playerOneMatchPoints,
+      playerTwoMatchPoints,
+    });
+
+    await this.emitGameOver(gameId);
+  }
+
+  async emitGameOver(gameId: number) {
+    const game = await this.findOne(gameId);
+
+    this.server?.to(`game:${gameId}`).emit('gameOver', game);
   }
 
   movePlayers(
@@ -359,6 +480,10 @@ export class GameService {
     },
   ) {
     if (!this.gamesInMemory[body.gameId]) {
+      return;
+    }
+
+    if (this.gamesInMemory[body.gameId].status == GameStatus.PAUSE) {
       return;
     }
 
