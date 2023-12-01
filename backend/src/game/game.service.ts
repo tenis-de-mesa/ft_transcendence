@@ -183,9 +183,7 @@ export class GameService {
   }
 
   async updateGame() {
-    Object.keys(this.gamesInMemory).forEach((gameId) => {
-      const game: GameRoom = this.gamesInMemory[gameId];
-
+    Object.values(this.gamesInMemory).forEach((game) => {
       game.ball.x += game.ball.speedX;
       game.ball.y += game.ball.speedY;
 
@@ -230,7 +228,7 @@ export class GameService {
         }
       }
 
-      this.server?.to(`game:${gameId}`).emit('updateBallPosition', {
+      this.server?.to(`game:${game.gameId}`).emit('updateBallPosition', {
         x: game.ball.x,
         y: game.ball.y,
         radius: game.ball.radius,
@@ -250,10 +248,10 @@ export class GameService {
           game.ball.radius + game.powerUp.radius;
         if (powerUpHit) {
           game.powerUp.activate(game);
-          this.server?.to(`game:${gameId}`).emit('pup');
+          this.server?.to(`game:${game.gameId}`).emit('pup');
         }
 
-        this.server?.to(`game:${gameId}`).emit('updatePowerUp', {
+        this.server?.to(`game:${game.gameId}`).emit('updatePowerUp', {
           x: game.powerUp.x,
           y: game.powerUp.y,
           active: game.powerUp.active,
