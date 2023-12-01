@@ -31,7 +31,7 @@ export default function Home() {
 
   useEffect(() => {
     socket.emit("inFindGameQueue", { vanilla: true }, (inQueue) =>
-      setInGameQueueVanilla(inQueue)
+      setInGameQueueVanilla(inQueue),
     );
   }, [socket, inGameQueueVanilla]);
 
