@@ -30,12 +30,12 @@ export class GameGateway
   @WebSocketServer() server: Server;
 
   queues: {
-    all: UserEntity[];
+    matchVanilla: UserEntity[];
+    matchPowerUp: UserEntity[];
     invites: {
       user: UserEntity;
       guest: UserEntity;
     }[];
-    // open: []
   };
 
   interval: NodeJS.Timeout;
@@ -46,13 +46,14 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.matchmaking();
+      this.matchMakingPowerUps();
+      this.matchMakingVanilla();
       this.gameService.updateGame();
     }, 16);
     this.queues = {
-      all: [],
+      matchVanilla: [],
+      matchPowerUp: [],
       invites: [],
-      // open: []
     };
   }
 
@@ -86,7 +87,12 @@ export class GameGateway
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
     if (user) {
-      this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+      this.queues.matchVanilla = this.queues.matchVanilla.filter(
+        (u) => u.id != user.id,
+      );
+      this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+        (u) => u.id != user.id,
+      );
       this.queues.invites = this.queues.invites.filter((u) => {
         if (u.user.id == user.id) {
           this.sendUpdateInviteList(u.guest.id);
@@ -110,12 +116,12 @@ export class GameGateway
     }
   }
 
-  async matchmaking() {
-    if (this.queues.all.length < 2) {
+  async matchMakingPowerUps() {
+    if (this.queues.matchPowerUp.length < 2) {
       return;
     }
 
-    const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
+    const [playerOne, playerTwo] = this.queues.matchPowerUp.splice(0, 2);
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
 
@@ -127,23 +133,63 @@ export class GameGateway
     this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
   }
 
-  @SubscribeMessage('findGame')
-  handleFindGame(@User() user: UserEntity) {
-    if (this.queues.all.find((u) => u.id == user.id)) {
+  async matchMakingVanilla() {
+    if (this.queues.matchVanilla.length < 2) {
       return;
     }
 
-    this.queues.all.push(user);
+    const [playerOne, playerTwo] = this.queues.matchVanilla.splice(0, 2);
+
+    const game = await this.gameService.newGame(playerOne, playerTwo, true);
+
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
+  }
+
+  @SubscribeMessage('findGame')
+  handleFindGame(@User() user: UserEntity) {
+    if (this.queues.matchPowerUp.find((u) => u.id == user.id)) {
+      return;
+    }
+
+    this.queues.matchPowerUp.push(user);
   }
 
   @SubscribeMessage('cancelFindGame')
   handleCancelFindGame(@User() user: UserEntity) {
-    this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+    this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+      (u) => u.id != user.id,
+    );
   }
 
-  @SubscribeMessage('inFindGameQueue')
+  @SubscribeMessage('inFindGame')
   handleFindGameQueue(@User() user: UserEntity): boolean {
-    return Boolean(this.queues.all.find((u) => u.id == user.id));
+    return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
+  }
+
+  @SubscribeMessage('findGameVanilla')
+  handleFindGameVanilla(@User() user: UserEntity) {
+    if (this.queues.matchVanilla.find((u) => u.id == user.id)) {
+      return;
+    }
+
+    this.queues.matchVanilla.push(user);
+  }
+
+  @SubscribeMessage('cancelFindGameVanilla')
+  handleCancelFindGameVanilla(@User() user: UserEntity) {
+    this.queues.matchVanilla = this.queues.matchVanilla.filter(
+      (u) => u.id != user.id,
+    );
+  }
+
+  @SubscribeMessage('inFindGameQueueVanilla')
+  handleFindGameQueueVanilla(@User() user: UserEntity): boolean {
+    return Boolean(this.queues.matchVanilla.find((u) => u.id == user.id));
   }
 
   @SubscribeMessage('invitePlayerToGame')

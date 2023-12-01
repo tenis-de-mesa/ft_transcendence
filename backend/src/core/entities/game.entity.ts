@@ -25,6 +25,9 @@ export class GameEntity {
   @Column({ default: 10 })
   maxScore: number;
 
+  @Column({ default: false })
+  isVanilla: boolean;
+
   @Column({
     type: 'enum',
     enum: GameStatus,
