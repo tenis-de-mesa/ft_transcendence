@@ -193,13 +193,18 @@ export class GameGateway
   }
 
   @SubscribeMessage('inFindGame')
-  handleFindGameQueue(@User() user: UserEntity): boolean {
-    return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
-  }
-
-  @SubscribeMessage('inFindGameQueueVanilla')
-  handleFindGameQueueVanilla(@User() user: UserEntity): boolean {
-    return Boolean(this.queues.matchVanilla.find((u) => u.id == user.id));
+  handleFindGameQueue(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ): boolean {
+    if (body?.vanilla) {
+      return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
+    } else {
+      return Boolean(this.queues.matchVanilla.find((u) => u.id == user.id));
+    }
   }
 
   @SubscribeMessage('invitePlayerToGame')
