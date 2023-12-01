@@ -281,6 +281,13 @@ export class GameGateway
     this.sendUpdateInviteList(userId);
   }
 
+  @SubscribeMessage('findLiveGames')
+  async handleFindLiveGames(@User('id') userId: number) {
+    const liveGames = await this.gameService.getLiveGames();
+    console.log('SERVER: Find live games');
+    this.server.to(`user:${userId}`).emit('updateLiveGames', liveGames);
+  }
+
   @SubscribeMessage('joinGame')
   async handleJoinGame(
     @ConnectedSocket() client: Socket,

@@ -158,11 +158,7 @@ export class GameService {
     return null;
   }
 
-  async newGame(
-    user1: UserEntity,
-    user2: UserEntity,
-    isVanilla: boolean = false,
-  ) {
+  async newGame(user1: UserEntity, user2: UserEntity, isVanilla = false) {
     if (this.getRunningGame(user1.id) ?? this.getRunningGame(user2.id)) {
       return null;
     }
@@ -404,6 +400,14 @@ export class GameService {
     const games = await this.gameRepository.find({
       relations: { playerOne: true, playerTwo: true },
       where: [{ playerOne: { id: userId } }, { playerTwo: { id: userId } }],
+    });
+    return games;
+  }
+
+  async getLiveGames() {
+    const games = await this.gameRepository.find({
+      relations: { playerOne: true, playerTwo: true },
+      where: { status: GameStatus.START },
     });
     return games;
   }

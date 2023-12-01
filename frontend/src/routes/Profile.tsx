@@ -57,7 +57,7 @@ export default function Profile() {
         },
       }),
     ],
-    [],
+    []
   );
 
   useEffect(() => {
@@ -186,7 +186,7 @@ export default function Profile() {
             <Table
               columns={columns as ColumnDef<unknown>[]}
               data={games}
-              pageSize={5}
+              pageSize={4}
             />
           </>
         )}
