@@ -243,6 +243,17 @@ export class GameService {
     await this.gameRepository.update(gameId, { status: GameStatus.START });
   }
 
+  async emitCurrentGames() {
+    const currentLiveGames = Object.values(this.gamesInMemory).map((game) => {
+      return {
+        gameId: game.gameId,
+        playerOneNickname: game.playerOne.user.nickname,
+        playerTwoNickname: game.playerTwo.user.nickname,
+      };
+    });
+    this.server.emit('currentLiveGames', currentLiveGames);
+  }
+
   async updateGame() {
     Object.values(this.gamesInMemory).forEach((game) => {
       if (game.status == GameStatus.PAUSE) {

@@ -49,6 +49,7 @@ export class GameGateway
       this.matchMakingPowerUps();
       this.matchMakingVanilla();
       this.gameService.updateGame();
+      this.gameService.emitCurrentGames();
     }, 16);
     this.queues = {
       matchVanilla: [],
