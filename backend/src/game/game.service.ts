@@ -178,6 +178,17 @@ export class GameService {
     return this.gamesInMemory[game.id];
   }
 
+  async emitCurrentGames() {
+    const currentLiveGames = Object.values(this.gamesInMemory).map((game) => {
+      return {
+        gameId: game.gameId,
+        playerOneNickname: game.playerOne.user.nickname,
+        playerTwoNickname: game.playerTwo.user.nickname,
+      };
+    });
+    this.server.emit('currentLiveGames', currentLiveGames);
+  }
+
   async updateGame() {
     Object.keys(this.gamesInMemory).forEach((gameId) => {
       const game: GameRoom = this.gamesInMemory[gameId];

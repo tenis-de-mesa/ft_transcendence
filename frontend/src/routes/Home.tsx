@@ -3,14 +3,13 @@ import { Typography } from "../components/Typography";
 import { AuthContext } from "../contexts";
 import { useWebSocket } from "../hooks";
 import { Button, Card } from "../components";
-import { Game } from "../types";
 import { Link } from "react-router-dom";
 
 export default function Home() {
   const { currentUser } = useContext(AuthContext);
   const socket = useWebSocket();
   const [invites, setInvites] = useState([]);
-  const [liveGames, setLiveGames] = useState<Game[]>([]);
+  const [liveGames, setLiveGames] = useState([]);
   const [inGameQueue, setInGameQueue] = useState(false);
   const [inGameQueueVanilla, setInGameQueueVanilla] = useState(false);
 
@@ -18,11 +17,10 @@ export default function Home() {
     socket.on("updateInviteList", (invitesList) => {
       setInvites(invitesList);
     });
-    socket.on("updateLiveGames", (liveGames) => {
+    socket.on("currentLiveGames", (liveGames) => {
       setLiveGames(liveGames);
     });
     socket.emit("findMyInvites");
-    socket.emit("findLiveGames");
   }, [socket]);
 
   useEffect(() => {
@@ -140,14 +138,15 @@ export default function Home() {
               <Typography variant="h6">Live Games</Typography>
             </Card.Title>
             <Card.Body className="!px-10" position="left">
-              {liveGames.map((game) => {
+              {liveGames.map((liveGame) => {
                 return (
-                  <div key={game.id}>
+                  <div key={liveGame.gameId}>
                     <div className="flex items-center gap-2">
                       <Typography variant="md">
-                        {game.playerOne.nickname} x {game.playerTwo.nickname}
+                        {liveGame.playerOneNickname} x{" "}
+                        {liveGame.playerTwoNickname}
                       </Typography>
-                      <Link to={`/games/${game.id}`}>
+                      <Link to={`/games/${liveGame.gameId}`}>
                         <Button variant="info" size="sm">
                           Join
                         </Button>

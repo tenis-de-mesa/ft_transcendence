@@ -49,6 +49,7 @@ export class GameGateway
       this.matchMakingPowerUps();
       this.matchMakingVanilla();
       this.gameService.updateGame();
+      this.gameService.emitCurrentGames();
     }, 16);
     this.queues = {
       matchVanilla: [],
@@ -279,13 +280,6 @@ export class GameGateway
   @SubscribeMessage('findMyInvites')
   handleFindMyInvites(@User('id') userId: number) {
     this.sendUpdateInviteList(userId);
-  }
-
-  @SubscribeMessage('findLiveGames')
-  async handleFindLiveGames(@User('id') userId: number) {
-    const liveGames = await this.gameService.getLiveGames();
-    console.log('SERVER: Find live games');
-    this.server.to(`user:${userId}`).emit('updateLiveGames', liveGames);
   }
 
   @SubscribeMessage('joinGame')
