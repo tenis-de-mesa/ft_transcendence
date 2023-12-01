@@ -78,9 +78,13 @@ export class GameGateway
 
     const game = this.gameService.getRunningGame(user.id);
 
-    if (game) {
-      clientSocket.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
     }
+
+    this.gameService.unpauseGame(game.gameId);
+
+    clientSocket.emit('gameAvailable', game.gameId);
   }
 
   handleDisconnect(clientSocket: Socket) {
