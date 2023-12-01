@@ -24,8 +24,14 @@ const Game = () => {
   const [ballPosition, setBallPosition] = useState(null);
   const [powerUp, setPowerUp] = useState(null);
   const [gameOver, setGameOver] = useState(game.status === "finish");
+  const [gamePaused, setGamePaused] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
   const isPlayer =
     game.playerOne.id == currentUser.id || game.playerTwo.id == currentUser.id;
+
+  useEffect(() => {
+    setGamePaused(false);
+  }, [ballPosition, players]);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -114,8 +120,17 @@ const Game = () => {
     });
 
     socket.on("gameOver", (game: Game) => {
+      console.log("Received game over!");
+      setGamePaused(false);
       setGameOver(true);
       setGame(game);
+    });
+
+    socket.on("gamePause", (remainingSeconds: number) => {
+      console.log("Received game pause");
+      setGameOver(false);
+      setGamePaused(true);
+      setRemainingSeconds(remainingSeconds);
     });
 
     socket.emit("playerInGame");
@@ -158,13 +173,15 @@ const Game = () => {
         />
       </div>
 
-      {gameOver && (
+      {gameOver && !gamePaused && (
         <>
           <Overlay />
           <Card className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 z-[1001] min-w-[27rem]">
             <Card.Title>
               <Typography variant="h6" customWeight="bold">
-                {game.winner?.nickname} won!
+                {game.winner
+                  ? `${game.winner.nickname} won!`
+                  : `Game abandoned`}
               </Typography>
             </Card.Title>
             <Card.Body className="space-y-3">
@@ -181,12 +198,12 @@ const Game = () => {
                   </Typography>
                   <div
                     className={
-                      game.playerOneMatchPoints >= 0
+                      game.playerOneMatchPoints > 0
                         ? "text-success-200"
                         : "text-error-200"
                     }
                   >
-                    {game.playerOneMatchPoints > 0 ? "+" : "-"}
+                    {game.playerOneMatchPoints > 0 ? "+" : ""}
                     {game.playerOneMatchPoints}
                   </div>
                 </div>
@@ -229,6 +246,27 @@ const Game = () => {
                 </Button>
               </Link>
             </Card.Footer>
+          </Card>
+        </>
+      )}
+
+      {gamePaused && (
+        <>
+          <Overlay />
+          <Card className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 z-[1001] min-w-[27rem]">
+            <Card.Title>
+              <Typography variant="h6" customWeight="bold">
+                Game Paused
+              </Typography>
+            </Card.Title>
+            <Card.Body className="space-y-3">
+              <Typography variant="lg" customWeight="bold">
+                Users have <br />
+                <strong>{remainingSeconds}</strong> seconds
+                <br />
+                to return to the game
+              </Typography>
+            </Card.Body>
           </Card>
         </>
       )}

@@ -78,30 +78,42 @@ export class GameGateway
 
     const game = this.gameService.getRunningGame(user.id);
 
-    if (game) {
-      clientSocket.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
     }
+
+    this.gameService.unpauseGame(game.gameId);
+
+    clientSocket.emit('gameAvailable', game.gameId);
   }
 
   handleDisconnect(clientSocket: Socket) {
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    if (user) {
-      this.queues.matchVanilla = this.queues.matchVanilla.filter(
-        (u) => u.id != user.id,
-      );
-      this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
-        (u) => u.id != user.id,
-      );
-      this.queues.invites = this.queues.invites.filter((u) => {
-        if (u.user.id == user.id) {
-          this.sendUpdateInviteList(u.guest.id);
-        } else if (u.guest.id == user.id) {
-          this.sendUpdateInviteList(u.user.id);
-        }
-        return u.user.id != user.id && u.guest.id != user.id;
-      });
+    if (!user) {
+      return;
     }
+
+    this.queues.matchVanilla = this.queues.matchVanilla.filter(
+      (u) => u.id != user.id,
+    );
+
+    this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+      (u) => u.id != user.id,
+    );
+
+    const listOfUsersForUpdateInvites: Set<number> = new Set();
+
+    this.queues.invites = this.queues.invites.filter((u) => {
+      if (u.user.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.guest.id);
+      } else if (u.guest.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.user.id);
+      }
+      return u.user.id != user.id && u.guest.id != user.id;
+    });
+
+    listOfUsersForUpdateInvites.forEach((id) => this.sendUpdateInviteList(id));
   }
 
   private async validate(client: Socket) {
