@@ -29,6 +29,10 @@ const Game = () => {
   const isPlayer =
     game.playerOne.id == currentUser.id || game.playerTwo.id == currentUser.id;
 
+  useEffect(() => {
+    setGamePaused(false);
+  }, [ballPosition, players]);
+
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");

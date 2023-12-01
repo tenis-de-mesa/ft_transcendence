@@ -161,11 +161,7 @@ export class GameService {
     return null;
   }
 
-  async newGame(
-    user1: UserEntity,
-    user2: UserEntity,
-    isVanilla: boolean = false,
-  ) {
+  async newGame(user1: UserEntity, user2: UserEntity, isVanilla = false) {
     if (this.getRunningGame(user1.id) ?? this.getRunningGame(user2.id)) {
       return null;
     }
@@ -212,6 +208,11 @@ export class GameService {
       .emit('gamePause', (maxTime - currentTime) / 1000);
 
     const interval = setInterval(() => {
+      if (this.gamesInMemory[gameId].status != GameStatus.PAUSE) {
+        clearInterval(interval);
+        return;
+      }
+
       currentTime += intervalTime;
 
       if (currentTime >= maxTime) {
@@ -430,8 +431,8 @@ export class GameService {
     delete this.gamesInMemory[gameId];
 
     const status = GameStatus.FINISH;
-    const playerOneMatchPoints: number = 0;
-    const playerTwoMatchPoints: number = 0;
+    const playerOneMatchPoints = 0;
+    const playerTwoMatchPoints = 0;
     const playerOneScore = game.playerOne.score;
     const playerTwoScore = game.playerTwo.score;
 
@@ -468,6 +469,10 @@ export class GameService {
     },
   ) {
     if (!this.gamesInMemory[body.gameId]) {
+      return;
+    }
+
+    if (this.gamesInMemory[body.gameId].status == GameStatus.PAUSE) {
       return;
     }
 
