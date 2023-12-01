@@ -209,10 +209,14 @@ export class GameGateway
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
-    @MessageBody() guestId: number,
     @User() user: UserEntity,
+    @MessageBody() guestId: number,
   ) {
-    if (this.queues.invites.find((i) => i.guest.id == guestId)) {
+    if (
+      this.queues.invites.find(
+        (i) => i.guest.id == guestId && i.user.id == user.id,
+      )
+    ) {
       return;
     }
 
