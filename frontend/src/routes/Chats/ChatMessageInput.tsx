@@ -21,7 +21,7 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
   const { currentUser } = useContext(AuthContext);
-  const { currentChat } = useContext(ChatContext);
+  const { currentChat, userStatus } = useContext(ChatContext);
   const [message, setMessage] = useState("");
   const [blocked, setBlocked] = useState<Block>({
     isBlocked: false,
@@ -44,7 +44,7 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
   };
 
   useEffect(() => {
-    const checkIsBlocked = () => {
+    if (currentChat?.type === "direct") {
       const youBlockedUser =
         currentUser?.blockedUsers.find(
           (user) => currentChat?.users.find((u) => u.userId === user)
@@ -68,17 +68,20 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
           message: "You are blocked by this user",
         });
       }
-    };
-
-    if (currentChat?.type === "direct") {
-      checkIsBlocked();
+    } else if (currentChat?.type === "channel") {
+      if (userStatus === "muted") {
+        return setBlocked({
+          isBlocked: true,
+          message: "You are currently muted in this channel",
+        });
+      }
     }
-  }, [
-    currentChat,
-    currentUser?.blockedBy,
-    currentUser?.blockedUsers,
-    currentUser,
-  ]);
+
+    return setBlocked({
+      isBlocked: false,
+      message: "",
+    });
+  }, [userStatus, currentChat, currentUser]);
 
   useEffect(() => {
     socket.on(
