@@ -13,9 +13,6 @@ export class GameService {
 
   server: Server;
 
-  windowWidth = 700;
-  windowHeight = 600;
-
   constructor(
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
@@ -109,7 +106,7 @@ export class GameService {
         user: userOne,
         paddle: {
           x: 10,
-          y: this.windowHeight / 2,
+          y: windowHeight / 2,
           width: 10,
           height: 100,
         },
@@ -120,14 +117,14 @@ export class GameService {
         user: userTwo,
         paddle: {
           x: windowWidth - 20,
-          y: this.windowHeight / 2,
+          y: windowHeight / 2,
           width: 10,
           height: 100,
         },
       },
       ball: {
-        x: this.windowWidth / 2,
-        y: this.windowHeight / 2,
+        x: windowWidth / 2,
+        y: windowHeight / 2,
         speedX: this.getRandomElement([-3, 3]),
         speedY: this.getRandomElement([-3, 3]),
         radius: 16,
@@ -194,7 +191,7 @@ export class GameService {
 
       if (
         game.ball.y < 0 + game.ball.radius ||
-        game.ball.y > this.windowHeight - game.ball.radius
+        game.ball.y > game.windowHeight - game.ball.radius
       ) {
         game.ball.speedY = -game.ball.speedY;
       }
@@ -202,7 +199,7 @@ export class GameService {
       if (game.ball.x <= 0) {
         game.playerTwo.score++;
         return this.gainedAPoint(game.gameId);
-      } else if (game.ball.x >= this.windowWidth) {
+      } else if (game.ball.x >= game.windowWidth) {
         game.playerOne.score++;
         return this.gainedAPoint(game.gameId);
       }
@@ -358,6 +355,8 @@ export class GameService {
       return;
     }
 
+    const { windowHeight } = this.gamesInMemory[body.gameId];
+
     const position =
       this.gamesInMemory[body.gameId].playerOne.user.id == userId ? 0 : 1;
 
@@ -376,8 +375,8 @@ export class GameService {
       }
     }
     if (body.down) {
-      if (player.paddle.y > this.windowHeight - 100 - 10) {
-        player.paddle.y = this.windowHeight - 100;
+      if (player.paddle.y > windowHeight - 100 - 10) {
+        player.paddle.y = windowHeight - 100;
       } else {
         player.paddle.y += movementfactor;
       }
