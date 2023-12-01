@@ -540,14 +540,6 @@ export class GameService {
     return games;
   }
 
-  async getLiveGames() {
-    const games = await this.gameRepository.find({
-      relations: { playerOne: true, playerTwo: true },
-      where: { status: GameStatus.START },
-    });
-    return games;
-  }
-
   async seedGames(user: UserEntity, gamesCount: number): Promise<void> {
     const loser = await this.userRepository.findOne({
       where: { id: Not(user.id) },
