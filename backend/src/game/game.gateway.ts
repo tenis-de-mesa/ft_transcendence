@@ -174,22 +174,27 @@ export class GameGateway
   }
 
   @SubscribeMessage('cancelFindGame')
-  handleCancelFindGame(@User() user: UserEntity) {
-    this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
-      (u) => u.id != user.id,
-    );
+  handleCancelFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      this.queues.matchVanilla = this.queues.matchVanilla.filter(
+        (u) => u.id != user.id,
+      );
+    } else {
+      this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+        (u) => u.id != user.id,
+      );
+    }
   }
 
   @SubscribeMessage('inFindGame')
   handleFindGameQueue(@User() user: UserEntity): boolean {
     return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
-  }
-
-  @SubscribeMessage('cancelFindGameVanilla')
-  handleCancelFindGameVanilla(@User() user: UserEntity) {
-    this.queues.matchVanilla = this.queues.matchVanilla.filter(
-      (u) => u.id != user.id,
-    );
   }
 
   @SubscribeMessage('inFindGameQueueVanilla')

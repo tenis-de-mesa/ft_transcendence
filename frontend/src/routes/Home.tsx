@@ -71,7 +71,7 @@ export default function Home() {
           <Button
             variant="error"
             onClick={() => {
-              socket.emit("cancelFindGameVanilla");
+              socket.emit("cancelFindGame", { vanilla: true });
               setInGameQueueVanilla(false);
             }}
           >
