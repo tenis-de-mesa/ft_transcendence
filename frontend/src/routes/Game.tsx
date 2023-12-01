@@ -164,7 +164,9 @@ const Game = () => {
           <Card className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 z-[1001] min-w-[27rem]">
             <Card.Title>
               <Typography variant="h6" customWeight="bold">
-                {game.winner?.nickname} won!
+                {game.winner
+                  ? `${game.winner.nickname} won!`
+                  : `Game abandoned`}
               </Typography>
             </Card.Title>
             <Card.Body className="space-y-3">
@@ -181,12 +183,12 @@ const Game = () => {
                   </Typography>
                   <div
                     className={
-                      game.playerOneMatchPoints >= 0
+                      game.playerOneMatchPoints > 0
                         ? "text-success-200"
                         : "text-error-200"
                     }
                   >
-                    {game.playerOneMatchPoints > 0 ? "+" : "-"}
+                    {game.playerOneMatchPoints > 0 ? "+" : ""}
                     {game.playerOneMatchPoints}
                   </div>
                 </div>
