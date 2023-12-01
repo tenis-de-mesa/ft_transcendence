@@ -4,6 +4,7 @@ import { AuthProvider } from '../../src/core/entities';
 import { UsersModule } from '../../src/users/users.module';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('Unique Name', () => {
   let app: INestApplication;
@@ -11,7 +12,7 @@ describe('Unique Name', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [UsersModule, TypeOrmConfigModule],
+      imports: [EventEmitterModule.forRoot(), UsersModule, TypeOrmConfigModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
