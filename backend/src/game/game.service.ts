@@ -203,20 +203,38 @@ export class GameService {
 
     await this.gameRepository.update(gameId, { status: GameStatus.PAUSE });
 
-    setTimeout(() => {
-      const checkPlayerOne = this.checkUserDisconnect(playerOneUser);
-      const checkPlayerTwo = this.checkUserDisconnect(playerTwoUser);
+    const maxTime = 1000 * 15;
+    const intervalTime = 1000;
+    let currentTime = 0;
 
-      if (checkPlayerOne && checkPlayerTwo) {
-        this.abandonedGame(gameId);
-      } else if (checkPlayerOne) {
-        this.walkoverGame(gameId, playerTwoUser);
-      } else if (checkPlayerTwo) {
-        this.walkoverGame(gameId, playerOneUser);
+    this.server
+      .to(`game:${gameId}`)
+      .emit('gamePause', (maxTime - currentTime) / 1000);
+
+    const interval = setInterval(() => {
+      currentTime += intervalTime;
+
+      if (currentTime >= maxTime) {
+        clearInterval(interval);
+
+        const checkPlayerOne = this.checkUserDisconnect(playerOneUser);
+        const checkPlayerTwo = this.checkUserDisconnect(playerTwoUser);
+
+        if (checkPlayerOne && checkPlayerTwo) {
+          this.abandonedGame(gameId);
+        } else if (checkPlayerOne) {
+          this.walkoverGame(gameId, playerTwoUser);
+        } else if (checkPlayerTwo) {
+          this.walkoverGame(gameId, playerOneUser);
+        } else {
+          this.unpauseGame(gameId);
+        }
       } else {
-        this.unpauseGame(gameId);
+        this.server
+          .to(`game:${gameId}`)
+          .emit('gamePause', (maxTime - currentTime) / 1000);
       }
-    }, 15000);
+    }, intervalTime);
   }
 
   async unpauseGame(gameId: number) {
