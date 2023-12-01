@@ -97,7 +97,7 @@ export class UsersController {
   ): Promise<void> {
     await this.usersService.blockUserById(userId, blockUserId);
 
-    this.eventEmitter.emit('user.blocked', {
+    this.eventEmitter.emit('chat.blocked', {
       blockedUserId: blockUserId,
       blockingUserId: userId,
     });
@@ -111,7 +111,7 @@ export class UsersController {
   ): Promise<void> {
     await this.usersService.unblockUserById(userId, unblockUserId);
 
-    this.eventEmitter.emit('user.unblocked', {
+    this.eventEmitter.emit('chat.unblocked', {
       unblockedUserId: unblockUserId,
       unblockingUserId: userId,
     });

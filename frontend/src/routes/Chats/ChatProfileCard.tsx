@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { FormEvent, useContext } from "react";
 import { Link, useFetcher } from "react-router-dom";
 import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { FiX } from "react-icons/fi";
@@ -11,14 +11,28 @@ type ChatProfileCardProps = {
 };
 
 export default function ChatProfileCard({ user }: ChatProfileCardProps) {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const { closeCard } = useContext(ChatContext);
-  const { Form, data } = useFetcher();
-
-  console.log({ data });
+  const { Form } = useFetcher();
 
   const checkUserIsBlocked = (userBlockedId: number) => {
     return currentUser.blockedUsers.includes(userBlockedId);
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const intent = e.target[0].value;
+
+    if (intent === "block") {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: [...prev.blockedUsers, user.id],
+      }));
+    } else {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: prev.blockedUsers.filter((id) => id !== user.id),
+      }));
+    }
   };
 
   return (
@@ -44,7 +58,7 @@ export default function ChatProfileCard({ user }: ChatProfileCardProps) {
           </Typography>
 
           <div className="flex gap-1 flex-1 justify-end">
-            <Form method="POST">
+            <Form method="POST" onSubmit={handleSubmit}>
               {!user.deletedAt &&
                 currentUser.id !== user?.id &&
                 (checkUserIsBlocked(user?.id) ? (

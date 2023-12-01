@@ -14,6 +14,7 @@ import {
 } from '../core/entities';
 import { BullModule } from '@nestjs/bull';
 import { ChatsProcessor } from './chats.processor';
+import { GatewaySocketManager } from '../core/adapters';
 
 @Module({
   imports: [
@@ -30,6 +31,14 @@ import { ChatsProcessor } from './chats.processor';
     UsersModule,
   ],
   controllers: [ChatsController],
-  providers: [ChatsService, ChatsGateway, ChatsProcessor],
+  providers: [
+    ChatsService,
+    ChatsGateway,
+    ChatsProcessor,
+    {
+      provide: GatewaySocketManager.name,
+      useClass: GatewaySocketManager,
+    },
+  ],
 })
 export class ChatsModule {}

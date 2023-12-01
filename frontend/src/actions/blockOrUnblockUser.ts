@@ -10,8 +10,6 @@ export async function blockOrUnblockUser({
   const { id } = params;
   const { method } = request;
 
-  console.log({ params, request });
-
   const conditions = [
     [!method, "Missing form method"],
     [!id, "Missing ID of user to block"],
