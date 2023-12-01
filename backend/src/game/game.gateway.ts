@@ -221,11 +221,14 @@ export class GameGateway
     this.queues.invites.push({ guest, user });
 
     this.sendUpdateInviteList(guest.id);
+
+    if (!this.gameService.getRunningGame(guest.id)) {
+      this.server.to(`user:${guest.id}`).emit('newGameInvite', user);
+    }
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
   async handleAcceptInvitePlayerToGame(
-    @ConnectedSocket() clientSocket: Socket,
     @User('id') userId: number,
     @MessageBody() userIdInvitation: number,
   ) {
