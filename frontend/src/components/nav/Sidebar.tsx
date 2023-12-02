@@ -80,7 +80,7 @@ export const Sidebar: FC<ISidebarProps> = ({
   }, [pathname, isTab, closeMobileMenu]);
 
   return (
-    <div className="h-full">
+    <div className="h-screen">
       <div
         onClick={() => setIsOpen(false)}
         className={classNames(
