@@ -80,7 +80,7 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   @Post('seed')
   async seedUsers() {
-    return await this.usersService.seedUsers(5);
+    return await this.usersService.seedUsers(25);
   }
 
   @UseGuards(AuthenticatedGuard)

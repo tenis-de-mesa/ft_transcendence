@@ -30,12 +30,12 @@ export class GameGateway
   @WebSocketServer() server: Server;
 
   queues: {
-    all: UserEntity[];
+    matchVanilla: UserEntity[];
+    matchPowerUp: UserEntity[];
     invites: {
       user: UserEntity;
       guest: UserEntity;
     }[];
-    // open: []
   };
 
   interval: NodeJS.Timeout;
@@ -46,13 +46,15 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.matchmaking();
+      this.matchMakingPowerUps();
+      this.matchMakingVanilla();
       this.gameService.updateGame();
+      this.gameService.emitCurrentGames();
     }, 16);
     this.queues = {
-      all: [],
+      matchVanilla: [],
+      matchPowerUp: [],
       invites: [],
-      // open: []
     };
   }
 
@@ -77,25 +79,42 @@ export class GameGateway
 
     const game = this.gameService.getRunningGame(user.id);
 
-    if (game) {
-      clientSocket.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
     }
+
+    this.gameService.unpauseGame(game.gameId);
+
+    clientSocket.emit('gameAvailable', game.gameId);
   }
 
   handleDisconnect(clientSocket: Socket) {
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    if (user) {
-      this.queues.all = this.queues.all.filter((u) => u.id != user.id);
-      this.queues.invites = this.queues.invites.filter((u) => {
-        if (u.user.id == user.id) {
-          this.sendUpdateInviteList(u.guest.id);
-        } else if (u.guest.id == user.id) {
-          this.sendUpdateInviteList(u.user.id);
-        }
-        return u.user.id != user.id && u.guest.id != user.id;
-      });
+    if (!user) {
+      return;
     }
+
+    this.queues.matchVanilla = this.queues.matchVanilla.filter(
+      (u) => u.id != user.id,
+    );
+
+    this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+      (u) => u.id != user.id,
+    );
+
+    const listOfUsersForUpdateInvites: Set<number> = new Set();
+
+    this.queues.invites = this.queues.invites.filter((u) => {
+      if (u.user.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.guest.id);
+      } else if (u.guest.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.user.id);
+      }
+      return u.user.id != user.id && u.guest.id != user.id;
+    });
+
+    listOfUsersForUpdateInvites.forEach((id) => this.sendUpdateInviteList(id));
   }
 
   private async validate(client: Socket) {
@@ -110,12 +129,12 @@ export class GameGateway
     }
   }
 
-  async matchmaking() {
-    if (this.queues.all.length < 2) {
+  async matchMakingPowerUps() {
+    if (this.queues.matchPowerUp.length < 2) {
       return;
     }
 
-    const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
+    const [playerOne, playerTwo] = this.queues.matchPowerUp.splice(0, 2);
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
 
@@ -127,31 +146,90 @@ export class GameGateway
     this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
   }
 
-  @SubscribeMessage('findGame')
-  handleFindGame(@User() user: UserEntity) {
-    if (this.queues.all.find((u) => u.id == user.id)) {
+  async matchMakingVanilla() {
+    if (this.queues.matchVanilla.length < 2) {
       return;
     }
 
-    this.queues.all.push(user);
+    const [playerOne, playerTwo] = this.queues.matchVanilla.splice(0, 2);
+
+    const game = await this.gameService.newGame(playerOne, playerTwo, true);
+
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
+  }
+
+  @SubscribeMessage('findGame')
+  handleFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      if (this.queues.matchVanilla.find((u) => u.id == user.id)) {
+        return;
+      }
+
+      this.queues.matchVanilla.push(user);
+    } else {
+      if (this.queues.matchPowerUp.find((u) => u.id == user.id)) {
+        return;
+      }
+
+      this.queues.matchPowerUp.push(user);
+    }
   }
 
   @SubscribeMessage('cancelFindGame')
-  handleCancelFindGame(@User() user: UserEntity) {
-    this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+  handleCancelFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      this.queues.matchVanilla = this.queues.matchVanilla.filter(
+        (u) => u.id != user.id,
+      );
+    } else {
+      this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+        (u) => u.id != user.id,
+      );
+    }
   }
 
-  @SubscribeMessage('inFindGameQueue')
-  handleFindGameQueue(@User() user: UserEntity): boolean {
-    return Boolean(this.queues.all.find((u) => u.id == user.id));
+  @SubscribeMessage('inFindGame')
+  handleFindGameQueue(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ): boolean {
+    if (body?.vanilla) {
+      return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
+    } else {
+      return Boolean(this.queues.matchVanilla.find((u) => u.id == user.id));
+    }
   }
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
-    @MessageBody() guestId: number,
     @User() user: UserEntity,
+    @MessageBody() guestId: number,
   ) {
-    if (this.queues.invites.find((i) => i.guest.id == guestId)) {
+    if (
+      this.queues.invites.find(
+        (i) => i.guest.id == guestId && i.user.id == user.id,
+      )
+    ) {
       return;
     }
 
@@ -160,11 +238,14 @@ export class GameGateway
     this.queues.invites.push({ guest, user });
 
     this.sendUpdateInviteList(guest.id);
+
+    if (!this.gameService.getRunningGame(guest.id)) {
+      this.server.to(`user:${guest.id}`).emit('newGameInvite', user);
+    }
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
   async handleAcceptInvitePlayerToGame(
-    @ConnectedSocket() clientSocket: Socket,
     @User('id') userId: number,
     @MessageBody() userIdInvitation: number,
   ) {

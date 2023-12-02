@@ -1,15 +1,16 @@
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
+import { makeRequest } from "../api";
+import { Chat } from "../types";
 
 export async function redirectToChat({ params }: LoaderFunctionArgs) {
-  const response = await fetch(
-    `http://localhost:3001/chats/with/${params.userId}`,
-    {
-      credentials: "include",
-    }
+  const { data, error } = await makeRequest<Chat>(
+    `/chats/with/${params.userId}`,
+    { method: "GET" }
   );
-  if (!response.ok) {
+
+  if (error) {
     return redirect(`/chats/new/${params.userId}`);
   }
-  const chat = await response.json();
-  return redirect(`/chats/${chat.id}`);
+
+  return redirect(`/chats/${data.id}`);
 }

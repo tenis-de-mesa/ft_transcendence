@@ -17,6 +17,7 @@ import {
   generateTFASecret,
   loadGame,
   loadGames,
+  loadNewChat,
 } from "./loaders";
 
 import {
@@ -115,7 +116,11 @@ const router = createBrowserRouter(
             action={createChat}
           >
             <Route path="with/:userId" loader={redirectToChat} />
-            <Route path="new/:id" element={<ChatNew />} loader={loadUserById} />
+            <Route
+              path="new/:userId"
+              element={<ChatNew />}
+              loader={loadNewChat}
+            />
             <Route
               path=":id"
               element={<Chat />}
