@@ -53,8 +53,8 @@ export default function NewChannelCard() {
   useEffect(() => {
     setFilteredUsers(
       users.filter((user) =>
-        user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     );
   }, [searchTerm, users]);
 

@@ -39,7 +39,7 @@ export default function Chats() {
             <Card.Title>
               <Typography variant="h6">Chats</Typography>
             </Card.Title>
-            <Card.Body position="left">
+            <Card.Body position="left" className="h-full overflow-y-auto">
               <div className="flex flex-col justify-between">
                 {chatList.map((chat) => (
                   <NavLink
