@@ -35,7 +35,7 @@ export const AuthContextProvider = ({ children }) => {
       console.log("currentUserData", user);
       setCurrentUser(user);
     });
-  }, []);
+  }, [currentUser]);
 
   if (isLoading) {
     return null;
