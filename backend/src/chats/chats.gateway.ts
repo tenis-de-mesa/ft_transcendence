@@ -18,8 +18,6 @@ import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { GatewayChatEventDto } from './dto';
-import { GatewaySocketManager, IGatewaySocketManager } from '../core/adapters';
-import { Inject } from '@nestjs/common';
 
 interface NewChatMessage {
   chatId: number;
@@ -43,9 +41,6 @@ export class ChatsGateway
     private readonly chatService: ChatsService,
     private readonly userService: UsersService,
     private readonly sessionService: SessionsService,
-
-    @Inject(GatewaySocketManager.name)
-    private readonly sockets: IGatewaySocketManager,
   ) {}
 
   afterInit(_server: Server) {
@@ -61,13 +56,13 @@ export class ChatsGateway
 
   handleConnection(client: Socket) {
     const user = client.handshake.auth['user'];
-    this.sockets.pushUserSocket(user.id, client);
+
+    if (user) {
+      client.join(`user:${user.id}`);
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    const user = client.handshake.auth['user'];
-    this.sockets.deleteUserSocket(user.id);
-  }
+  handleDisconnect(client: Socket) {}
 
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
@@ -168,16 +163,9 @@ export class ChatsGateway
     blockingUserId: number;
   }) {
     const { blockedUserId, blockingUserId } = payload;
-    const blockedUserSockets = this.sockets.getUserSockets(blockedUserId);
-    const blockingUserSockets = this.sockets.getUserSockets(blockingUserId);
 
-    if (blockedUserSockets) {
-      blockedUserSockets.map((socket) => socket.emit('userBlocked', payload));
-    }
-
-    if (blockingUserSockets) {
-      blockingUserSockets.map((socket) => socket.emit('userBlocked', payload));
-    }
+    this.server.to(`user:${blockedUserId}`).emit('userBlocked', payload);
+    this.server.to(`user:${blockingUserId}`).emit('userBlocked', payload);
   }
 
   @OnEvent('chat.unblocked')
@@ -186,20 +174,9 @@ export class ChatsGateway
     unblockingUserId: number;
   }) {
     const { unblockedUserId, unblockingUserId } = payload;
-    const unblockedUserSockets = this.sockets.getUserSockets(unblockedUserId);
-    const unblockingUserSockets = this.sockets.getUserSockets(unblockingUserId);
 
-    if (unblockedUserSockets) {
-      unblockedUserSockets.map((socket) =>
-        socket.emit('userUnblocked', payload),
-      );
-    }
-
-    if (unblockingUserSockets) {
-      unblockingUserSockets.map((socket) =>
-        socket.emit('userUnblocked', payload),
-      );
-    }
+    this.server.to(`user:${unblockedUserId}`).emit('userUnblocked', payload);
+    this.server.to(`user:${unblockingUserId}`).emit('userUnblocked', payload);
   }
 
   private async validate(client: Socket) {
