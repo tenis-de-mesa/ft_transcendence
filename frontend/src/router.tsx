@@ -172,8 +172,8 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="*" element={<ErrorBoundary />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;

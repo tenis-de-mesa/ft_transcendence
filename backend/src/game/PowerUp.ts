@@ -10,7 +10,8 @@ export class PowerUp {
     this.active = false;
     this.radius = 24;
     this.x = windowWidth / 2;
-    this.y = Math.random() * ((windowHeight - this.radius) - this.radius) + this.radius;
+    this.y =
+      Math.random() * (windowHeight - this.radius - this.radius) + this.radius;
   }
 
   activate(game: GameRoom) {

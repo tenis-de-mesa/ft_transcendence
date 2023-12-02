@@ -33,7 +33,7 @@ const StorySidebar = (args: Props) => {
     friends: [],
     winCount: 0,
     loseCount: 0,
-    totalMatchPoints: 0
+    totalMatchPoints: 0,
   };
 
   return (
