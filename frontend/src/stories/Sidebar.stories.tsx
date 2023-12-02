@@ -26,6 +26,14 @@ const StorySidebar = (args: Props) => {
     nickname: "frosa-ma",
     status: "",
     avatarUrl: "",
+    userId: 0,
+    tfaEnabled: false,
+    blockedBy: [],
+    blockedUsers: [],
+    friends: [],
+    winCount: 0,
+    loseCount: 0,
+    totalMatchPoints: 0,
   };
 
   return (
@@ -35,8 +43,8 @@ const StorySidebar = (args: Props) => {
           <Sidebar
             {...args}
             options={navitems}
-            user={user}
             className={args.className}
+            user={user}
           />
           <main className="flex-1 py-4 mx-auto">
             <Routes>

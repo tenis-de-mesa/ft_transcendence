@@ -138,7 +138,7 @@ const router = createBrowserRouter(
             />
           </Route>
           <Route
-            path="profile/:id"
+            path="profile/:userId"
             element={<Profile />}
             loader={loadUserById}
           />
@@ -172,8 +172,8 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="*" element={<ErrorBoundary />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 export default router;
