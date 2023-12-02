@@ -3,7 +3,9 @@ import { makeRequest } from "../api";
 import { User } from "../types";
 
 export async function loadUserById({ params }: LoaderFunctionArgs) {
-  const { data, error } = await makeRequest<User>(`/users/${params.id}`, {
+  const { userId } = params;
+
+  const { data, error } = await makeRequest<User>(`/users/${userId}`, {
     method: "GET",
   });
 
