@@ -18,14 +18,10 @@ import { User } from '../core/decorators';
 import { UpdateUserDto, AddFriendDto } from './dto';
 import { UserEntity } from '../core/entities';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly eventEmitter: EventEmitter2,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('/')
   async findAll() {
@@ -42,18 +38,8 @@ export class UsersController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('me')
-  async getMe(@User() user: UserEntity) {
-    let blockedBy = [];
-    let blockedUsers = [];
-    if (user?.id) {
-      const [_blockedUsers, _blockedBy] = await Promise.all([
-        await this.usersService.getBlockedUsers(user.id),
-        await this.usersService.getUsersWhoBlockedMe(user.id),
-      ]);
-      blockedBy = _blockedBy;
-      blockedUsers = _blockedUsers;
-    }
-    return { ...user, blockedBy, blockedUsers };
+  async getMe(@User('id') userId: number) {
+    return this.usersService.getUserData(userId);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -96,11 +82,6 @@ export class UsersController {
     @Param('blockUserId', ParseIntPipe) blockUserId: number,
   ): Promise<void> {
     await this.usersService.blockUserById(userId, blockUserId);
-
-    this.eventEmitter.emit('chat.blocked', {
-      blockedUserId: blockUserId,
-      blockingUserId: userId,
-    });
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -110,11 +91,6 @@ export class UsersController {
     @Param('unblockUserId', ParseIntPipe) unblockUserId: number,
   ): Promise<void> {
     await this.usersService.unblockUserById(userId, unblockUserId);
-
-    this.eventEmitter.emit('chat.unblocked', {
-      unblockedUserId: unblockUserId,
-      unblockingUserId: userId,
-    });
   }
 
   @UseGuards(AuthenticatedGuard)

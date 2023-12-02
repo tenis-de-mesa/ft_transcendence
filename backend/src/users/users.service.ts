@@ -16,6 +16,7 @@ import {
   UserStatus,
 } from '../core/entities';
 import { BlockListEntity } from '../core/entities/blockList.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +28,7 @@ export class UsersService {
     @InjectRepository(BlockListEntity)
     private readonly blockListRepository: Repository<BlockListEntity>,
     @Inject(S3Client) private readonly s3Client: S3Client,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
@@ -174,10 +176,15 @@ export class UsersService {
       await this.getUserById(blockedById),
     ]);
 
-    return await this.blockListRepository.save({
+    const block = await this.blockListRepository.save({
       blockedById,
       blockedUserId,
     });
+
+    this.eventEmitter.emit('users.update', blockedById);
+    this.eventEmitter.emit('users.update', blockedUserId);
+
+    return block;
   }
 
   async unblockUserById(
@@ -197,6 +204,9 @@ export class UsersService {
     }
 
     await this.blockListRepository.remove(block);
+
+    this.eventEmitter.emit('users.update', blockedById);
+    this.eventEmitter.emit('users.update', blockedUserId);
   }
 
   async getBlockedUsers(blockedById: number): Promise<number[]> {
@@ -278,5 +288,21 @@ export class UsersService {
     });
 
     return _user.friends;
+  }
+
+  async getUserData(userId: number) {
+    const user = await this.getUserById(userId);
+
+    let blockedBy: number[] = [];
+    let blockedUsers: number[] = [];
+
+    const [_blockedUsers, _blockedBy] = await Promise.all([
+      await this.getBlockedUsers(user.id),
+      await this.getUsersWhoBlockedMe(user.id),
+    ]);
+    blockedBy = _blockedBy;
+    blockedUsers = _blockedUsers;
+
+    return { ...user, blockedBy, blockedUsers };
   }
 }

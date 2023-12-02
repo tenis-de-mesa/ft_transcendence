@@ -6,7 +6,6 @@ import {
   OnGatewayInit,
   WsException,
   ConnectedSocket,
-  OnGatewayConnection,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
@@ -30,7 +29,7 @@ interface NewChatMessage {
   },
   cookie: true,
 })
-export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
+export class ChatsGateway implements OnGatewayInit {
   @WebSocketServer()
   server: Server;
 
@@ -49,14 +48,6 @@ export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
         })
         .catch((error) => next(error));
     });
-  }
-
-  handleConnection(client: Socket) {
-    const user = client.handshake.auth['user'];
-
-    if (user) {
-      client.join(`user:${user.id}`);
-    }
   }
 
   @SubscribeMessage('sendChatMessage')
@@ -150,28 +141,6 @@ export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
   @OnEvent('chat.updateMemberRole')
   handleUpdateMemberRoleEvent(member: ChatMemberEntity) {
     this.server.to(`chat:${member.chatId}`).emit('userRoleUpdated', member);
-  }
-
-  @OnEvent('chat.blocked')
-  handleChatBlockedEvent(payload: {
-    blockedUserId: number;
-    blockingUserId: number;
-  }) {
-    const { blockedUserId, blockingUserId } = payload;
-
-    this.server.to(`user:${blockedUserId}`).emit('userBlocked', payload);
-    this.server.to(`user:${blockingUserId}`).emit('userBlocked', payload);
-  }
-
-  @OnEvent('chat.unblocked')
-  handleChatUnblockedEvent(payload: {
-    unblockedUserId: number;
-    unblockingUserId: number;
-  }) {
-    const { unblockedUserId, unblockingUserId } = payload;
-
-    this.server.to(`user:${unblockedUserId}`).emit('userUnblocked', payload);
-    this.server.to(`user:${unblockingUserId}`).emit('userUnblocked', payload);
   }
 
   private async validate(client: Socket) {

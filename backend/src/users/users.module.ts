@@ -6,13 +6,16 @@ import { UserEntity, SessionEntity } from '../core/entities';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 import { BlockListEntity } from '../core/entities/blockList.entity';
 import { SessionsService } from './sessions/sessions.service';
+import { UsersGateway } from './users.gateway';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity, SessionEntity, BlockListEntity]),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [UsersController],
-  providers: [UsersService, SessionsService, S3ClientProvider],
+  providers: [UsersService, SessionsService, S3ClientProvider, UsersGateway],
   exports: [UsersService, SessionsService, S3ClientProvider],
 })
 export class UsersModule {}

@@ -83,62 +83,6 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
     });
   }, [userStatus, currentChat, currentUser]);
 
-  useEffect(() => {
-    socket.on(
-      "userBlocked",
-      (payload: { blockedUserId: number; blockingUserId: number }) => {
-        const { blockedUserId, blockingUserId } = payload;
-
-        if (currentChat?.type === "direct") {
-          if (
-            blockedUserId === currentUser?.id &&
-            currentChat?.users.find((u) => u.userId === blockingUserId)
-          ) {
-            setBlocked({
-              isBlocked: true,
-              message: "You are blocked by this user",
-            });
-          } else if (
-            blockingUserId === currentUser?.id &&
-            currentChat?.users.find((u) => u.userId === blockedUserId)
-          ) {
-            setBlocked({
-              isBlocked: true,
-              message: "You blocked this user",
-            });
-          }
-        }
-      },
-    );
-
-    socket.on(
-      "userUnblocked",
-      (payload: { unblockedUserId: number; unblockingUserId: number }) => {
-        const { unblockedUserId, unblockingUserId } = payload;
-
-        if (currentChat?.type === "direct") {
-          if (
-            unblockedUserId === currentUser?.id &&
-            currentChat?.users.find((u) => u.userId === unblockingUserId)
-          ) {
-            setBlocked({
-              isBlocked: false,
-              message: "",
-            });
-          } else if (
-            unblockingUserId === currentUser?.id &&
-            currentChat?.users.find((u) => u.userId === unblockedUserId)
-          ) {
-            setBlocked({
-              isBlocked: false,
-              message: "",
-            });
-          }
-        }
-      },
-    );
-  }, [socket, currentChat, currentUser?.id]);
-
   return (
     <Form method="POST" onSubmit={handleSubmit}>
       <Input
