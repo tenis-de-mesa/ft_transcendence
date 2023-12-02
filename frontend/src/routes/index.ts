@@ -17,3 +17,4 @@ export { default as EnableTFA } from "./EnableTFA";
 export { default as DisableTFA } from "./DisableTFA";
 export { default as RegenerateTFACodes } from "./RegenerateTFACodes";
 export { default as LoginTFACheck } from "./LoginTFACheck";
+export { default as LoginTFARecover } from "./LoginTFARecover";

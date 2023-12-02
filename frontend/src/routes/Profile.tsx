@@ -1,17 +1,18 @@
-import { useLoaderData } from "react-router-dom";
-import { Game, User } from "../types";
-import UserForm from "../components/UserForm";
-
 import "./Profile.css";
-import { Avatar } from "../components/Avatar";
-import { Card } from "../components/Card";
-import { Button } from "../components/Button";
-import { Typography } from "../components/Typography";
-import UserUpdateAvatar from "../components/UserUpdateAvatar";
-import { AddFriendButton } from "../components/AddFriendButton";
+import { Form, useLoaderData } from "react-router-dom";
+import { Game, User } from "../types";
 import { AuthContext } from "../contexts";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { ChatButton } from "../components";
+import {
+  ChatButton,
+  Input,
+  Typography,
+  Button,
+  Avatar,
+  Card,
+  AddFriendButton,
+  UserUpdateAvatar,
+} from "../components";
 import { useWebSocket } from "../hooks";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
@@ -19,15 +20,16 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 const columnHelper = createColumnHelper<Game>();
 
 export default function Profile() {
-  const { currentUser } = useContext(AuthContext);
-  const profileUser = useLoaderData() as User; // loadUserById
+  const profileUser = useLoaderData() as User;
   const socket = useWebSocket();
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const [nickname, setNickname] = useState(currentUser.nickname);
   const [games, setGames] = useState([]);
 
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
-    const alternate = document.querySelector(".flip-card .wrapper");
+    const alternate = document.querySelector(".wrapper");
     if (alternate) {
       alternate.classList.toggle("flipped");
     }
@@ -35,25 +37,13 @@ export default function Profile() {
 
   const columns = useMemo<ColumnDef<Game>[]>(
     () => [
-      columnHelper.accessor("id", {
-        header: "#",
-        cell: (info) => info.getValue(),
-      }),
       columnHelper.accessor("playerOne", {
         header: "Player One",
-        cell: (info) => {
-          return (
-            <div className="flex space-x-1">{info.getValue()?.nickname}</div>
-          );
-        },
+        cell: (info) => info.getValue()?.nickname,
       }),
       columnHelper.accessor("playerTwo", {
         header: "Player Two",
-        cell: (info) => {
-          return (
-            <div className="flex space-x-1">{info.getValue()?.nickname}</div>
-          );
-        },
+        cell: (info) => info.getValue()?.nickname,
       }),
       columnHelper.accessor("playerOneScore", {
         header: "Score",
@@ -76,9 +66,23 @@ export default function Profile() {
     });
   }, [socket, profileUser.id]);
 
+  const updateNickname = async (nickname: string) => {
+    await fetch("http://localhost:3001/users/", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nickname }),
+      credentials: "include",
+    });
+    setCurrentUser((prevUser) => ({ ...prevUser, nickname }));
+    flipCard();
+  };
+
   return (
-    <div className="grid justify-center align-center gap-3 mt-5 h-full">
-      <div className="grid justify-center align-center flip-card">
+    <div className="grid justify-center align-center gap-3 h-full">
+      <div className="grid justify-center align-center w-full h-full flip-card">
         <div className="wrapper self-center">
           <Card className="card front">
             <Card.Title>
@@ -150,13 +154,42 @@ export default function Profile() {
               <UserUpdateAvatar user={profileUser} />
             </Card.Title>
             <Card.Body position="left">
-              <UserForm user={profileUser} />
+              <Form>
+                <Input
+                  label="Nickname"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder=""
+                  type="text"
+                />
+                <center>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="inline m-2"
+                    onClick={() => updateNickname(nickname)}
+                  >
+                    Atualizar
+                  </Button>
+                </center>
+              </Form>
             </Card.Body>
           </Card>
         </div>
       </div>
       <div className="max-w-md">
-        <Table columns={columns as ColumnDef<unknown>[]} data={games} />
+        {games.length > 0 && (
+          <>
+            <Typography variant="h6" className="text-center">
+              Latest games
+            </Typography>
+            <Table
+              columns={columns as ColumnDef<unknown>[]}
+              data={games}
+              pageSize={4}
+            />
+          </>
+        )}
       </div>
     </div>
   );

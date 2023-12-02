@@ -1,5 +1,17 @@
+import { makeRequest } from "../api";
+import { Game } from "../types";
+
 export async function loadGames() {
-  return fetch(`http://localhost:3001/games/`, {
-    credentials: "include",
+  const { data, error } = await makeRequest<Game>("/games", {
+    method: "GET",
   });
+
+  if (error) {
+    throw new Response(error.message, {
+      status: error.statusCode,
+      statusText: error.message,
+    });
+  }
+
+  return data;
 }

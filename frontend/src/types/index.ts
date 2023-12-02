@@ -28,14 +28,22 @@ export type Message = {
   sender?: User;
 };
 
+export type ChatMemberRole = "owner" | "admin" | "member";
+
+export type ChatMemberStatus = "active" | "muted" | "banned";
+
 export type ChatMember = {
   user: User;
   userId: number;
   chat: Chat;
   chatId: number;
-  role: "owner" | "admin" | "member";
-  status: "active" | "banned" | "muted";
+  role: ChatMemberRole;
+  status: ChatMemberStatus;
 };
+
+export type ChatAccess = "public" | "protected" | "private";
+
+export type ChatType = "direct" | "channel";
 
 export type Chat = {
   id: number;
@@ -43,8 +51,8 @@ export type Chat = {
   users: ChatMember[];
   messages: Message[];
   newMessage: string;
-  access: "public" | "protected" | "private";
-  type: "direct" | "channel";
+  access: ChatAccess;
+  type: ChatType;
   owner: User;
 };
 

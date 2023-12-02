@@ -1,4 +1,4 @@
-import { UserEntity } from '../core/entities';
+import { GameStatus, UserEntity } from '../core/entities';
 import { PowerUp } from './PowerUp';
 
 export type Paddle = {
@@ -40,4 +40,5 @@ export interface GameRoom {
   windowHeight: number;
   powerUpState: boolean;
   powerUp: PowerUp;
+  status: GameStatus;
 }

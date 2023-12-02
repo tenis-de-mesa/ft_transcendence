@@ -30,23 +30,13 @@ export class GameGateway
   @WebSocketServer() server: Server;
 
   queues: {
-    all: UserEntity[];
+    matchVanilla: UserEntity[];
+    matchPowerUp: UserEntity[];
     invites: {
       user: UserEntity;
       guest: UserEntity;
     }[];
-    // open: []
   };
-
-  allUsers: Record<
-    number,
-    {
-      user: UserEntity;
-      client: Socket;
-    }
-  >;
-
-  allClientSockets: Record<string, number>;
 
   interval: NodeJS.Timeout;
 
@@ -56,17 +46,16 @@ export class GameGateway
     private readonly gameService: GameService,
   ) {
     this.interval = setInterval(() => {
-      this.matchmaking();
+      this.matchMakingPowerUps();
+      this.matchMakingVanilla();
       this.gameService.updateGame();
+      this.gameService.emitCurrentGames();
     }, 16);
     this.queues = {
-      all: [],
+      matchVanilla: [],
+      matchPowerUp: [],
       invites: [],
-      // open: []
     };
-
-    this.allUsers = {};
-    this.allClientSockets = {};
   }
 
   afterInit() {
@@ -82,75 +71,181 @@ export class GameGateway
   }
 
   handleConnection(clientSocket: Socket) {
-    // TODO: not exists user?
     const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    this.allUsers[user.id] = { client: clientSocket, user: user };
+    if (user) {
+      clientSocket.join(`user:${user.id}`);
+    }
 
-    this.allClientSockets[clientSocket.id] = user.id;
+    const game = this.gameService.getRunningGame(user.id);
+
+    if (!game) {
+      return;
+    }
+
+    this.gameService.unpauseGame(game.gameId);
+
+    clientSocket.emit('gameAvailable', game.gameId);
   }
 
   handleDisconnect(clientSocket: Socket) {
-    const userId = this.allClientSockets[clientSocket.id];
+    const user: UserEntity = clientSocket.handshake.auth?.user;
 
-    delete this.allUsers[userId];
-    delete this.allClientSockets[clientSocket.id];
-  }
-
-  async matchmaking() {
-    if (this.queues.all.length < 2) {
+    if (!user) {
       return;
     }
 
-    const [playerOne, playerTwo] = this.queues.all.splice(0, 2);
+    this.queues.matchVanilla = this.queues.matchVanilla.filter(
+      (u) => u.id != user.id,
+    );
+
+    this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+      (u) => u.id != user.id,
+    );
+
+    const listOfUsersForUpdateInvites: Set<number> = new Set();
+
+    this.queues.invites = this.queues.invites.filter((u) => {
+      if (u.user.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.guest.id);
+      } else if (u.guest.id == user.id) {
+        listOfUsersForUpdateInvites.add(u.user.id);
+      }
+      return u.user.id != user.id && u.guest.id != user.id;
+    });
+
+    listOfUsersForUpdateInvites.forEach((id) => this.sendUpdateInviteList(id));
+  }
+
+  private async validate(client: Socket) {
+    const cookies = cookie.parse(client.handshake.headers.cookie);
+    const sid = cookies['connect.sid'].split('.')[0].slice(2);
+
+    try {
+      const session = await this.sessionService.getSessionById(sid);
+      return await this.userService.getUserById(session.userId);
+    } catch (error) {
+      throw new WsException('Unauthorized connection');
+    }
+  }
+
+  async matchMakingPowerUps() {
+    if (this.queues.matchPowerUp.length < 2) {
+      return;
+    }
+
+    const [playerOne, playerTwo] = this.queues.matchPowerUp.splice(0, 2);
 
     const game = await this.gameService.newGame(playerOne, playerTwo);
 
-    this.allUsers[playerOne.id].client.emit('gameAvailable', game.gameId);
-    this.allUsers[playerTwo.id].client.emit('gameAvailable', game.gameId);
-  }
-
-  @SubscribeMessage('findGame')
-  handleFindGame(@User() user: UserEntity) {
-    if (this.queues.all.find((u) => u.id == user.id)) {
+    if (!game) {
       return;
     }
 
-    this.queues.all.push(user);
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
+  }
+
+  async matchMakingVanilla() {
+    if (this.queues.matchVanilla.length < 2) {
+      return;
+    }
+
+    const [playerOne, playerTwo] = this.queues.matchVanilla.splice(0, 2);
+
+    const game = await this.gameService.newGame(playerOne, playerTwo, true);
+
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${playerOne.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${playerTwo.id}`).emit('gameAvailable', game.gameId);
+  }
+
+  @SubscribeMessage('findGame')
+  handleFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      if (this.queues.matchVanilla.find((u) => u.id == user.id)) {
+        return;
+      }
+
+      this.queues.matchVanilla.push(user);
+    } else {
+      if (this.queues.matchPowerUp.find((u) => u.id == user.id)) {
+        return;
+      }
+
+      this.queues.matchPowerUp.push(user);
+    }
   }
 
   @SubscribeMessage('cancelFindGame')
-  handleCancelFindGame(@User() user: UserEntity) {
-    this.queues.all = this.queues.all.filter((u) => u.id != user.id);
+  handleCancelFindGame(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ) {
+    if (body?.vanilla) {
+      this.queues.matchVanilla = this.queues.matchVanilla.filter(
+        (u) => u.id != user.id,
+      );
+    } else {
+      this.queues.matchPowerUp = this.queues.matchPowerUp.filter(
+        (u) => u.id != user.id,
+      );
+    }
   }
 
-  @SubscribeMessage('inFindGameQueue')
-  handleFindGameQueue(@User() user: UserEntity): boolean {
-    return Boolean(this.queues.all.find((u) => u.id == user.id));
+  @SubscribeMessage('inFindGame')
+  handleFindGameQueue(
+    @User() user: UserEntity,
+    @MessageBody()
+    body: {
+      vanilla: boolean;
+    },
+  ): boolean {
+    if (body?.vanilla) {
+      return Boolean(this.queues.matchPowerUp.find((u) => u.id == user.id));
+    } else {
+      return Boolean(this.queues.matchVanilla.find((u) => u.id == user.id));
+    }
   }
 
   @SubscribeMessage('invitePlayerToGame')
   async handleInvitePlayerToGame(
-    @MessageBody() guestId: number,
     @User() user: UserEntity,
+    @MessageBody() guestId: number,
   ) {
-    if (this.queues.invites.find((i) => i.guest.id == guestId)) {
+    if (
+      this.queues.invites.find(
+        (i) => i.guest.id == guestId && i.user.id == user.id,
+      )
+    ) {
       return;
     }
 
     const guest = await this.userService.getUserById(guestId);
 
-    this.queues.invites.push({
-      guest,
-      user,
-    });
+    this.queues.invites.push({ guest, user });
 
     this.sendUpdateInviteList(guest.id);
+
+    if (!this.gameService.getRunningGame(guest.id)) {
+      this.server.to(`user:${guest.id}`).emit('newGameInvite', user);
+    }
   }
 
   @SubscribeMessage('acceptInvitePlayerToGame')
   async handleAcceptInvitePlayerToGame(
-    @ConnectedSocket() clientSocket: Socket,
     @User('id') userId: number,
     @MessageBody() userIdInvitation: number,
   ) {
@@ -166,8 +261,12 @@ export class GameGateway
 
     const game = await this.gameService.newGame(match.user, match.guest);
 
-    this.allUsers[match.user.id].client.emit('gameAvailable', game.gameId);
-    clientSocket.emit('gameAvailable', game.gameId);
+    if (!game) {
+      return;
+    }
+
+    this.server.to(`user:${match.user.id}`).emit('gameAvailable', game.gameId);
+    this.server.to(`user:${userId}`).emit('gameAvailable', game.gameId);
   }
 
   @SubscribeMessage('declineInvitePlayerToGame')
@@ -187,24 +286,12 @@ export class GameGateway
       .filter((i) => i.guest.id == userId)
       .map((i) => i.user);
 
-    this.allUsers[userId]?.client.emit('updateInviteList', inviteList);
+    this.server.to(`user:${userId}`).emit('updateInviteList', inviteList);
   }
 
   @SubscribeMessage('findMyInvites')
   handleFindMyInvites(@User('id') userId: number) {
     this.sendUpdateInviteList(userId);
-  }
-
-  private async validate(client: Socket) {
-    const cookies = cookie.parse(client.handshake.headers.cookie);
-    const sid = cookies['connect.sid'].split('.')[0].slice(2);
-
-    try {
-      const session = await this.sessionService.getSessionById(sid);
-      return await this.userService.getUserById(session.userId);
-    } catch (error) {
-      throw new WsException('Unauthorized connection');
-    }
   }
 
   @SubscribeMessage('joinGame')
@@ -213,8 +300,21 @@ export class GameGateway
     @MessageBody() gameId: number,
   ) {
     client.join(`game:${gameId}`);
-    const game = this.gameService.gamesInMemory[gameId];
-    return game;
+    return this.gameService.gamesInMemory[gameId];
+  }
+
+  @SubscribeMessage('leaveGame')
+  async handleLeaveGame(
+    @ConnectedSocket() client: Socket,
+    @User('id') userId: number,
+    @MessageBody() gameId: number,
+  ) {
+    const game = this.gameService.getRunningGame(userId);
+    if (game) {
+      client.emit('gameAvailable', game.gameId);
+    } else {
+      client.leave(`game:${gameId}`);
+    }
   }
 
   @SubscribeMessage('movePlayer')

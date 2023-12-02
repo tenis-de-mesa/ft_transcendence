@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FiX } from "react-icons/fi";
 import { Form } from "react-router-dom";
-import { User } from "../../types";
+import { ChatAccess, User } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
 import { Avatar, Button, Card, Input, Typography } from "../../components";
 
@@ -10,10 +10,15 @@ export default function NewChannelCard() {
   const { closeCard } = useContext(ChatContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [password, setPassword] = useState("");
-  const [hasPassword, setHasPassword] = useState(false);
+  const [selectedAccess, setSelectedAccess] = useState<ChatAccess>("public");
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [selectedUsersId, setSelectedUsersId] = useState<number[]>([]);
+
+  const getAccessBoxStyle = (access: ChatAccess) => {
+    return `bg-gray-700 px-2 py-1 rounded select-none flex-1 cursor-pointer
+    ${access === selectedAccess ? "bg-info-700" : "bg-gray-700"}`;
+  };
 
   // Function to toggle user selection
   const toggleUserSelection = (userId: number) => {
@@ -29,7 +34,7 @@ export default function NewChannelCard() {
     closeCard();
     setSearchTerm("");
     setSelectedUsersId([]);
-    setHasPassword(false);
+    // setSelectedAccess("public");
     setPassword("");
   };
 
@@ -78,7 +83,7 @@ export default function NewChannelCard() {
               onClick={closeCard}
             />
           </Card.Title>
-          <Card.Body position="left" className="space-y-2">
+          <Card.Body className="space-y-2">
             <Typography variant="md" className="text-left">
               Select participants
             </Typography>
@@ -111,7 +116,7 @@ export default function NewChannelCard() {
                             className="mr-1 hidden"
                             type="checkbox"
                             value={user.id}
-                            name="users[]"
+                            name="userId"
                             checked={selectedUsersId.includes(user.id)}
                             onChange={() => toggleUserSelection(user.id)}
                           />
@@ -138,37 +143,57 @@ export default function NewChannelCard() {
                 </Typography>
               )}
             </div>
-
-            <Typography variant="md" as="label">
-              <input
-                type="checkbox"
-                name="hasPassword"
-                id="hasPassword"
-                className="mr-1"
-                onChange={() => setHasPassword(!hasPassword)}
-              />
-              Protect with password
-            </Typography>
-
-            {hasPassword && (
-              <div className="">
-                <Input
-                  name="password"
-                  type="password"
-                  placeholder="Insert password"
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                ></Input>
-              </div>
-            )}
           </Card.Body>
-          <Card.Footer hr={false}>
+          <Card.Footer position="left" className="space-y-3">
+            <div className="text-white space-y-1">
+              <Typography
+                variant="xs"
+                customColor="text-gray-400"
+                className="text-left select-none"
+              >
+                CHAT ACCESS
+              </Typography>
+
+              <ul className="flex justify-between gap-2 text-center">
+                <li
+                  className={getAccessBoxStyle("public")}
+                  onClick={() => setSelectedAccess("public")}
+                >
+                  <Typography variant="sm">PUBLIC</Typography>
+                </li>
+                <li
+                  className={getAccessBoxStyle("protected")}
+                  onClick={() => setSelectedAccess("protected")}
+                >
+                  <Typography variant="sm">PROTECTED</Typography>
+                </li>
+                <li
+                  className={getAccessBoxStyle("private")}
+                  onClick={() => setSelectedAccess("private")}
+                >
+                  <Typography variant="sm">PRIVATE</Typography>
+                </li>
+              </ul>
+            </div>
+
+            {selectedAccess === "protected" && (
+              <Input
+                name="password"
+                type="password"
+                placeholder="Insert password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            )}
+
             <Button
               className="justify-center w-full font-bold"
               type="submit"
               variant="info"
-              disabled={hasPassword && password.length === 0}
+              name="access"
+              value={selectedAccess}
+              disabled={selectedAccess === "protected" && password.length === 0}
             >
               Create Channel
             </Button>

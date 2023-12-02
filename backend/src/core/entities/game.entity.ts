@@ -9,6 +9,7 @@ import { UserEntity } from './user.entity';
 
 export enum GameStatus {
   START = 'start',
+  PAUSE = 'pause',
   FINISH = 'finish',
 }
 @Entity({ name: 'games' })
@@ -24,6 +25,9 @@ export class GameEntity {
 
   @Column({ default: 10 })
   maxScore: number;
+
+  @Column({ default: false })
+  isVanilla: boolean;
 
   @Column({
     type: 'enum',

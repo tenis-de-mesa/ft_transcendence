@@ -17,6 +17,7 @@ import {
   generateTFASecret,
   loadGame,
   loadGames,
+  loadNewChat,
 } from "./loaders";
 
 import {
@@ -37,6 +38,7 @@ import {
   disableTFA,
   regenerateTFACodes,
   loginTFACheck,
+  loginTFARecover,
   manageChannelPassword,
 } from "./actions";
 
@@ -60,6 +62,7 @@ import {
   DisableTFA,
   RegenerateTFACodes,
   LoginTFACheck,
+  LoginTFARecover,
   Games,
   Game,
 } from "./routes";
@@ -73,6 +76,11 @@ const router = createBrowserRouter(
         path="/login/tfa-check"
         element={<LoginTFACheck />}
         action={loginTFACheck}
+      />
+      <Route
+        path="/login/tfa-recover"
+        element={<LoginTFARecover />}
+        action={loginTFARecover}
       />
       ,
       <Route path="/login/:provider" loader={providerLogin} />,
@@ -104,7 +112,11 @@ const router = createBrowserRouter(
             action={createChat}
           >
             <Route path="with/:userId" loader={redirectToChat} />
-            <Route path="new/:id" element={<ChatNew />} loader={loadUserById} />
+            <Route
+              path="new/:userId"
+              element={<ChatNew />}
+              loader={loadNewChat}
+            />
             <Route
               path=":id"
               element={<Chat />}
@@ -126,7 +138,7 @@ const router = createBrowserRouter(
             />
           </Route>
           <Route
-            path="profile/:id"
+            path="profile/:userId"
             element={<Profile />}
             loader={loadUserById}
           />
@@ -138,7 +150,7 @@ const router = createBrowserRouter(
           <Route path="games" element={<Games />} loader={loadGames} />
           <Route path="games/:id" element={<Game />} loader={loadGame} />
           <Route path="settings" element={<Settings />} />
-          <Route path="tfa">
+          <Route path="tfa" index={false}>
             <Route
               path="enable"
               loader={generateTFASecret}
@@ -159,8 +171,9 @@ const router = createBrowserRouter(
           </Route>
         </Route>
       </Route>
-    </Route>,
-  ),
+      <Route path="*" element={<ErrorBoundary />} />
+    </Route>
+  )
 );
 
 export default router;

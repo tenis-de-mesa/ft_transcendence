@@ -1,10 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Chat, ChatMember } from "../types";
+import { Chat, ChatMember, ChatMemberRole, ChatMemberStatus } from "../types";
 import { AuthContext } from ".";
 import { socket } from "../socket";
-
-type ChatMemberRole = "owner" | "admin" | "member";
-type ChatMemberStatus = "active" | "muted" | "banned";
 
 type ChatContextType = {
   currentChat: Chat;

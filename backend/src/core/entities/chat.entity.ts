@@ -41,7 +41,7 @@ export class ChatEntity {
   @Column({ nullable: true })
   password: string;
 
-  @OneToOne(() => UserEntity)
+  @OneToOne(() => UserEntity, { createForeignKeyConstraints: false })
   @JoinColumn()
   owner: UserEntity;
 

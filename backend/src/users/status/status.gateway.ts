@@ -71,7 +71,7 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('playerInGame')
   async handlePlayerInGame(@User() user: UserEntity) {
-    this.userService.updateUser(user.id, {
+    await this.userService.updateUser(user.id, {
       status: UserStatus.IN_GAME,
     });
     this.emitUserStatus(user.id, UserStatus.IN_GAME);
