@@ -34,7 +34,6 @@ export const Sidebar: FC<ISidebarProps> = ({
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeNavitem, setActiveNavitem] = useState<string>("");
-  // const { currentUser } = useContext(AuthContext);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
