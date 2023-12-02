@@ -136,6 +136,7 @@ export class GameService {
       },
       powerUpState: false,
       powerUp,
+      lastPlayer: undefined,
     };
   }
 
@@ -311,6 +312,8 @@ export class GameService {
           game.ball.speedY =
             relativeCollision * game.ball.verticalAdjustmentFactor;
           game.ball.speedY *= game.ball.speedFactor;
+
+          game.lastPlayer = player;
         }
       }
 
@@ -346,6 +349,7 @@ export class GameService {
           x: game.powerUp.x,
           y: game.powerUp.y,
           active: game.powerUp.active,
+          powerUp: game.powerUp,
         });
       }
     });
@@ -494,7 +498,7 @@ export class GameService {
       return;
     }
 
-    const { windowHeight } = this.gamesInMemory[body.gameId];
+    const { windowHeight, powerUp } = this.gamesInMemory[body.gameId];
 
     const position =
       this.gamesInMemory[body.gameId].playerOne.user.id == userId ? 0 : 1;
@@ -514,8 +518,13 @@ export class GameService {
       }
     }
     if (body.down) {
-      if (player.paddle.y > windowHeight - 100 - 10) {
-        player.paddle.y = windowHeight - 100;
+      let deltaPaddleSize = 100;
+      if (powerUp.powerUp == 'paddle') {
+        deltaPaddleSize = 200;
+      }
+
+      if (player.paddle.y > windowHeight - deltaPaddleSize - 10) {
+        player.paddle.y = windowHeight - deltaPaddleSize;
       } else {
         player.paddle.y += movementfactor;
       }

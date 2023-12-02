@@ -41,4 +41,5 @@ export interface GameRoom {
   powerUpState: boolean;
   powerUp: PowerUp;
   status: GameStatus;
+  lastPlayer: Player | undefined;
 }
