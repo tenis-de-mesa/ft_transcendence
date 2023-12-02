@@ -188,14 +188,9 @@ export class UsersService {
       return null;
     }
 
-    const [block, _blockedUser, _blockedBy] = await Promise.all([
-      await this.blockListRepository.findOne({
-        where: { blockedById, blockedUserId },
-      }),
-
-      await this.getUserById(blockedUserId),
-      await this.getUserById(blockedById),
-    ]);
+    const block = await this.blockListRepository.findOne({
+      where: { blockedById, blockedUserId },
+    });
 
     if (!block) {
       return null;
