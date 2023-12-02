@@ -10,3 +10,4 @@ export * from "./loadAllChats";
 export * from "./generateTFASecret";
 export * from "./loadGame";
 export * from "./loadGames";
+export * from "./loadNewChat";
