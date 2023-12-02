@@ -142,7 +142,7 @@ const router = createBrowserRouter(
             />
           </Route>
           <Route
-            path="profile/:id"
+            path="profile/:userId"
             element={<Profile />}
             loader={loadUserById}
           />
