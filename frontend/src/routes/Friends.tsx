@@ -5,7 +5,7 @@ import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Data } from "../data/tableData";
 import { Typography } from "../components/Typography";
-import { InviteGameButton } from "../components";
+import { Button, InviteGameButton } from "../components";
 import { ChatButton } from "../components";
 
 const columnHelper = createColumnHelper<User>();
@@ -47,14 +47,29 @@ export default function Friends() {
 
   return (
     <>
-      <Typography variant="h5" className="mb-6">
-        Friends
-      </Typography>
-
-      <Table
-        columns={columns as unknown as ColumnDef<Data>[]}
-        data={data as unknown as Data[]}
-      />
+      {/* Don't show the table if there is no data */}
+      {data.length === 0 ? (
+        <div className="grid align-center content-center justify-center h-full">
+          <Typography variant="lg" className="text-center">
+            You don't have any friends added yet.
+          </Typography>
+          <Link to="/users" className="text-center p-3">
+            <Button variant={"info"} size="lg" className="inline">
+              Check the users list
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <>
+          <Typography variant="h5" className="mb-6">
+            Friends
+          </Typography>
+          <Table
+            columns={columns as unknown as ColumnDef<unknown>[]}
+            data={data as unknown as Data[]}
+          />
+        </>
+      )}
     </>
   );
 }
