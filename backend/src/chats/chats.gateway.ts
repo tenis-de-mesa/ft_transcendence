@@ -7,7 +7,6 @@ import {
   WsException,
   ConnectedSocket,
   OnGatewayConnection,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
@@ -31,9 +30,7 @@ interface NewChatMessage {
   },
   cookie: true,
 })
-export class ChatsGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatsGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
@@ -61,8 +58,6 @@ export class ChatsGateway
       client.join(`user:${user.id}`);
     }
   }
-
-  handleDisconnect(client: Socket) {}
 
   @SubscribeMessage('sendChatMessage')
   async handleEvent(
