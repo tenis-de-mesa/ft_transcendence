@@ -113,11 +113,11 @@ export default function ChatMemberList({
   }, []);
 
   return (
-    <Card className="w-1/3">
+    <Card className="w-1/3 overflow-hidden">
       <Card.Title>
         <Typography variant="h6">Members - {users?.length}</Typography>
       </Card.Title>
-      <Card.Body>
+      <Card.Body className="h-full overflow-y-auto">
         <div className="flex flex-col">
           {users?.map((user) => (
             <div

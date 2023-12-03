@@ -2,7 +2,7 @@ import { makeRequest } from "../api";
 import { User } from "../types";
 
 export async function loadFriendsList() {
-  const { data, error } = await makeRequest<User[]>(`/chats`, {
+  const { data, error } = await makeRequest<User[]>(`/users/friends`, {
     method: "GET",
   });
 

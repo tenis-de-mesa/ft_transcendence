@@ -95,7 +95,7 @@ export default function NewChannelCard() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <div className="my-3 overflow-y-auto min-h-[15rem]">
+            <div className="my-3 overflow-y-auto h-[14rem] ">
               {filteredUsers.length >= 1 ? (
                 <ul className="flex flex-col items-start">
                   {filteredUsers.map((user) => {
