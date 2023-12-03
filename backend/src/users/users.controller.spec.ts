@@ -6,6 +6,7 @@ import { UsersController } from './users.controller';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
 import { BlockListEntity } from '../core/entities/blockList.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 const usersEntityList: UserEntity[] = [
   new UserEntity({
@@ -56,6 +57,12 @@ describe('UsersController', () => {
           provide: getRepositoryToken(BlockListEntity),
           useValue: {
             save: jest.fn(),
+          },
+        },
+        {
+          provide: EventEmitter2,
+          useValue: {
+            emit: jest.fn(),
           },
         },
       ],

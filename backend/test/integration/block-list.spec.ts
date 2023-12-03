@@ -7,6 +7,7 @@ import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { StatusGateway } from '../../src/users/status/status.gateway';
 import { StatusModule } from '../../src/users/status/status.module';
 import { SessionsService } from '../../src/users/sessions/sessions.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('User Status', () => {
   let app: INestApplication;
@@ -16,7 +17,12 @@ describe('User Status', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmConfigModule, UsersModule, StatusModule],
+      imports: [
+        EventEmitterModule.forRoot(),
+        TypeOrmConfigModule,
+        UsersModule,
+        StatusModule,
+      ],
     }).compile();
     app = moduleFixture.createNestApplication();
     usersService = app.get(UsersService);

@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useContext } from "react";
+import { Link, useFetcher } from "react-router-dom";
 import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 import { FiX } from "react-icons/fi";
 import { User } from "../../types";
 import { AuthContext, ChatContext } from "../../contexts";
-import { blockUser, unblockUser } from "../../actions/blockUser";
 import { Avatar, Button, Card, Typography } from "../../components";
 
 type ChatProfileCardProps = {
@@ -12,21 +11,28 @@ type ChatProfileCardProps = {
 };
 
 export default function ChatProfileCard({ user }: ChatProfileCardProps) {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const { closeCard } = useContext(ChatContext);
-
-  // TODO: Auto update blocked users to display proper buttons
+  const { Form } = useFetcher();
 
   const checkUserIsBlocked = (userBlockedId: number) => {
     return currentUser.blockedUsers.includes(userBlockedId);
   };
 
-  const handleUserBlock = () => {
-    blockUser(user?.id);
-  };
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const intent = e.target[0].value;
 
-  const handleUserUnblock = () => {
-    unblockUser(user?.id);
+    if (intent === "block") {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: [...prev.blockedUsers, user.id],
+      }));
+    } else {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: prev.blockedUsers.filter((id) => id !== user.id),
+      }));
+    }
   };
 
   return (
@@ -52,25 +58,31 @@ export default function ChatProfileCard({ user }: ChatProfileCardProps) {
           </Typography>
 
           <div className="flex gap-1 flex-1 justify-end">
-            {!user.deletedAt &&
-              currentUser.id !== user?.id &&
-              (checkUserIsBlocked(user?.id) ? (
-                <Button
-                  size="md"
-                  variant="success"
-                  title="Unblock"
-                  IconOnly={<LiaUserSolid />}
-                  onClick={handleUserUnblock}
-                />
-              ) : (
-                <Button
-                  size="md"
-                  variant="error"
-                  title="Block"
-                  IconOnly={<LiaUserSlashSolid />}
-                  onClick={handleUserBlock}
-                />
-              ))}
+            <Form method="POST" onSubmit={handleSubmit}>
+              {!user.deletedAt &&
+                currentUser.id !== user?.id &&
+                (checkUserIsBlocked(user?.id) ? (
+                  <Button
+                    size="md"
+                    variant="success"
+                    title="Unblock"
+                    name="intent"
+                    value="unblock"
+                    IconOnly={<LiaUserSolid />}
+                    formAction={`/users/${user?.id}/unblock`}
+                  />
+                ) : (
+                  <Button
+                    size="md"
+                    variant="error"
+                    title="Block"
+                    name="intent"
+                    value="block"
+                    IconOnly={<LiaUserSlashSolid />}
+                    formAction={`/users/${user?.id}/block`}
+                  />
+                ))}
+            </Form>
 
             <Button
               IconOnly={<FiX />}

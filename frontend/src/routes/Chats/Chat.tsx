@@ -14,7 +14,7 @@ import ChatSettingsCard from "./ChatSettingsCard";
 export default function Chat() {
   const chat = useLoaderData() as Chat;
   const { currentUser } = useContext(AuthContext);
-  const { setCurrentChat, userStatus, setShowCard } = useContext(ChatContext);
+  const { setCurrentChat, setShowCard } = useContext(ChatContext);
   const navigate = useNavigate();
 
   useEffect(() => setCurrentChat(chat), [chat, setCurrentChat]);
@@ -30,15 +30,6 @@ export default function Chat() {
       socket.emit("leaveChat", chat.id);
     };
   }, [chat, currentUser?.id, navigate]);
-
-  const members = chat.users.map((user) => user.userId);
-
-  const isBlockedForOthers =
-    currentUser.blockedBy.find((user) => members.includes(user)) !== undefined;
-
-  const isBlockedByMe =
-    currentUser.blockedUsers.find((user) => members.includes(user)) !==
-    undefined;
 
   return (
     <div className="flex h-full gap-3">
@@ -67,13 +58,7 @@ export default function Chat() {
         </Card.Title>
         <Card.Body position="left" className="pt-0 h-5/6">
           <ChatMessages />
-
-          <ChatMessageInput
-            disabled={
-              userStatus === "muted" ||
-              ((isBlockedByMe || isBlockedForOthers) && chat.type === "direct")
-            }
-          />
+          <ChatMessageInput />
         </Card.Body>
       </Card>
 

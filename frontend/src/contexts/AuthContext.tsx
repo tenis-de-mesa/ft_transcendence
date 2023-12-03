@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { User } from "../types";
+import { socket } from "../socket";
 
 type AuthContextType = {
   currentUser: User;
@@ -26,8 +27,14 @@ export const AuthContextProvider = ({ children }) => {
       setIsLoading(false);
     };
 
-    fetchUser();
-  }, []);
+    if (currentUser == null) {
+      fetchUser();
+    }
+
+    socket.on("currentUserData", (user: User) => {
+      setCurrentUser(user);
+    });
+  }, [currentUser]);
 
   if (isLoading) {
     return null;

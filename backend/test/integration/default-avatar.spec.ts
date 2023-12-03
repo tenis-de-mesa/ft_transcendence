@@ -5,6 +5,7 @@ import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
 import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('Default Avatar', () => {
   let app: INestApplication;
@@ -14,7 +15,7 @@ describe('Default Avatar', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmConfigModule, UsersModule],
+      imports: [EventEmitterModule.forRoot(), TypeOrmConfigModule, UsersModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

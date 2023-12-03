@@ -1,7 +1,8 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import { useFetcher, useParams } from "react-router-dom";
 import { Input } from "../../components";
-import { socket } from "../../socket";
+import { AuthContext, ChatContext } from "../../contexts";
+import { useWebSocket } from "../../hooks";
 
 interface ChatMessageInputProps
   extends React.DetailedHTMLProps<
@@ -9,11 +10,23 @@ interface ChatMessageInputProps
     HTMLInputElement
   > {}
 
+interface Block {
+  isBlocked: boolean;
+  message: string;
+}
+
 export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
+  const socket = useWebSocket();
   const params = useParams();
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
+  const { currentUser } = useContext(AuthContext);
+  const { currentChat, userStatus } = useContext(ChatContext);
   const [message, setMessage] = useState("");
+  const [blocked, setBlocked] = useState<Block>({
+    isBlocked: false,
+    message: "",
+  });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,13 +43,54 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
     });
   };
 
+  useEffect(() => {
+    if (currentChat?.type === "direct") {
+      const youBlockedUser =
+        currentUser?.blockedUsers.find(
+          (user) => currentChat?.users.find((u) => u.userId === user),
+        ) !== undefined;
+
+      if (youBlockedUser) {
+        return setBlocked({
+          isBlocked: true,
+          message: "You blocked this user",
+        });
+      }
+
+      const userBlockedYou =
+        currentUser?.blockedBy.find(
+          (user) => currentChat?.users.find((u) => u.userId === user),
+        ) !== undefined;
+
+      if (userBlockedYou) {
+        return setBlocked({
+          isBlocked: true,
+          message: "You are blocked by this user",
+        });
+      }
+    } else if (currentChat?.type === "channel") {
+      if (userStatus === "muted") {
+        return setBlocked({
+          isBlocked: true,
+          message: "You are currently muted in this channel",
+        });
+      }
+    }
+
+    return setBlocked({
+      isBlocked: false,
+      message: "",
+    });
+  }, [userStatus, currentChat, currentUser]);
+
   return (
     <Form method="POST" onSubmit={handleSubmit}>
       <Input
         {...props}
         type="text"
         value={message}
-        placeholder="Enter your message"
+        disabled={blocked.isBlocked}
+        placeholder={blocked.isBlocked ? blocked.message : "Enter your message"}
         onChange={(e) => setMessage(e.target.value)}
       />
     </Form>

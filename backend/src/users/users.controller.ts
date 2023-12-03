@@ -38,18 +38,8 @@ export class UsersController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('me')
-  async getMe(@User() user: UserEntity) {
-    let blockedBy = [];
-    let blockedUsers = [];
-    if (user?.id) {
-      const [_blockedUsers, _blockedBy] = await Promise.all([
-        await this.usersService.getBlockedUsers(user.id),
-        await this.usersService.getUsersWhoBlockedMe(user.id),
-      ]);
-      blockedBy = _blockedBy;
-      blockedUsers = _blockedUsers;
-    }
-    return { ...user, blockedBy, blockedUsers };
+  async getMe(@User('id') userId: number) {
+    return this.usersService.getUserData(userId);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -86,21 +76,21 @@ export class UsersController {
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('block/:id')
+  @Post(':blockUserId/block')
   async blockUser(
-    @User() user: UserEntity,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return await this.usersService.blockUserById(user.id, id);
+    @User('id') userId: number,
+    @Param('blockUserId', ParseIntPipe) blockUserId: number,
+  ): Promise<void> {
+    await this.usersService.blockUserById(userId, blockUserId);
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('unblock/:id')
+  @Post(':unblockUserId/unblock')
   async unblockUser(
-    @User() user: UserEntity,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return await this.usersService.unblockUserById(user.id, id);
+    @User('id') userId: number,
+    @Param('unblockUserId', ParseIntPipe) unblockUserId: number,
+  ): Promise<void> {
+    await this.usersService.unblockUserById(userId, unblockUserId);
   }
 
   @UseGuards(AuthenticatedGuard)
