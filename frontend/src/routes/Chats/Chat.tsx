@@ -10,6 +10,7 @@ import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
 import ChatMessageInput from "./ChatMessageInput";
 import ChatSettingsCard from "./ChatSettingsCard";
+import classNames from "classnames";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
@@ -33,7 +34,7 @@ export default function Chat() {
 
   return (
     <div className="flex h-full gap-3">
-      <Card className="w-full h-full">
+      <Card className={chat.type === "channel" ? "max-w-4xl" : "max-w-7xl"}>
         <Card.Title
           hr={false}
           className="relative px-4 min-h-[60px] shadow-[0px_10px_5px_-5px] shadow-gray-900/50"

@@ -47,7 +47,7 @@ export default function ChatMessages() {
       lastMessage.sender.id !== currentMessage.sender.id;
 
     return (
-      <div key={message.id}>
+      <div key={message.id} className="pr-14">
         {showHeader && (
           <div className="flex gap-4 mt-5">
             <Avatar
