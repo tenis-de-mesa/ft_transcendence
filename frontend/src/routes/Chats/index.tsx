@@ -24,6 +24,12 @@ export default function Chats() {
       }
     });
 
+    socket.on("newChat", (chat: Chat) => {
+      if (!chatList.find((c) => c.id === chat.id)) {
+        setChatList([...chatList, chat]);
+      }
+    });
+
     socket.on("userBanned", (id: number) => {
       if (id === currentUser?.id) {
         setChatList(chatList.filter((chat) => chat.id !== currentChat?.id));

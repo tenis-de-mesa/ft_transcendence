@@ -11,6 +11,7 @@ import { UserEntity } from '../core/entities';
 import * as cookie from 'cookie';
 import { UsersService } from '../users/users.service';
 import { OnEvent } from '@nestjs/event-emitter';
+import { ChatWithName } from '../chats/dto';
 
 @WebSocketGateway({
   cors: {
@@ -62,5 +63,10 @@ export class UsersGateway implements OnGatewayInit, OnGatewayConnection {
   async handleUsersUpdateEvent(userId: number) {
     const data = await this.userService.getUserData(userId);
     this.server.to(`user:${userId}`).emit('currentUserData', data);
+  }
+
+  @OnEvent('users.newChat')
+  async handleNewChat(userId: number, chat: ChatWithName) {
+    this.server.to(`user:${userId}`).emit('newChat', chat);
   }
 }
