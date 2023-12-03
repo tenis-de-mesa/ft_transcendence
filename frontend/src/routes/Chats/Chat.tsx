@@ -10,7 +10,6 @@ import ChatMessages from "./ChatMessages";
 import ChatMemberList from "./ChatMemberList";
 import ChatMessageInput from "./ChatMessageInput";
 import ChatSettingsCard from "./ChatSettingsCard";
-import classNames from "classnames";
 
 export default function Chat() {
   const chat = useLoaderData() as Chat;
