@@ -47,9 +47,7 @@ export default function Friends() {
 
   return (
     <>
-      <Typography variant="h5">
-        Friends
-      </Typography>
+      <Typography variant="h5">Friends</Typography>
 
       {data.length === 0 ? (
         <div className="grid align-center content-center justify-center h-full">

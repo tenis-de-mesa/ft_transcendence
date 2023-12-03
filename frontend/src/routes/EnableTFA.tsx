@@ -62,7 +62,11 @@ const EnableTFA = () => {
                 required={true}
               />
               <div className="flex justify-center mt-4">
-                <Button variant="primary" type="submit" className="flex justify-center w-full mb-3">
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="flex justify-center w-full mb-3"
+                >
                   Enable
                 </Button>
               </div>

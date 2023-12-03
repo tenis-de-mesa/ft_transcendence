@@ -11,9 +11,7 @@ const Settings = () => {
 
   return (
     <div>
-      <Typography variant="h5">
-        Settings
-      </Typography>
+      <Typography variant="h5">Settings</Typography>
 
       <StateAlerts />
 
@@ -21,7 +19,9 @@ const Settings = () => {
         <Card className="w-2/6">
           <Card.Title>
             <div className="flex items-baseline justify-between">
-              <Typography variant="h6">Two Factor Authentication (2FA)</Typography>
+              <Typography variant="h6">
+                Two Factor Authentication (2FA)
+              </Typography>
               {tfaEnabled ? (
                 <Typography variant="md">
                   <span className="text-success-500 ">ENABLED</span>
@@ -42,14 +42,22 @@ const Settings = () => {
                   </Button>
                 </Link>
                 <Link to="/tfa/regenerate-codes">
-                  <Button variant="info" size="sm" className="flex justify-center w-full mb-3">
+                  <Button
+                    variant="info"
+                    size="sm"
+                    className="flex justify-center w-full mb-3"
+                  >
                     Reset recovery codes
                   </Button>
                 </Link>
               </div>
             ) : (
               <Link to="/tfa/enable">
-                <Button variant="info" size="sm" className="flex justify-center w-full mb-3">
+                <Button
+                  variant="info"
+                  size="sm"
+                  className="flex justify-center w-full mb-3"
+                >
                   Enable
                 </Button>
               </Link>

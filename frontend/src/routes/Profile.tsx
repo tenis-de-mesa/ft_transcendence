@@ -104,7 +104,11 @@ export default function Profile() {
             </Card.Title>
             <Card.Body>
               <>
-                <Typography customWeight="regular" variant="h4" className="mb-5">
+                <Typography
+                  customWeight="regular"
+                  variant="h4"
+                  className="mb-5"
+                >
                   {currentUser.nickname}
                 </Typography>
                 <Typography customWeight="regular" variant="md">
@@ -138,18 +142,27 @@ export default function Profile() {
             </Card.Body>
           </Card>
           <Card className="card back">
-            <div onClick={flipCard} className="absolute top-1 right-1 p-2 shadow-none cursor-pointer text-white">
+            <div
+              onClick={flipCard}
+              className="absolute top-1 right-1 p-2 shadow-none cursor-pointer text-white"
+            >
               <IoChevronBackOutline size={20} />
             </div>
             <Card.Title>
               <UserUpdateAvatar user={profileUser} />
             </Card.Title>
             <Card.Body position="left">
-              <Typography customWeight="regular" variant="h4" className="flex justify-center mb-5">
+              <Typography
+                customWeight="regular"
+                variant="h4"
+                className="flex justify-center mb-5"
+              >
                 {currentUser.nickname}
               </Typography>
               {error && (
-                <Alert severity="error">Nickname can't be longer than 16 characters</Alert>
+                <Alert severity="error">
+                  Nickname can't be longer than 16 characters
+                </Alert>
               )}
               <Form>
                 <Input
@@ -176,7 +189,7 @@ export default function Profile() {
         </div>
       </div>
       <div className="max-w-md">
-        {games.length > 0 && (
+        {(games.length > 0 && (
           <>
             <Typography variant="xl" className="text-center">
               Match history
@@ -187,7 +200,7 @@ export default function Profile() {
               pageSize={4}
             />
           </>
-        ) || 
+        )) || (
           <>
             <div className="grid align-center content-center justify-center">
               <Typography variant="lg" className="text-center">
@@ -200,7 +213,7 @@ export default function Profile() {
               </Link>
             </div>
           </>
-        }
+        )}
       </div>
     </div>
   );

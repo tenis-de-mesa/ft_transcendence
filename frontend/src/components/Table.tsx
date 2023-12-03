@@ -99,9 +99,9 @@ const Table = ({ columns, data, sortBy, pageSize = 9 }: TableProps) => {
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
-          </tr>
-        ))}
-      </tbody>
+            </tr>
+          ))}
+        </tbody>
       </table>
 
       <Pagination table={table} />
