@@ -4,7 +4,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { Chat } from "../../types";
 
 import Table from "../../components/Table";
-import { Typography } from "../../components";
+import { Button, Typography } from "../../components";
 import { Data } from "../../data";
 import { AuthContext } from "../../contexts";
 
@@ -98,19 +98,33 @@ export default function Channels() {
         },
       }),
     ],
-    [currentUser?.id],
+    [currentUser?.id]
   );
 
   return (
     <>
-      <Typography variant="h5">Channels</Typography>
-      <div className="mt-6">
-        <Table
-          columns={columns as unknown as ColumnDef<Data>[]}
-          data={channels as unknown as Data[]}
-          sortBy="id"
-        />
-      </div>
+      {channels.length === 0 ? (
+        <div className="grid align-center content-center justify-center h-full">
+          <Typography variant="lg" className="text-center">
+            There are no channels yet.
+          </Typography>
+          <Link to="/chats" className="text-center p-3">
+            <Button variant={"info"} size="lg" className="inline">
+              Go to chat
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <>
+          <Typography variant="h5" className="mb-6">
+            Leaderboard
+          </Typography>
+          <Table
+            columns={columns as unknown as ColumnDef<unknown>[]}
+            data={channels}
+          />
+        </>
+      )}
     </>
   );
 }
