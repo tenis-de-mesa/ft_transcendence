@@ -33,7 +33,7 @@ export default function Chat() {
 
   return (
     <div className="flex h-full gap-3">
-      <Card className={chat.type === "channel" ? "max-w-4xl" : "max-w-7xl"}>
+      <Card className={chat.type === "channel" ? "max-w-4xl min-w-[70%]" : "max-w-7xl min-w-[90%]"}>
         <Card.Title
           hr={false}
           className="relative px-4 min-h-[60px] shadow-[0px_10px_5px_-5px] shadow-gray-900/50"

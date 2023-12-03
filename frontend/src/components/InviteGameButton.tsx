@@ -16,11 +16,11 @@ export function InviteGameButton({ user }: { user: User }) {
 
   return (
     <Button
-      variant="info"
+      variant="error"
       size="sm"
       onClick={() => socket.emit("invitePlayerToGame", user.id)}
     >
-      Play
+      Invite to play
     </Button>
   );
 }

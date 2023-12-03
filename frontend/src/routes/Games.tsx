@@ -11,11 +11,13 @@ const Games = () => {
 
   const columns = [
     columnHelper.accessor("id", {
-      header: "#",
+      header: "Game ID",
       cell: (info) => {
         return (
           <Link to={`/games/${info.getValue()}`} className="flex space-x-1">
-            {info.getValue()}
+            <Typography variant="sm" customWeight="bold">
+              {info.getValue()}
+            </Typography>
           </Link>
         );
       },
@@ -65,7 +67,7 @@ const Games = () => {
       ) : (
         <>
           <Typography variant="h5" className="mb-6">
-            Leaderboard
+            Global game history
           </Typography>
           <Table
             columns={columns as unknown as ColumnDef<unknown>[]}

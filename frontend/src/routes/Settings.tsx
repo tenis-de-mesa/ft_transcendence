@@ -10,47 +10,53 @@ const Settings = () => {
   const tfaEnabled = currentUser.tfaEnabled;
 
   return (
-    <div className="max-w-xl">
-      <Typography variant="h4" className="mb-10">
+    <div>
+      <Typography variant="h5">
         Settings
       </Typography>
 
       <StateAlerts />
 
-      <Card>
-        <Card.Title>
-          <div className="flex items-center justify-between">
-            <Typography variant="h6">Two Factor Authentication</Typography>
-            {tfaEnabled ? (
-              <span className="text-success-500 ">enabled</span>
-            ) : (
-              <span className="text-error-500 ">disabled</span>
-            )}
-          </div>
-        </Card.Title>
-        <Card.Body position="center">
-          {tfaEnabled ? (
-            <div className="flex justify-center gap-2">
-              <Link to="/tfa/disable">
-                <Button variant="info" size="sm">
-                  Disable
-                </Button>
-              </Link>
-              <Link to="/tfa/regenerate-codes">
-                <Button variant="info" size="sm">
-                  Reset recovery codes
-                </Button>
-              </Link>
+      <div className="center">
+        <Card className="w-2/6">
+          <Card.Title>
+            <div className="flex items-baseline justify-between">
+              <Typography variant="h6">Two Factor Authentication (2FA)</Typography>
+              {tfaEnabled ? (
+                <Typography variant="md">
+                  <span className="text-success-500 ">ENABLED</span>
+                </Typography>
+              ) : (
+                <Typography variant="md">
+                  <span className="text-error-500 ">DISABLED</span>
+                </Typography>
+              )}
             </div>
-          ) : (
-            <Link to="/tfa/enable" className="inline-block">
-              <Button variant="info" size="sm">
-                Enable
-              </Button>
-            </Link>
-          )}
-        </Card.Body>
-      </Card>
+          </Card.Title>
+          <Card.Body position="center">
+            {tfaEnabled ? (
+              <div className="flex justify-center gap-2">
+                <Link to="/tfa/disable">
+                  <Button variant="info" size="sm">
+                    Disable
+                  </Button>
+                </Link>
+                <Link to="/tfa/regenerate-codes">
+                  <Button variant="info" size="sm" className="flex justify-center w-full mb-3">
+                    Reset recovery codes
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <Link to="/tfa/enable">
+                <Button variant="info" size="sm" className="flex justify-center w-full mb-3">
+                  Enable
+                </Button>
+              </Link>
+            )}
+          </Card.Body>
+        </Card>
+      </div>
     </div>
   );
 };

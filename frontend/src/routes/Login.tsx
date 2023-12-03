@@ -14,12 +14,12 @@ export default function Login() {
       })}
     >
       <div className={classNames("center", "bg-white dark:bg-gray-700")}>
-        <Card className="bg-gray-100 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800">
+        <Card className="bg-gray-100 dark:border-gray-600 dark:bg-gray-800">
           <Card.Title>
             <Typography variant="h6">Transcendence</Typography>
           </Card.Title>
           <Card.Body className="flex flex-col gap-2 pt-0 pb-6">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 pt-4">
               <Link to={"/login/intra"}>
                 <Button
                   variant="info"
