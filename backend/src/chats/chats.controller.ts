@@ -74,7 +74,16 @@ export class ChatsController {
     @Body() dto: CreateChatDto,
     @User() user: UserEntity,
   ): Promise<ChatEntity> {
-    return await this.chatsService.create(dto, user);
+    const chat = await this.chatsService.create(dto, user);
+    const chatWithUsers = await this.chatsService.findOne(chat.id);
+    chatWithUsers.users.forEach((member) => {
+      const [chatWithName] = this.chatsService.mapChatsToChatsWithName(
+        [chatWithUsers],
+        member.user,
+      );
+      this.eventEmitter.emit('users.newChat', member.userId, chatWithName);
+    });
+    return chat;
   }
 
   @Patch(':id')
