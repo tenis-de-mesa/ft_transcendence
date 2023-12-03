@@ -32,7 +32,6 @@ export const AuthContextProvider = ({ children }) => {
     }
 
     socket.on("currentUserData", (user: User) => {
-      console.log("currentUserData", user);
       setCurrentUser(user);
     });
   }, [currentUser]);
