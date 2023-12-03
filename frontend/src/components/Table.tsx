@@ -14,7 +14,6 @@ import {
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import classNames from "classnames";
-import { Typography } from ".";
 
 export interface TableProps {
   columns: ColumnDef<unknown>[];
