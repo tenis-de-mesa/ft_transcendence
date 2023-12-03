@@ -47,7 +47,9 @@ export default function Chats() {
                     to={`/chats/${chat.id}`}
                     state={{ id: chat.id }}
                   >
-                    <Typography variant="sm">{chat.name}</Typography>
+                    <Typography variant="sm" className="truncate">
+                      {chat.name}
+                    </Typography>
                   </NavLink>
                 ))}
               </div>
