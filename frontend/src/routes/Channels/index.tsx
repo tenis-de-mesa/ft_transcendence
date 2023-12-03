@@ -5,7 +5,6 @@ import { Chat } from "../../types";
 
 import Table from "../../components/Table";
 import { Button, Typography } from "../../components";
-import { Data } from "../../data";
 import { AuthContext } from "../../contexts";
 
 import ActionChannelButton from "./ActionChannelButton";
