@@ -519,7 +519,7 @@ export class GameService {
     }
     if (body.down) {
       let deltaPaddleSize = 100;
-      if (powerUp.powerUp == 'paddle') {
+      if (powerUp?.powerUp == 'paddle') {
         deltaPaddleSize = 200;
       }
 

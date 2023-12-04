@@ -1,8 +1,7 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
-import { useFetcher, useParams } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 import { Input } from "../../components";
 import { AuthContext, ChatContext } from "../../contexts";
-import { useWebSocket } from "../../hooks";
 
 interface ChatMessageInputProps
   extends React.DetailedHTMLProps<
@@ -16,8 +15,6 @@ interface Block {
 }
 
 export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
-  const socket = useWebSocket();
-  const params = useParams();
   // TODO: retrieve errors from action
   const { Form } = useFetcher();
   const { currentUser } = useContext(AuthContext);
@@ -29,18 +26,12 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
   });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setMessage("");
-
     const newMessage = message.trim();
-    if (!newMessage.length) {
-      return;
-    }
 
-    socket.emit("sendChatMessage", {
-      message: newMessage,
-      chatId: params.id!,
-    });
+    setMessage("");
+    if (!newMessage.length) {
+      return e.preventDefault();
+    }
   };
 
   useEffect(() => {
@@ -88,6 +79,7 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
       <Input
         {...props}
         type="text"
+        name="message"
         value={message}
         disabled={blocked.isBlocked}
         placeholder={blocked.isBlocked ? blocked.message : "Enter your message"}

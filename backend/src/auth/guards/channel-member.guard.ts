@@ -17,7 +17,6 @@ export class ChannelMemberGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-
     const userId = Number(request.user?.id);
     const chatId = Number(request.params?.id);
 
@@ -31,6 +30,10 @@ export class ChannelMemberGuard implements CanActivate {
 
     if (!member) {
       throw new UnauthorizedException('User is not a member of this chat');
+    }
+
+    if (member.status === 'banned') {
+      throw new UnauthorizedException('User is banned from this chat');
     }
 
     return true;

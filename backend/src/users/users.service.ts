@@ -147,7 +147,7 @@ export class UsersService {
 
     const deleted = await this.userRepository.softRemove(user);
 
-    /* FIXME: This is a workaround!
+    /* This is a workaround!
      * Currently, doing what TypeORM describes in its documentation doesn't
      * seem to work. Even though the @BeforeSoftRemove hook is triggered,
      * the entity isn't properly updated in the database. However, it is
