@@ -30,6 +30,7 @@ export default function ChatNew() {
                 type="text"
                 name="message"
                 value={message}
+                autoComplete="off"
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Enter your message"
               />
