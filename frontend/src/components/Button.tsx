@@ -97,6 +97,7 @@ export const Button: FC<ButtonProps> = ({
         [classNames(ButtonVariantClassName.disabled, "cursor-not-allowed")]:
           disabled,
       })}
+      disabled={disabled}
     >
       {LeadingIcon ? (
         <LeadingIcon.type

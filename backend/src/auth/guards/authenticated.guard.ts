@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from '../../core/entities';
+import { UserEntity } from '../../core/entities';
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
@@ -14,11 +14,11 @@ export class AuthenticatedGuard implements CanActivate {
       throw new UnauthorizedException('User is not logged in');
     }
 
-    if (request.url.includes('tfa/authenticate')) {
+    if (request.url.match(/\/auth\/tfa\/(authenticate|recover)/)) {
       return true;
     }
 
-    const user = request.user as User;
+    const user = request.user as UserEntity;
     if (user.tfaEnabled && !request.session.tfaAuthenticated) {
       throw new UnauthorizedException('User is not authenticated with 2FA');
     }

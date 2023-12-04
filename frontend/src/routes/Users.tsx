@@ -1,45 +1,52 @@
-import { Form, useLoaderData } from "react-router-dom";
-import { socket } from "../socket";
-import { useEffect, useState } from "react";
-import { User, UserStatus } from "../types/types";
+import { Link, useLoaderData } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { User } from "../types";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { Typography } from "../components/Typography";
+import Table from "../components/Table";
+import { AddFriendButton, ChatButton, InviteGameButton } from "../components";
+import { UserWithStatus } from "../components/UserWithStatus";
+
+const columnHelper = createColumnHelper<User>();
 
 export default function Users() {
-  const initialUsers: User[] = useLoaderData() as User[];
-  const [users, setUsers] = useState(initialUsers);
+  const loadedUsers: User[] = useLoaderData() as User[];
+  const [users, setUsers] = useState(loadedUsers);
 
-  useEffect(() => {
-    // Listen for user status updates from the server
-    socket.on("userStatus", (data: UserStatus) => {
-      // Update the status of the user in the local state
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => {
-          // If the user is the one whose status has been updated, change their status
-          if (user.id === data.id) {
-            return { ...user, status: data.status };
-          }
-          // Otherwise, return the user as is
-          return user;
-        }),
-      );
-    });
-  }, []);
+  useEffect(() => setUsers(loadedUsers), [loadedUsers]);
+
+  const columns = useMemo<ColumnDef<User>[]>(
+    () => [
+      columnHelper.accessor("nickname", {
+        header: "Name",
+        cell: (info) => (
+          <Link to={`/profile/${info.row.original.id}`}>
+            <UserWithStatus user={info.row.original} />
+          </Link>
+        ),
+      }),
+      columnHelper.accessor("id", {
+        header: "Actions",
+        cell: (info) => {
+          return (
+            <div className="flex space-x-1">
+              <ChatButton user={info.row.original} />
+              <AddFriendButton user={info.row.original} />
+              <InviteGameButton user={info.row.original} />
+            </div>
+          );
+        },
+      }),
+    ],
+    [],
+  );
 
   return (
-    <div>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <span>{user.login} </span>
-            <span style={{ color: user.status === "online" ? "green" : "red" }}>
-              {user.status}
-            </span>
-            <Form method="post" action="/chats">
-              <input type="hidden" name="user" value={user.id} />
-              <button type="submit">Chat</button>
-            </Form>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Typography variant="h5">Users</Typography>
+      <div className="mt-6">
+        <Table columns={columns as ColumnDef<unknown>[]} data={users} />
+      </div>
+    </>
   );
 }

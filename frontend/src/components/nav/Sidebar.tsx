@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect, useState } from "react";
-
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import { motion } from "framer-motion";
 
@@ -13,29 +12,30 @@ import { INavitem } from "../../@interfaces";
 import classNames from "classnames";
 import { LuLogOut } from "react-icons/lu";
 import { Navitem } from "./Navitem";
+import { Avatar } from "../Avatar";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { User } from "../../types";
 
 export interface ISidebarProps {
   options: INavitem[];
-  username: string;
-  email: string;
   darkMode?: boolean;
   className?: string;
+  user: User;
 }
 
 export const Sidebar: FC<ISidebarProps> = ({
   options,
-  username,
-  email,
   className,
   darkMode,
+  user,
 }) => {
   const isTab = useMediaQuery({ query: "(max-width: 786px)" });
   const isMob = useMediaQuery({ query: "(max-height: 420px)" });
 
-  const [isOpen, setIsOpen] = useState<boolean>(isTab ? false : true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeNavitem, setActiveNavitem] = useState<string>("");
-
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const SidebarAnimation = isTab
     ? {
@@ -70,14 +70,6 @@ export const Sidebar: FC<ISidebarProps> = ({
         },
       };
 
-  useEffect(() => {
-    if (isTab) {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
-    }
-  }, [isTab]);
-
   const closeMobileMenu = useCallback((isTab: boolean) => {
     isTab && setIsOpen(false);
   }, []);
@@ -87,7 +79,7 @@ export const Sidebar: FC<ISidebarProps> = ({
   }, [pathname, isTab, closeMobileMenu]);
 
   return (
-    <div>
+    <div className="h-screen">
       <div
         onClick={() => setIsOpen(false)}
         className={classNames(
@@ -107,16 +99,14 @@ export const Sidebar: FC<ISidebarProps> = ({
           "flex flex-col justify-between",
           "bg-white dark:bg-gray-800 text-gray-900",
           "shadow-xl",
-          "z-[999] w-[16rem] max-w-[16rem] h-screen overflow-hidden md:relative fixed",
+          "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 md:relative fixed",
           "border-r border-gray-100 dark:border-opacity-10",
           className,
         )}
-        onHoverStart={() => !isTab && setIsOpen(true)}
-        onHoverEnd={() => !isTab && setIsOpen(false)}
       >
         <div
           className={classNames(
-            "flex flex-row w-full py-3 mx-2 mb-8 transform ease-out duration-100",
+            "flex ml-3 py-2 mt-5 mb-4 transform ease-out duration-100",
             {
               "px-5": isOpen,
             },
@@ -124,20 +114,44 @@ export const Sidebar: FC<ISidebarProps> = ({
         >
           <img
             src={darkMode ? images.logoLight : images.logoDark}
-            width={45}
+            width={36}
             className="select-none"
           />
 
           <Typography
             variant="xl"
-            className={classNames("ml-2.5 whitespace-nowrap select-none", {
-              "opacity-0 transition ease-in-out delay-75": !isOpen,
-            })}
+            className={classNames(
+              "ml-2.5 whitespace-nowrap select-none",
+              "transition ease-in-out",
+              {
+                "opacity-100 delay-150": isOpen,
+                "opacity-0 delay-0": !isOpen,
+              },
+            )}
             customWeight="medium"
           >
             Transcendence
           </Typography>
         </div>
+
+        {!isTab && (
+          <div className="relative h-10">
+            <div
+              className={classNames(
+                "absolute top-0 flex items-center justify-center",
+                "w-8 h-8",
+                "bg-gray-800 rounded-full cursor-pointer -right-3",
+              )}
+              onClick={() => !isTab && setIsOpen(!isOpen)}
+            >
+              {isOpen ? (
+                <FaArrowLeft className="text-white" size={17} />
+              ) : (
+                <FaArrowRight className="text-white" size={17} />
+              )}
+            </div>
+          </div>
+        )}
 
         <div className={classNames("h-full")}>
           <ul
@@ -165,57 +179,71 @@ export const Sidebar: FC<ISidebarProps> = ({
             "h-screen": isMob,
           })}
         >
-          <img
-            src={images.demoAvatar}
-            className="w-10 h-10 rounded-full cursor-pointer select-none"
-          />
           {isOpen ? (
-            <div className="duration-100 ease-in transform">
-              <Typography
-                variant="sm"
-                customWeight="medium"
-                customColor="text-gray-700 dark:text-white"
-                className="transition ease-in delay-150 opacity-100"
-              >
-                {username}
-              </Typography>
+            <div className="w-full duration-100 ease-in transform">
+              <Avatar
+                size="sm"
+                seed={user.login}
+                src={user.avatarUrl}
+                className="fixed w-0 h-0 transition duration-150 ease-out opacity-0 bottom-1"
+              />
+              <div className="flex items-center justify-between py-1">
+                <Typography
+                  variant="sm"
+                  customWeight="medium"
+                  customColor="text-gray-700 dark:text-white"
+                  className="transition ease-in delay-150 opacity-100"
+                >
+                  {user.nickname}
+                </Typography>
+                <LuLogOut
+                  size={20}
+                  className="text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer hover:text-primary-400"
+                  onClick={() => navigate("/logout", { replace: true })}
+                />
+              </div>
               <Typography
                 variant="xs"
                 customColor="text-gray-500 dark:text-gray-400"
                 className="transition ease-in delay-300 opacity-100 whitespace-nowrap"
               >
-                {email}
+                {user.email}
               </Typography>
-              <LuLogOut
-                size={20}
-                className="absolute top-0 text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer -right-1"
-              />
             </div>
           ) : (
             <div>
-              <Typography
-                variant="sm"
-                customWeight="medium"
-                customColor="text-gray-700 dark:text-white"
-                className="opacity-0"
-              >
-                {username}
-              </Typography>
+              <Avatar
+                size="sm"
+                seed={user.login}
+                src={user.avatarUrl}
+                className="fixed transition ease-in delay-300 opacity-100 cursor-pointer select-none bottom-4"
+              />
+              <div className="flex items-center justify-between">
+                <Typography
+                  variant="sm"
+                  customWeight="medium"
+                  customColor="text-gray-700 dark:text-white"
+                  className="opacity-0"
+                >
+                  {user.nickname}
+                </Typography>
+                <LuLogOut
+                  size={20}
+                  className="absolute top-0 right-0 opacity-0"
+                />
+              </div>
               <Typography
                 variant="xs"
                 customColor="text-gray-500"
                 className="opacity-0 whitespace-nowrap"
               >
-                {email}
+                {user.nickname}
               </Typography>
-              <LuLogOut
-                size={20}
-                className="absolute top-0 right-0 opacity-0"
-              />
             </div>
           )}
         </div>
       </motion.div>
+
       <div className="m-3 md:hidden" onClick={() => setIsOpen(true)}>
         <IoMdMenu size={25} className="text-gray-900 dark:text-white" />
       </div>

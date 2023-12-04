@@ -1,3 +1,4 @@
+import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Entity,
   Column,
@@ -5,10 +6,16 @@ import {
   JoinTable,
   OneToMany,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
+  BeforeSoftRemove,
 } from 'typeorm';
-import { ApiHideProperty } from '@nestjs/swagger';
-import { Session, FriendRequest } from '.';
-import { Chat } from './chat.entity';
+import {
+  SessionEntity,
+  FriendRequestEntity,
+  MessageEntity,
+  ChatMemberEntity,
+  BlockListEntity,
+} from '.';
 
 export enum AuthProvider {
   INTRA = 'intra',
@@ -18,10 +25,11 @@ export enum AuthProvider {
 export enum UserStatus {
   OFFLINE = 'offline',
   ONLINE = 'online',
+  IN_GAME = 'in_game',
 }
 
 @Entity({ name: 'users' })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -31,10 +39,19 @@ export class User {
   })
   intraId: number;
 
-  @Column({ unique: true })
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   login: string;
 
-  @Column({ unique: true })
+  @Column({
+    nullable: true,
+    unique: true,
+  })
   nickname: string;
 
   @Column({ nullable: true })
@@ -53,6 +70,15 @@ export class User {
   @Column({ nullable: true })
   tfaSecret: string;
 
+  @Column({ default: 0 })
+  winCount: number;
+
+  @Column({ default: 0 })
+  loseCount: number;
+
+  @Column({ default: 0 })
+  totalMatchPoints: number;
+
   @Column('varchar', {
     array: true,
     nullable: true,
@@ -66,40 +92,74 @@ export class User {
   })
   status: UserStatus;
 
-  @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
+  @OneToMany(() => SessionEntity, (session) => session.user)
+  sessions: SessionEntity[];
 
   @ApiHideProperty()
-  @ManyToMany(() => User)
+  @ManyToMany(() => UserEntity)
   @JoinTable({
     name: 'friends',
     joinColumn: {
-      name: 'user_id',
+      name: 'userId',
     },
     inverseJoinColumn: {
-      name: 'friend_id',
+      name: 'friendId',
     },
   })
-  friends: User[];
+  friends: UserEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.receiver)
-  friend_requests_received: FriendRequest[];
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friendRequest) => friendRequest.receiver,
+  )
+  friendRequestsReceived: FriendRequestEntity[];
 
   @ApiHideProperty()
-  @OneToMany(() => FriendRequest, (friend_request) => friend_request.sender)
-  friend_requests_sent: FriendRequest[];
+  @OneToMany(() => FriendRequestEntity, (friendRequest) => friendRequest.sender)
+  friendRequestsSent: FriendRequestEntity[];
 
+  @OneToMany(() => ChatMemberEntity, (member) => member.user)
+  chats: ChatMemberEntity[];
 
-  @ManyToMany(() => Chat, (chat) => chat.users)
-  @JoinTable()
-  chats: Chat[];
+  @OneToMany(() => MessageEntity, (message) => message.sender)
+  messages: MessageEntity[];
 
-  constructor(user?: User) {
+  @OneToMany(() => BlockListEntity, (block) => block.blockedUser)
+  blockedBy: BlockListEntity[];
+
+  @OneToMany(() => BlockListEntity, (block) => block.blockedBy)
+  blockedUsers: BlockListEntity[];
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
+
+  constructor(user?: Partial<UserEntity>) {
     this.id = user?.id;
+    this.intraId = user?.intraId;
     this.login = user?.login;
     this.nickname = user?.nickname;
-    this.intraId = user?.intraId;
+    this.avatarUrl = user?.avatarUrl;
     this.provider = user?.provider;
+    this.tfaEnabled = user?.tfaEnabled;
+    this.tfaSecret = user?.tfaSecret;
+    this.tfaRecoveryCodes = user?.tfaRecoveryCodes;
+    this.status = user?.status;
+    this.sessions = user?.sessions;
+    this.friends = user?.friends;
+    this.friendRequestsReceived = user?.friendRequestsReceived;
+    this.friendRequestsSent = user?.friendRequestsSent;
+    this.chats = user?.chats;
+    this.messages = user?.messages;
+    this.blockedBy = user?.blockedBy;
+    this.blockedUsers = user?.blockedUsers;
+    this.deletedAt = user?.deletedAt;
+  }
+
+  @BeforeSoftRemove()
+  beforeSoftRemove() {
+    this.login = null;
+    this.nickname = null;
+    this.intraId = null;
   }
 }

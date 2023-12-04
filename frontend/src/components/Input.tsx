@@ -1,25 +1,26 @@
-import React, { FC } from "react";
+import React, { FC, InputHTMLAttributes } from "react";
 import classNames from "classnames";
 import { Typography } from "./Typography";
 
-export interface InputProps {
+export interface InputProps
+  extends React.DetailedHTMLProps<
+    InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > {
   type: "text" | "email" | "password";
   value: string;
-  handleChange: (value: string) => void;
   label?: string;
   leadingText?: string;
   placeholder: string;
-  error?: string;
+  error?: string | boolean;
   helperText?: string;
   LeadingIcon?: React.ReactElement;
   TrailingIcon?: React.ReactElement;
-  disabled?: boolean;
 }
 
 export const Input: FC<InputProps> = ({
   type,
   value,
-  handleChange,
   label,
   leadingText,
   placeholder,
@@ -27,10 +28,10 @@ export const Input: FC<InputProps> = ({
   helperText,
   LeadingIcon,
   TrailingIcon,
-  disabled,
+  ...props
 }) => {
   return (
-    <>
+    <div>
       {label ? (
         <Typography
           as="label"
@@ -69,8 +70,8 @@ export const Input: FC<InputProps> = ({
             className={classNames(
               "flex items-center h-11 text-lg text-gray-500 pl-3.5 pr-3 border border-r-0 rounded-l-lg border-gray-300 dark:border-gray-500",
               {
-                "bg-gray-50 dark:bg-gray-700": disabled,
-                "dark:bg-gray-800": !disabled,
+                "bg-gray-50 dark:bg-gray-700": props.disabled,
+                "dark:bg-gray-800": !props.disabled,
               },
             )}
           >
@@ -79,13 +80,9 @@ export const Input: FC<InputProps> = ({
         ) : null}
 
         <input
+          {...props}
           type={type}
           value={value}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (!disabled) {
-              handleChange(event.target.value);
-            }
-          }}
           placeholder={placeholder}
           aria-label="input"
           className={classNames(
@@ -101,21 +98,20 @@ export const Input: FC<InputProps> = ({
                 !error,
               "border-error-400 focus:ring-2 focus:border-error-400 focus:ring-error-500":
                 error,
-              "bg-white dark:bg-gray-800": !disabled,
-              "bg-gray-50 dark:bg-gray-700": disabled,
+              "bg-white dark:bg-gray-800": !props.disabled,
+              "bg-gray-50 dark:bg-gray-700": props.disabled,
             },
           )}
-          disabled={disabled}
         />
       </div>
 
-      {error ? (
+      {error && typeof error === "string" ? (
         <div className="mt-1.5 text-error-500 text-sm">{error}</div>
       ) : null}
 
       {helperText ? (
         <div className="mt-1.5 text-gray-500 text-sm">{helperText}</div>
       ) : null}
-    </>
+    </div>
   );
 };

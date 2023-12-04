@@ -1,35 +1,70 @@
-import { Outlet, useLoaderData, useOutletContext } from "react-router-dom";
-import { User } from "../types/types";
+import classNames from "classnames";
+import { Outlet, useNavigate } from "react-router-dom";
+import { Sidebar } from "../components/nav/Sidebar";
+import { navitems as navitemsTemplate } from "../data";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../contexts";
+import { Toaster } from "sonner";
+import { useWebSocket } from "../hooks";
+import { toast } from "sonner";
+import { User } from "../types";
 
-import Login from "../components/Login";
-import Sidebar from "../components/Sidebar";
-import { useState } from "react";
-
-import "./Root.css";
+export const isDark = true;
 
 export default function Root() {
-  const user: User = useLoaderData() as User;
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { currentUser } = useContext(AuthContext);
 
-  if (!user) {
-    return <Login />;
-  }
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  // On the navitem with label profile, append the user id to the path
+  const navitems = navitemsTemplate.map((navitem) => {
+    if (navitem.label === "Profile") {
+      return { ...navitem, path: `${navitem.path}/${currentUser.id}` };
+    }
+    return navitem;
+  });
 
   return (
-    <div className={`container ${sidebarOpen ? "" : "closed"}`}>
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
-        ≡
-      </button>
-      <Sidebar user={user} sidebarOpen={sidebarOpen}></Sidebar>
-      <Outlet context={user} />
+    <div
+      className={classNames("w-screen h-screen", "overflow-hidden", {
+        dark: isDark,
+      })}
+    >
+      <div className="flex w-full h-full bg-white dark:bg-gray-700">
+        <div className="">
+          <Sidebar darkMode={isDark} options={navitems} user={currentUser} />
+        </div>
+        <div className="w-full h-full py-3 px-10 mt-2">
+          <Outlet />
+          <Toaster theme="dark" duration={6000} />
+          <SocketListener />
+        </div>
+      </div>
     </div>
   );
 }
 
-export function RootUser(): User {
-  return useOutletContext();
+function SocketListener() {
+  const socket = useWebSocket();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    socket.on("newGameInvite", (user: User) => {
+      toast(`${user.nickname} invited you to play a game`, {
+        action: {
+          label: "View invites",
+          onClick: () => navigate("/"),
+        },
+      });
+    });
+
+    socket.on("gameAvailable", (gameId) => {
+      navigate(`/games/${gameId}`);
+    });
+
+    return () => {
+      socket.off("newGameInvite");
+      socket.off("gameAvailable");
+    };
+  }, [socket, navigate]);
+
+  return null;
 }

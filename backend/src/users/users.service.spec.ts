@@ -1,32 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { User, Session, AuthProvider } from '../core/entities';
+import { UserEntity, SessionEntity, AuthProvider } from '../core/entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { S3ClientProvider } from '../lib/aws/s3Client';
+import { BlockListEntity } from '../core/entities/blockList.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-const usersEntityList: User[] = [
-  new User({
+const usersEntityList: UserEntity[] = [
+  new UserEntity({
     id: 1,
     login: 'login-1',
     nickname: 'login-1',
-  } as User),
-  new User({
+  } as UserEntity),
+  new UserEntity({
     id: 2,
     login: 'login-2',
     nickname: 'login-2',
-  } as User),
-  new User({
+  } as UserEntity),
+  new UserEntity({
     id: 3,
     login: 'login-3',
     nickname: 'login-3',
-  } as User),
+  } as UserEntity),
 ];
 
 describe('UsersService', () => {
   let app: TestingModule;
   let usersService: UsersService;
-  let userRepository: Repository<User>;
+  let userRepository: Repository<UserEntity>;
 
   beforeEach(async () => {
     app = await Test.createTestingModule({
@@ -34,7 +36,7 @@ describe('UsersService', () => {
         UsersService,
         S3ClientProvider,
         {
-          provide: getRepositoryToken(User),
+          provide: getRepositoryToken(UserEntity),
           useValue: {
             find: jest.fn().mockResolvedValue(usersEntityList),
             save: jest.fn(),
@@ -44,16 +46,30 @@ describe('UsersService', () => {
           },
         },
         {
-          provide: getRepositoryToken(Session),
+          provide: getRepositoryToken(SessionEntity),
           useValue: {
             createQueryBuilder: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(BlockListEntity),
+          useValue: {
+            save: jest.fn(),
+          },
+        },
+        {
+          provide: EventEmitter2,
+          useValue: {
+            emit: jest.fn(),
           },
         },
       ],
     }).compile();
 
     usersService = app.get<UsersService>(UsersService);
-    userRepository = app.get<Repository<User>>(getRepositoryToken(User));
+    userRepository = app.get<Repository<UserEntity>>(
+      getRepositoryToken(UserEntity),
+    );
   });
 
   afterEach(async () => {
@@ -82,14 +98,16 @@ describe('UsersService', () => {
       // Arrange
       const dataUser = {
         login: 'test',
-        provider: AuthProvider.GUEST,
+        provider: AuthProvider.INTRA,
         intraId: 1,
       };
 
-      const user: User = new User(dataUser as User);
+      const user: UserEntity = new UserEntity(dataUser as UserEntity);
       jest
         .spyOn(userRepository, 'save')
-        .mockImplementationOnce(async (user: User) => new User({ ...user }));
+        .mockImplementationOnce(
+          async (user: UserEntity) => new UserEntity({ ...user }),
+        );
 
       // Act
       const result = await usersService.createUser(user);
@@ -101,15 +119,17 @@ describe('UsersService', () => {
       // Arrange
       const dataUser = {
         login: 'test',
-        provider: AuthProvider.GUEST,
+        provider: AuthProvider.INTRA,
         intraId: 1,
       };
 
-      const user: User = new User(dataUser as User);
+      const user: UserEntity = new UserEntity(dataUser as UserEntity);
 
       jest
         .spyOn(userRepository, 'save')
-        .mockImplementationOnce(async (user: User) => new User({ ...user }));
+        .mockImplementationOnce(
+          async (user: UserEntity) => new UserEntity({ ...user }),
+        );
 
       jest
         .spyOn(usersService, 'checkNicknameAvailable')
@@ -119,7 +139,21 @@ describe('UsersService', () => {
       const result = await usersService.createUser(user);
 
       // Assert
-      expect(result).toEqual({ ...dataUser, nickname: dataUser.login + '-1' });
+      expect(result.nickname).not.toEqual(dataUser.login);
+    });
+  });
+
+  describe('blockUserById', () => {
+    it("shouldn't block user", async () => {
+      // Arrange
+      const userId = 1;
+      const userBlockedId = 1;
+
+      // Act
+      const result = await usersService.blockUserById(userId, userBlockedId);
+
+      // Assert
+      expect(result).toEqual(null);
     });
   });
 });

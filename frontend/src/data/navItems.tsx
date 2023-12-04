@@ -2,13 +2,16 @@ import { INavitem } from "../@interfaces";
 
 import {
   LuBarChart2,
-  LuGlobe,
+  LuGamepad2,
+  LuHeart,
   LuHome,
   LuMessagesSquare,
   LuSettings,
   LuUser,
   LuUsers,
 } from "react-icons/lu";
+
+import { TbUsersGroup } from "react-icons/tb";
 
 export const navitems: INavitem[] = [
   {
@@ -26,29 +29,41 @@ export const navitems: INavitem[] = [
   {
     order: 2,
     path: "users",
-    label: "All users",
+    label: "Users",
     icon: <LuUsers />,
   },
   {
     order: 3,
+    path: "friends",
+    label: "Friends",
+    icon: <LuHeart />,
+  },
+  {
+    order: 4,
     path: "leaderboard",
     label: "Leaderboard",
     icon: <LuBarChart2 />,
   },
   {
-    order: 4,
+    order: 5,
     path: "games",
     label: "Games",
-    icon: <LuGlobe />,
-  },
-  {
-    order: 5,
-    path: "chat",
-    label: "Chat",
-    icon: <LuMessagesSquare />,
+    icon: <LuGamepad2 />,
   },
   {
     order: 6,
+    path: "chats",
+    label: "Chats",
+    icon: <LuMessagesSquare />,
+  },
+  {
+    order: 7,
+    path: "channels",
+    label: "Channels",
+    icon: <TbUsersGroup />,
+  },
+  {
+    order: 8,
     path: "settings",
     label: "Settings",
     icon: <LuSettings />,

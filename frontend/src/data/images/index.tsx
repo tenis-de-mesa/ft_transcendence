@@ -30,7 +30,7 @@ const prodImages: Record<image, string> = {
   logoLight:
     "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695391752/transcendence/logo-light.svg",
   demoAvatar:
-    "https://res.cloudinary.com/tailwindcss/image/upload/v1634915122/demoAvatar_jooj6y.png",
+    "https://res.cloudinary.com/dgqelq6lb/image/upload/v1697128089/transcendence/images/avatar0.png",
 
   BR: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695390151/transcendence/BR.svg",
   KR: "https://res.cloudinary.com/dgqelq6lb/image/upload/v1695390151/transcendence/KR.svg",

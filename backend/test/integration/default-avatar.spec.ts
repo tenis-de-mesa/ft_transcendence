@@ -3,18 +3,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmConfigModule } from '../../src/config/typeorm-config.module';
 import { UsersModule } from '../../src/users/users.module';
 import { UsersService } from '../../src/users/users.service';
-import { AuthProvider, User } from '../../src/core/entities';
+import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('Default Avatar', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let s3Client: S3Client;
-  let userEntity: User;
+  let userEntity: UserEntity;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [TypeOrmConfigModule, UsersModule],
+      imports: [EventEmitterModule.forRoot(), TypeOrmConfigModule, UsersModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -73,7 +74,7 @@ describe('Default Avatar', () => {
     expect(s3ClientMock).toBeCalled();
     expect(imageKey).toEqual(user.id + file.originalname);
     expect(user.avatarUrl).toEqual(
-      `https://transcendence-images.s3.amazonaws.com/${imageKey}`,
+      `https://transcendence.s3.amazonaws.com/${imageKey}`,
     );
   });
 });

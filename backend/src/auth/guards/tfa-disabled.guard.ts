@@ -4,16 +4,18 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { User } from '../../core/entities';
+import { UserEntity } from '../../core/entities';
 
 @Injectable()
 export class TwoFactorDisabledGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const user: User = request.user;
+    const user: UserEntity = request.user;
 
     if (user.tfaEnabled) {
-      throw new ForbiddenException('Two factor authentication is enabled');
+      throw new ForbiddenException(
+        'Two factor authentication is already enabled',
+      );
     }
 
     return true;

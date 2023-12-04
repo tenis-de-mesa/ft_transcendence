@@ -3,12 +3,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { SessionsService } from '../sessions/sessions.service';
 import { UsersService } from '../users.service';
-import { Session, UserStatus } from '../../core/entities';
-import * as cookie from 'cookie';
+import { SessionEntity, UserEntity, UserStatus } from '../../core/entities';
+import { User } from '../../core/decorators';
 
 @WebSocketGateway({
   cors: {
@@ -28,49 +29,64 @@ export class StatusGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Called when a client connects to the server
   async handleConnection(client: Socket) {
-    const session = await this.getSession(client);
-    if (!session) return;
-
-    const userId = session.userId;
-    await this.sessionService.updateSession(session.id, {
+    const session: SessionEntity =
+      await this.sessionService.getSessionByClientSocket(client);
+    // If the client is not authenticated, disconnect it
+    if (!session) {
+      return client.disconnect();
+    }
+    // Check if the user id in the auth token matches the user id in the session
+    if (client.handshake.auth.user.id !== session.userId) {
+      return client.disconnect();
+    }
+    // Link the socket id to the session
+    const updateSessionPromise = this.sessionService.updateSession(session.id, {
       socketId: client.id,
     });
-    await this.userService.updateUser(userId, { status: UserStatus.ONLINE });
-    await this.emitUserStatus(userId, UserStatus.ONLINE);
+    // Update the user status to online
+    const updateUserPromise = this.userService.updateUser(session.userId, {
+      status: UserStatus.ONLINE,
+    });
+    await Promise.all([updateSessionPromise, updateUserPromise]);
+    this.emitUserStatus(session.userId, UserStatus.ONLINE);
   }
 
   // Called when a client disconnects from the server
   async handleDisconnect(client: Socket) {
     const session = await this.sessionService.getSessionBySocketId(client.id);
-    if (!session) return;
+    if (!session) {
+      return;
+    }
 
-    const userId = session.userId;
-    this.sessionService.updateSession(session.id, { socketId: null });
-    this.userService.updateUser(userId, { status: UserStatus.OFFLINE });
-    this.emitUserStatus(userId, UserStatus.OFFLINE);
+    const updateSessionPromise = this.sessionService.updateSession(session.id, {
+      socketId: null,
+    });
+    const updateUserPromise = this.userService.updateUser(session.userId, {
+      status: UserStatus.OFFLINE,
+    });
+    await Promise.all([updateSessionPromise, updateUserPromise]);
+
+    this.emitUserStatus(session.userId, UserStatus.OFFLINE);
+  }
+
+  @SubscribeMessage('playerInGame')
+  async handlePlayerInGame(@User() user: UserEntity) {
+    await this.userService.updateUser(user.id, {
+      status: UserStatus.IN_GAME,
+    });
+    this.emitUserStatus(user.id, UserStatus.IN_GAME);
+  }
+
+  @SubscribeMessage('playerLeftGame')
+  async handlePlayerLeftGame(@User() user: UserEntity) {
+    this.userService.updateUser(user.id, {
+      status: UserStatus.ONLINE,
+    });
+    this.emitUserStatus(user.id, UserStatus.ONLINE);
   }
 
   // Emit user status to all clients connected via websocket
   emitUserStatus(userId: number, status: string) {
     this.server.emit('userStatus', { id: userId, status });
-  }
-
-  async getSession(client: Socket): Promise<Session> {
-    const sessionId = this.getSessionId(client);
-    return await this.sessionService.getSessionById(sessionId);
-  }
-
-  getSessionId(client: Socket): string {
-    const cookies = cookie.parse(client.handshake.headers.cookie || '');
-    const sessionCookie = cookies['connect.sid'];
-    return this.extractSessionId(sessionCookie);
-  }
-
-  extractSessionId(sessionId: string): string {
-    if (!sessionId) return '';
-
-    const prefixIndex = sessionId.indexOf(':');
-    const dotIndex = sessionId.indexOf('.');
-    return sessionId.substring(prefixIndex + 1, dotIndex);
   }
 }
