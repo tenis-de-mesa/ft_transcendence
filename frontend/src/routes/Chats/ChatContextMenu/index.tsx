@@ -92,7 +92,7 @@ export default function ChatContextMenu({
                     {
                       action: "update-member-role",
                       method: "POST",
-                    }
+                    },
                   )
                 }
               >

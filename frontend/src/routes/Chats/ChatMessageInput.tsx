@@ -38,7 +38,7 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
     if (currentChat?.type === "direct") {
       const youBlockedUser =
         currentUser?.blockedUsers.find(
-          (user) => currentChat?.users.find((u) => u.userId === user)
+          (user) => currentChat?.users.find((u) => u.userId === user),
         ) !== undefined;
 
       if (youBlockedUser) {
@@ -50,7 +50,7 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
 
       const userBlockedYou =
         currentUser?.blockedBy.find(
-          (user) => currentChat?.users.find((u) => u.userId === user)
+          (user) => currentChat?.users.find((u) => u.userId === user),
         ) !== undefined;
 
       if (userBlockedYou) {
