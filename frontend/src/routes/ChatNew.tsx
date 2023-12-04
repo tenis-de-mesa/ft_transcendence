@@ -24,7 +24,7 @@ export default function ChatNew() {
         <>
           <div></div>
           <div>
-            <Form method="POST" action="/chats">
+            <Form method="POST" action="/chats" autoComplete="off">
               <input type="hidden" name="users[]" value={chatUser.id} />
               <Input
                 type="text"
