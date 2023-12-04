@@ -114,7 +114,7 @@ describe('Two-factor authentication Integration Test Suite', () => {
         // Assert
         expect(response.status).toBe(HttpStatus.FORBIDDEN);
         expect(response.body.message).toBe(
-          'Two factor authentication is enabled',
+          'Two factor authentication is already enabled',
         );
       });
     });
@@ -200,7 +200,7 @@ describe('Two-factor authentication Integration Test Suite', () => {
         // Assert
         expect(response.status).toBe(HttpStatus.FORBIDDEN);
         expect(response.body.message).toBe(
-          'Two factor authentication is enabled',
+          'Two factor authentication is already enabled',
         );
       });
 
