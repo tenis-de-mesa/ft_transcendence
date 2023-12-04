@@ -1,8 +1,8 @@
 import "./Profile.css";
-import { Form, Link, useLoaderData } from "react-router-dom";
+import { Link, useFetcher, useLoaderData } from "react-router-dom";
 import { Game, User } from "../types";
 import { AuthContext } from "../contexts";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { FormEvent, useContext, useEffect, useMemo, useState } from "react";
 import {
   ChatButton,
   Input,
@@ -18,18 +18,44 @@ import { useWebSocket } from "../hooks";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { IoChevronBackOutline } from "react-icons/io5";
+import { LiaUserSlashSolid, LiaUserSolid } from "react-icons/lia";
 
 const columnHelper = createColumnHelper<Game>();
 
 export default function Profile() {
-  const profileUser = useLoaderData() as User;
+  let profileUser = useLoaderData() as User;
   const socket = useWebSocket();
   const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const { Form } = useFetcher();
   const [nickname, setNickname] = useState(currentUser.nickname);
   const [games, setGames] = useState([]);
   const [error, setError] = useState(false);
 
   const isViewingOwnProfile = currentUser.id === profileUser.id;
+
+  if (currentUser.id === profileUser.id) {
+    profileUser = currentUser;
+  }
+
+  const checkUserIsBlocked = (userBlockedId: number) => {
+    return currentUser.blockedUsers.includes(userBlockedId);
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const intent = e.target[0].value;
+
+    if (intent === "block") {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: [...prev.blockedUsers, profileUser.id],
+      }));
+    } else {
+      setCurrentUser((prev) => ({
+        ...prev,
+        blockedUsers: prev.blockedUsers.filter((id) => id !== profileUser.id),
+      }));
+    }
+  };
 
   const flipCard = () => {
     setError(false);
@@ -61,7 +87,7 @@ export default function Profile() {
         },
       }),
     ],
-    [],
+    []
   );
 
   useEffect(() => {
@@ -137,6 +163,38 @@ export default function Profile() {
                 <div className="flex flex-col gap-2 py-4">
                   <ChatButton user={profileUser} />
                   <AddFriendButton user={profileUser} />
+
+                  <Form method="POST" onSubmit={handleSubmit}>
+                    {!profileUser.deletedAt &&
+                      currentUser.id !== profileUser.id &&
+                      (checkUserIsBlocked(profileUser.id) ? (
+                        <Button
+                          className="w-full"
+                          size="md"
+                          variant="success"
+                          title="Unblock"
+                          name="intent"
+                          value="unblock"
+                          LeadingIcon={<LiaUserSolid />}
+                          formAction={`/users/${profileUser.id}/unblock`}
+                        >
+                          Unblock
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full"
+                          size="md"
+                          variant="error"
+                          title="Block"
+                          name="intent"
+                          value="block"
+                          LeadingIcon={<LiaUserSlashSolid />}
+                          formAction={`/users/${profileUser.id}/block`}
+                        >
+                          Block
+                        </Button>
+                      ))}
+                  </Form>
                 </div>
               </>
             </Card.Body>
