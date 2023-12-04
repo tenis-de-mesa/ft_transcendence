@@ -16,19 +16,26 @@ import { UsersModule } from '../../src/users/users.module';
 import { AuthModule } from '../../src/auth/auth.module';
 import { TfaModule } from '../../src/auth/tfa/tfa.module';
 import { AuthenticatedGuard } from '../../src/auth/guards';
-import { AuthProvider, User } from '../../src/core/entities';
+import { AuthProvider, UserEntity } from '../../src/core/entities';
 import { UsersService } from '../../src/users/users.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('Two-factor authentication Integration Test Suite', () => {
   let app: INestApplication;
   let usersService: UsersService;
-  let mockUser: User;
+  let mockUser: UserEntity;
   let tfaSecret: string;
 
   describe('With authenticated user', () => {
     beforeAll(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [TypeOrmConfigModule, UsersModule, AuthModule, TfaModule],
+        imports: [
+          EventEmitterModule.forRoot(),
+          TypeOrmConfigModule,
+          UsersModule,
+          AuthModule,
+          TfaModule,
+        ],
       })
         .overrideGuard(AuthenticatedGuard)
         .useValue({
@@ -552,7 +559,13 @@ describe('Two-factor authentication Integration Test Suite', () => {
   describe('Without authenticated user', () => {
     beforeAll(async () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [TypeOrmConfigModule, UsersModule, AuthModule, TfaModule],
+        imports: [
+          EventEmitterModule.forRoot(),
+          TypeOrmConfigModule,
+          UsersModule,
+          AuthModule,
+          TfaModule,
+        ],
       })
         .overrideGuard(AuthenticatedGuard)
         .useValue({
