@@ -75,12 +75,13 @@ export default function ChatMessageInput({ ...props }: ChatMessageInputProps) {
   }, [userStatus, currentChat, currentUser]);
 
   return (
-    <Form method="POST" onSubmit={handleSubmit}>
+    <Form method="POST" onSubmit={handleSubmit} autoComplete="off">
       <Input
         {...props}
         type="text"
         name="message"
         value={message}
+        autoComplete="off"
         disabled={blocked.isBlocked}
         placeholder={blocked.isBlocked ? blocked.message : "Enter your message"}
         onChange={(e) => setMessage(e.target.value)}
