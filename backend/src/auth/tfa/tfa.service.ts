@@ -29,7 +29,7 @@ export class TfaService {
 
     const otpAuthUrl = authenticator.keyuri(
       user.login,
-      'ft_transcendence', // TODO: Maybe put this in .env
+      'ft_transcendence',
       secret,
     );
 
@@ -93,7 +93,6 @@ export class TfaService {
   }
 
   async tfaGenerateRecoveryCodes(): Promise<TfaRecoveryCodes> {
-    // TODO: Maybe extract hard coded values into constants
     const recoveryCodes = Array(12)
       .fill(0)
       .map(() => crypto.randomBytes(32).toString('hex').slice(0, 12));

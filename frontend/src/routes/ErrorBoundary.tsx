@@ -7,9 +7,6 @@ import { isDark } from "./Root";
 export default function ErrorBoundary() {
   const error = useRouteError();
 
-  // FIXME: Remove this log
-  console.error("ErrorBoundary: ", error);
-
   let status = 500;
   let statusText: string;
 

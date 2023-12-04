@@ -137,8 +137,6 @@ export class ChatsService {
   }
 
   async findOne(id: number): Promise<ChatEntity> {
-    // TODO: filter all data user from only userid
-
     const chat = await this.chatRepository.findOne({
       where: {
         id,

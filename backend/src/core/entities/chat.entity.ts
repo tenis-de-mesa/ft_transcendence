@@ -27,7 +27,7 @@ export class ChatEntity {
   @Column({
     type: 'enum',
     enum: ChatType,
-    default: ChatType.DIRECT, // TODO: Remove default value
+    default: ChatType.DIRECT,
   })
   type: ChatType;
 

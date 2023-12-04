@@ -32,7 +32,7 @@ export default function ChatContextMenu({
   return (
     <menu
       ref={contextMenuRef}
-      // FIXME: For some reason, Tailwind doesn't work for setting top and left
+      // For some reason, Tailwind doesn't work for setting top and left
       className={`flex-col absolute p-2 rounded bg-gray-900 text-white w-[320px] overflow-y-auto
       ${isOpen ? "flex" : "hidden"}`}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}
@@ -92,7 +92,7 @@ export default function ChatContextMenu({
                     {
                       action: "update-member-role",
                       method: "POST",
-                    },
+                    }
                   )
                 }
               >
