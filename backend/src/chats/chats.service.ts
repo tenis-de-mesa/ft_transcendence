@@ -458,6 +458,24 @@ export class ChatsService {
     await this.chatMemberRepository.remove(member);
   }
 
+  async sendMessage(
+    chatId: number,
+    user: UserEntity,
+    content: string,
+  ): Promise<MessageEntity> {
+    if (!content || content.trim().length === 0) {
+      throw new BadRequestException('Message cannot be empty');
+    }
+
+    const chat = await this.findOne(chatId);
+
+    return this.messageRepository.save({
+      chat,
+      content,
+      sender: user,
+    });
+  }
+
   async addMessage(dto: CreateMessageDto): Promise<MessageEntity> {
     const findUserPromise = this.userRepository.findOne({
       relations: { blockedBy: true, blockedUsers: true },

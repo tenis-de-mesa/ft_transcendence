@@ -18,6 +18,7 @@ import {
   AuthenticatedGuard,
   ChannelMemberGuard,
   ChannelRoleGuard,
+  MessageGuard,
 } from '../auth/guards';
 import { ChannelRoles, User } from '../core/decorators';
 import {
@@ -94,6 +95,19 @@ export class ChatsController {
     @Body() dto: UpdateChatDto,
   ): Promise<void> {
     return await this.chatsService.update(id, dto);
+  }
+
+  @Post(':id/send-message')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(ChannelMemberGuard, MessageGuard)
+  async sendMessage(
+    @Param('id', ParseIntPipe) id: number,
+    @User() user: UserEntity,
+    @Body('message') content: string,
+  ): Promise<void> {
+    const message = await this.chatsService.sendMessage(id, user, content);
+
+    this.eventEmitter.emit('chat.newMessage', message);
   }
 
   @Delete(':id/delete')

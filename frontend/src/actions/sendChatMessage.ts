@@ -1,26 +1,41 @@
 import { ActionFunctionArgs } from "react-router-dom";
-import { socket } from "../socket";
-import { NewChatMessage } from "../types";
+import { makeRequest } from "../api";
 
 export async function sendChatMessage({ request, params }: ActionFunctionArgs) {
   const formData = await request.formData();
+  const { id } = params;
+  const { method } = request;
   const message = formData.get("message") as string;
-  const chatId = params.id;
 
-  if (!message) {
-    return null;
+  const conditions = [
+    [!id, "Missing chat ID"],
+    [!method, "Missing method"],
+    [!message, "Missing message"],
+  ];
+
+  const fail = conditions.find(([condition]) => condition);
+
+  if (fail) {
+    return {
+      status: "error",
+      message: fail[1] as string,
+    };
   }
 
-  if (!chatId) {
-    console.error("Missing Chat ID or message");
-    return null;
+  const { error } = await makeRequest(`/chats/${id}/send-message`, {
+    method,
+    body: JSON.stringify({ message }),
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
   }
 
-  const body: NewChatMessage = {
-    chatId: parseInt(chatId),
-    message: message,
+  return {
+    status: "success",
+    message: "Message sent successfully",
   };
-
-  socket.emit("sendChatMessage", body);
-  return null;
 }

@@ -115,19 +115,13 @@ const Game = () => {
       setPowerUp({ x, y, active });
     });
 
-    socket.on("pup", () => {
-      console.log("got power up");
-    });
-
     socket.on("gameOver", (game: Game) => {
-      console.log("Received game over!");
       setGamePaused(false);
       setGameOver(true);
       setGame(game);
     });
 
     socket.on("gamePause", (remainingSeconds: number) => {
-      console.log("Received game pause");
       setGameOver(false);
       setGamePaused(true);
       setRemainingSeconds(remainingSeconds);

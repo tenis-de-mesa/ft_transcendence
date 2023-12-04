@@ -61,7 +61,7 @@ export default function Profile() {
         },
       }),
     ],
-    [],
+    []
   );
 
   useEffect(() => {
@@ -97,8 +97,8 @@ export default function Profile() {
           <Card className="card front">
             <Card.Title>
               <Avatar
-                seed={currentUser.login}
-                src={currentUser.avatarUrl}
+                seed={profileUser.login}
+                src={profileUser.avatarUrl}
                 className="inline mt-5"
               />
             </Card.Title>
@@ -109,7 +109,7 @@ export default function Profile() {
                   variant="h4"
                   className="mb-5"
                 >
-                  {currentUser.nickname}
+                  {profileUser.nickname}
                 </Typography>
                 <Typography customWeight="regular" variant="md">
                   <span className="flex justify-between gap-1">
@@ -157,7 +157,7 @@ export default function Profile() {
                 variant="h4"
                 className="flex justify-center mb-5"
               >
-                {currentUser.nickname}
+                {profileUser.nickname}
               </Typography>
               {error && (
                 <Alert severity="error">

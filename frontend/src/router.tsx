@@ -84,7 +84,7 @@ const router = createBrowserRouter(
         action={loginTFARecover}
       />
       ,
-      <Route path="/login/:provider" loader={providerLogin} />,
+      <Route path="/login/:provider" loader={providerLogin} />
       <Route path="/logout" loader={logout} />,
       <Route element={<RequireAuth />}>
         {/* Protected routes */}
@@ -176,8 +176,8 @@ const router = createBrowserRouter(
         </Route>
       </Route>
       <Route path="*" element={<ErrorBoundary />} />
-    </Route>,
-  ),
+    </Route>
+  )
 );
 
 export default router;
