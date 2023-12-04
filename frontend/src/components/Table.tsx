@@ -14,7 +14,6 @@ import {
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import classNames from "classnames";
-import { Typography } from ".";
 
 export interface TableProps {
   columns: ColumnDef<unknown>[];
@@ -88,35 +87,20 @@ const Table = ({ columns, data, sortBy, pageSize = 9 }: TableProps) => {
           ))}
         </thead>
 
-        {data.length > 0 ? (
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                className="border-b bg-gray-50 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
-                key={row.id}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td className="px-6 py-4" key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        ) : (
-          <tbody className="text-right">
-            <tr>
-              <td>
-                <Typography
-                  variant="md"
-                  className="py-5 text-gray-900 dark:text-gray-500"
-                >
-                  Seems like you don't have any data register to display
-                </Typography>
-              </td>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <tr
+              className="border-b bg-gray-50 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+              key={row.id}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <td className="px-6 py-4" key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
             </tr>
-          </tbody>
-        )}
+          ))}
+        </tbody>
       </table>
 
       <Pagination table={table} />

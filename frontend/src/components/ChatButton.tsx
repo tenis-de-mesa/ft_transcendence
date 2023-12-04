@@ -27,7 +27,7 @@ export function ChatButton({
         size="sm"
         LeadingIcon={<LuMessageSquare />}
       >
-        Send message
+        Message
       </Button>
     </Link>
   );

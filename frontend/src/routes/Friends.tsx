@@ -47,7 +47,8 @@ export default function Friends() {
 
   return (
     <>
-      {/* Don't show the table if there is no data */}
+      <Typography variant="h5">Friends</Typography>
+
       {data.length === 0 ? (
         <div className="grid align-center content-center justify-center h-full">
           <Typography variant="lg" className="text-center">

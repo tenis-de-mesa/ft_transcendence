@@ -48,7 +48,7 @@ export const UserUpdateAvatar = ({ user }: UserFormProps) => {
 
   return (
     <>
-      <div className="inline-block mb-2 hover:cursor-pointer relative">
+      <div className="inline-block mb-2 hover:cursor-pointer relative mt-5">
         <Avatar seed={user.login} src={avatarUrl} className="inline" />
         <div
           className="absolute inset-0 flex justify-end items-end hover:cursor-pointer hover:bg-gray-200 hover:bg-opacity-50 rounded-full"

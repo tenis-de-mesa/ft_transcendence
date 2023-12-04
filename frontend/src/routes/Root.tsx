@@ -32,7 +32,7 @@ export default function Root() {
         <div className="">
           <Sidebar darkMode={isDark} options={navitems} user={currentUser} />
         </div>
-        <div className="w-full h-full py-3 px-10">
+        <div className="w-full h-full py-3 px-10 mt-2">
           <Outlet />
           <Toaster theme="dark" duration={6000} />
           <SocketListener />

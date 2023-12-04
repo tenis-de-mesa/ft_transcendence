@@ -1,5 +1,5 @@
 import "./Profile.css";
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, Link, useLoaderData } from "react-router-dom";
 import { Game, User } from "../types";
 import { AuthContext } from "../contexts";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -12,10 +12,12 @@ import {
   Card,
   AddFriendButton,
   UserUpdateAvatar,
+  Alert,
 } from "../components";
 import { useWebSocket } from "../hooks";
 import Table from "../components/Table";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { IoChevronBackOutline } from "react-icons/io5";
 
 const columnHelper = createColumnHelper<Game>();
 
@@ -25,10 +27,12 @@ export default function Profile() {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const [nickname, setNickname] = useState(currentUser.nickname);
   const [games, setGames] = useState([]);
+  const [error, setError] = useState(false);
 
   const isViewingOwnProfile = currentUser.id === profileUser.id;
 
   const flipCard = () => {
+    setError(false);
     const alternate = document.querySelector(".wrapper");
     if (alternate) {
       alternate.classList.toggle("flipped");
@@ -67,6 +71,12 @@ export default function Profile() {
   }, [socket, profileUser.id]);
 
   const updateNickname = async (nickname: string) => {
+    if (nickname.length > 16) {
+      setError(true);
+      return;
+    }
+    setError(false);
+
     await fetch("http://localhost:3001/users/", {
       method: "POST",
       headers: {
@@ -81,46 +91,26 @@ export default function Profile() {
   };
 
   return (
-    <div className="grid justify-center align-center gap-3 h-full">
+    <div className="grid justify-center align-center h-4/5">
       <div className="grid justify-center align-center w-full h-full flip-card">
-        <div className="wrapper self-center">
+        <div className="wrapper self-center w-96">
           <Card className="card front">
             <Card.Title>
-              <>
-                {isViewingOwnProfile ? (
-                  <>
-                    <Avatar
-                      seed={currentUser.login}
-                      src={currentUser.avatarUrl}
-                      className="inline"
-                    />
-                    <Typography customWeight="regular" variant="h4">
-                      {currentUser.nickname}
-                    </Typography>
-                    <Button
-                      variant="info"
-                      onClick={flipCard}
-                      className="absolute top-0 right-0 p-2 shadow-none"
-                    >
-                      Editar
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Avatar
-                      seed={profileUser.login}
-                      src={profileUser.avatarUrl}
-                      className="inline"
-                    />
-                    <Typography customWeight="regular" variant="h4">
-                      {profileUser.nickname}
-                    </Typography>
-                  </>
-                )}
-              </>
+              <Avatar
+                seed={currentUser.login}
+                src={currentUser.avatarUrl}
+                className="inline mt-5"
+              />
             </Card.Title>
             <Card.Body>
               <>
+                <Typography
+                  customWeight="regular"
+                  variant="h4"
+                  className="mb-5"
+                >
+                  {currentUser.nickname}
+                </Typography>
                 <Typography customWeight="regular" variant="md">
                   <span className="flex justify-between gap-1">
                     <strong>Score:</strong>
@@ -135,6 +125,15 @@ export default function Profile() {
                     {profileUser.loseCount}
                   </span>
                 </Typography>
+                {isViewingOwnProfile && (
+                  <Button
+                    variant="info"
+                    onClick={flipCard}
+                    className="flex justify-center w-full mt-5"
+                  >
+                    Edit profile
+                  </Button>
+                )}
                 <div className="flex flex-col gap-2 py-4">
                   <ChatButton user={profileUser} />
                   <AddFriendButton user={profileUser} />
@@ -143,21 +142,33 @@ export default function Profile() {
             </Card.Body>
           </Card>
           <Card className="card back">
-            <Button
-              variant="info"
+            <div
               onClick={flipCard}
-              className="absolute top-0 left-0 p-2 shadow-none"
+              className="absolute top-1 right-1 p-2 shadow-none cursor-pointer text-white"
             >
-              Voltar
-            </Button>
+              <IoChevronBackOutline size={20} />
+            </div>
             <Card.Title>
               <UserUpdateAvatar user={profileUser} />
             </Card.Title>
             <Card.Body position="left">
+              <Typography
+                customWeight="regular"
+                variant="h4"
+                className="flex justify-center mb-5"
+              >
+                {currentUser.nickname}
+              </Typography>
+              {error && (
+                <Alert severity="error">
+                  Nickname can't be longer than 16 characters
+                </Alert>
+              )}
               <Form>
                 <Input
                   label="Nickname"
                   value={nickname}
+                  error={error}
                   onChange={(e) => setNickname(e.target.value)}
                   placeholder=""
                   type="text"
@@ -166,10 +177,10 @@ export default function Profile() {
                   <Button
                     variant="primary"
                     size="sm"
-                    className="inline m-2"
+                    className="w-full flex justify-center mt-4"
                     onClick={() => updateNickname(nickname)}
                   >
-                    Atualizar
+                    Update
                   </Button>
                 </center>
               </Form>
@@ -178,16 +189,29 @@ export default function Profile() {
         </div>
       </div>
       <div className="max-w-md">
-        {games.length > 0 && (
+        {(games.length > 0 && (
           <>
-            <Typography variant="h6" className="text-center">
-              Latest games
+            <Typography variant="xl" className="text-center">
+              Match history
             </Typography>
             <Table
               columns={columns as ColumnDef<unknown>[]}
               data={games}
               pageSize={4}
             />
+          </>
+        )) || (
+          <>
+            <div className="grid align-center content-center justify-center">
+              <Typography variant="lg" className="text-center">
+                There are no game history yet
+              </Typography>
+              <Link to="/" className="text-center p-3">
+                <Button variant={"info"} size="lg" className="inline">
+                  Go home and start playing!
+                </Button>
+              </Link>
+            </div>
           </>
         )}
       </div>

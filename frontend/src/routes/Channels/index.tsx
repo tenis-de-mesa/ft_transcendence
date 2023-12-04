@@ -37,9 +37,13 @@ export default function Channels() {
   const columns = useMemo<ColumnDef<Chat>[]>(
     () => [
       columnHelper.accessor("id", {
-        header: "#",
+        header: "Channel ID",
         cell: (props) => (
-          <Link to={`/chats/${props.getValue()}`}>{props.getValue()}</Link>
+          <Link to={`/chats/${props.getValue()}`}>
+            <Typography variant="sm" customWeight="bold">
+              {props.getValue()}
+            </Typography>
+          </Link>
         ),
       }),
       columnHelper.accessor("owner", {
@@ -116,7 +120,7 @@ export default function Channels() {
       ) : (
         <>
           <Typography variant="h5" className="mb-6">
-            Leaderboard
+            Channels
           </Typography>
           <Table
             columns={columns as unknown as ColumnDef<unknown>[]}

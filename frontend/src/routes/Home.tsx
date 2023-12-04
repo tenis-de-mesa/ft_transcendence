@@ -34,14 +34,14 @@ export default function Home() {
   }, [socket, inGameQueueVanilla]);
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="">
-        <Typography variant="h5" className="p-5">
-          Welcome, {currentUser.nickname} !
+    <div className="center">
+      <div>
+        <Typography variant="h4" className="p-5">
+          Welcome, {currentUser.nickname}!
         </Typography>
         <Card>
           <Card.Title position="center">
-            <Typography variant="h6">Quick Play Queue</Typography>
+            <Typography variant="h6">Quick Game</Typography>
           </Card.Title>
           <Card.Body className="!px-10 pb-5">
             <div className="flex justify-around gap-5">
@@ -96,15 +96,15 @@ export default function Home() {
         </Card>
 
         {invites.length > 0 && (
-          <Card className="my-5">
+          <Card className="my-5 max-h-96 overflow-scroll no-scrollbar">
             <Card.Title position="center">
               <Typography variant="h6">Game Invites</Typography>
             </Card.Title>
-            <Card.Body className="!px-10" position="left">
+            <Card.Body className="!px-10 pb-10" position="left">
               {invites.map((invite) => {
                 return (
                   <div key={invite.id}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 space-y-2">
                       <Typography variant="md">{invite.nickname}</Typography>
                       <Button
                         variant="info"
