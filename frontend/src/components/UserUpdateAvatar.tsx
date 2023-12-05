@@ -16,7 +16,7 @@ export const UserUpdateAvatar = ({ user }: UserFormProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleImageSelected = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -25,11 +25,14 @@ export const UserUpdateAvatar = ({ user }: UserFormProps) => {
     }
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch("http://localhost:3001/users/avatar", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
+    const response = await fetch(
+      "https://transcendence.ngrok.app/api/users/avatar",
+      {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      }
+    );
     if (!response.ok) {
       setError(response.statusText);
       return;

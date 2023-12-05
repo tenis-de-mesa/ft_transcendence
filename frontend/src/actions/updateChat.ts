@@ -12,7 +12,7 @@ export async function updateChat({ request, params }: ActionFunctionArgs) {
   }
 
   if (chatAccess === "protected") {
-    const verifyURL = `http://localhost:3001/chats/${chatId}/verify`;
+    const verifyURL = `https://transcendence.ngrok.app/api/chats/${chatId}/verify`;
     const verifyBody = { password: currentPassword };
 
     try {
@@ -36,7 +36,7 @@ export async function updateChat({ request, params }: ActionFunctionArgs) {
     }
   }
 
-  const patchURL = `http://localhost:3001/chats/${chatId}`;
+  const patchURL = `https://transcendence.ngrok.app/api/chats/${chatId}`;
   const patchBody = {
     password: newPassword?.length ? newPassword : null,
     access: newPassword?.length ? "protected" : "public",

@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const baseURL = "http://localhost:3001";
+const baseURL = "https://transcendence.ngrok.app";
 
 export const socket = io(baseURL, {
   withCredentials: true,

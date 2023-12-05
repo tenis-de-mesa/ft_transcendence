@@ -45,8 +45,8 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.enableCors({
-    origin: true,
     credentials: true,
+    origin: 'https://transcendence.ngrok.app',
   });
 
   app.useGlobalPipes(new ValidationPipe());

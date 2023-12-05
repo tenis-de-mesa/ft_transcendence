@@ -52,3 +52,10 @@ frontend-sh:
 db-console:
 	docker compose run --rm db \
 		psql -h db -U ${DATABASE_USER} -d ${DATABASE_NAME}
+
+nginx:
+	nginx -p $PWD -c nginx.conf -s reload
+
+ngrok: nginx
+	ngrok http --domain=transcendence.ngrok.app 8080
+
