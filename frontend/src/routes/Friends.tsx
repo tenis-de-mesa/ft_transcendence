@@ -62,9 +62,6 @@ export default function Friends() {
         </div>
       ) : (
         <>
-          <Typography variant="h5" className="mb-6">
-            Friends
-          </Typography>
           <Table
             columns={columns as unknown as ColumnDef<unknown>[]}
             data={data as unknown as Data[]}
