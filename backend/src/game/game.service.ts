@@ -141,6 +141,9 @@ export class GameService {
   }
 
   configurePowerUps(gameId: number) {
+    if (!this.gamesInMemory[gameId]) {
+      return;
+    }
     this.gamesInMemory[gameId].powerUp = new PowerUp(
       this.gamesInMemory[gameId].windowWidth,
       this.gamesInMemory[gameId].windowHeight,
@@ -195,6 +198,10 @@ export class GameService {
   }
 
   async pauseGame(gameId: number) {
+    if (!this.gamesInMemory[gameId]) {
+      return;
+    }
+
     this.gamesInMemory[gameId].status = GameStatus.PAUSE;
 
     const playerOneUser = this.gamesInMemory[gameId].playerOne.user;
@@ -211,6 +218,11 @@ export class GameService {
       .emit('gamePause', (maxTime - currentTime) / 1000);
 
     const interval = setInterval(() => {
+      if (!this.gamesInMemory[gameId]) {
+        clearInterval(interval);
+        return;
+      }
+
       if (this.gamesInMemory[gameId].status != GameStatus.PAUSE) {
         clearInterval(interval);
         return;
@@ -242,6 +254,9 @@ export class GameService {
   }
 
   async unpauseGame(gameId: number) {
+    if (!this.gamesInMemory[gameId]) {
+      return;
+    }
     this.gamesInMemory[gameId].status = GameStatus.START;
     await this.gameRepository.update(gameId, { status: GameStatus.START });
   }
