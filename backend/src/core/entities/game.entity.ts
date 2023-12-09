@@ -23,7 +23,7 @@ export class GameEntity {
   @Column({ default: 0 })
   playerTwoScore: number;
 
-  @Column({ default: 10 })
+  @Column({ default: 5 })
   maxScore: number;
 
   @Column({ default: false })
