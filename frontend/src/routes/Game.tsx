@@ -130,11 +130,10 @@ const Game = () => {
     socket.emit("playerInGame");
 
     return () => {
+      window.removeEventListener("keydown", handleKeyDown);
       socket.off("updatePlayerPosition");
       socket.off("updateBallPosition");
       socket.off("updatePowerUp");
-      socket.off("pup");
-      window.removeEventListener("keydown", handleKeyDown);
       socket.emit("playerLeftGame");
       socket.emit("leaveGame", game.id);
     };

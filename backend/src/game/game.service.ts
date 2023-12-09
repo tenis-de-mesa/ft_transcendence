@@ -88,10 +88,10 @@ export class GameService {
     userOne: UserEntity,
     userTwo: UserEntity,
   ): GameRoom {
-    const maxScore = this.gamesInMemory[gameId]?.maxScore ?? 10;
+    const maxScore = this.gamesInMemory[gameId]?.maxScore ?? 5;
     const playerOneScore = this.gamesInMemory[gameId]?.playerOne.score ?? 0;
     const playerTwoScore = this.gamesInMemory[gameId]?.playerTwo.score ?? 0;
-    const powerUp = this.gamesInMemory[gameId]?.powerUp;
+    const powerUp = this.gamesInMemory[gameId]?.powerUp ?? undefined;
     const status = this.gamesInMemory[gameId]?.status ?? GameStatus.START;
 
     const windowWidth = 700;
@@ -357,7 +357,6 @@ export class GameService {
           game.ball.radius + game.powerUp.radius;
         if (powerUpHit) {
           game.powerUp.activate(game);
-          this.server?.to(`game:${game.gameId}`).emit('pup');
         }
 
         this.server?.to(`game:${game.gameId}`).emit('updatePowerUp', {
@@ -526,20 +525,15 @@ export class GameService {
     const movementfactor = 20;
 
     if (body.up) {
-      if (player.paddle.y < 10) {
+      if (player.paddle.y < 20) {
         player.paddle.y = 0;
       } else {
         player.paddle.y -= movementfactor;
       }
     }
     if (body.down) {
-      let deltaPaddleSize = 100;
-      if (powerUp?.powerUp == 'paddle') {
-        deltaPaddleSize = 200;
-      }
-
-      if (player.paddle.y > windowHeight - deltaPaddleSize - 10) {
-        player.paddle.y = windowHeight - deltaPaddleSize;
+      if (player.paddle.y > windowHeight - player.paddle.height - 20) {
+        player.paddle.y = windowHeight - player.paddle.height;
       } else {
         player.paddle.y += movementfactor;
       }
