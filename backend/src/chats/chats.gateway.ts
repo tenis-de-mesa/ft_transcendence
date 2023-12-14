@@ -24,7 +24,7 @@ interface NewChatMessage {
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'https://transcendence.ngrok.app',
     credentials: true,
   },
   cookie: true,

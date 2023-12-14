@@ -20,7 +20,7 @@ export default function Login() {
           </Card.Title>
           <Card.Body className="flex flex-col gap-2 pt-0 pb-6">
             <div className="flex flex-col gap-1 pt-4">
-              <Link to={"/login/intra"}>
+              <a href={"/api/auth/login/intra"}>
                 <Button
                   variant="info"
                   LeadingIcon={<img src={images.logoLight} width={20} />}
@@ -28,8 +28,8 @@ export default function Login() {
                 >
                   <Typography variant="md">Login with 42</Typography>
                 </Button>
-              </Link>
-              <Link to={"/login/guest"}>
+              </a>
+              <a href={"/api/auth/login/guest"}>
                 <Button
                   variant="info"
                   LeadingIcon={<FaUserSecret size={20} />}
@@ -37,7 +37,7 @@ export default function Login() {
                 >
                   <Typography variant="md">Play anonymously</Typography>
                 </Button>
-              </Link>
+              </a>
             </div>
           </Card.Body>
         </Card>

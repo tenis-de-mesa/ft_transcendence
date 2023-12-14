@@ -7,7 +7,7 @@ import { AuthContext } from "../contexts";
 export const AddFriendButton = ({ user }: { user: User }) => {
   const { currentUser } = useContext(AuthContext);
   const [isFriend, setIsFriend] = useState(
-    user.friends.some((friend) => friend.id === currentUser.id),
+    user.friends.some((friend) => friend.id === currentUser.id)
   );
 
   // Don't show a button to add yourself
@@ -17,14 +17,17 @@ export const AddFriendButton = ({ user }: { user: User }) => {
   }
 
   const handleAddFriend = async (userId: number) => {
-    const response = await fetch(`http://localhost:3001/users/friends`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ friendId: userId }),
-    });
+    const response = await fetch(
+      `https://transcendence.ngrok.app/api/users/friends`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ friendId: userId }),
+      }
+    );
     if (response.ok) {
       setIsFriend(true);
     } else {
@@ -35,11 +38,11 @@ export const AddFriendButton = ({ user }: { user: User }) => {
 
   const handleRemoveFriend = async (userId: number) => {
     const response = await fetch(
-      `http://localhost:3001/users/friends/${userId}`,
+      `https://transcendence.ngrok.app/api/users/friends/${userId}`,
       {
         method: "DELETE",
         credentials: "include",
-      },
+      }
     );
     if (response.ok) {
       setIsFriend(false);

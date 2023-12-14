@@ -40,7 +40,7 @@ export default function NewChannelCard() {
 
   // Fetch users when component mounts
   useEffect(() => {
-    fetch(`http://localhost:3001/users/`, {
+    fetch(`https://transcendence.ngrok.app/api/users/`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -53,8 +53,8 @@ export default function NewChannelCard() {
   useEffect(() => {
     setFilteredUsers(
       users.filter((user) =>
-        user.nickname.toLowerCase().includes(searchTerm.toLowerCase()),
-      ),
+        user.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     );
   }, [searchTerm, users]);
 

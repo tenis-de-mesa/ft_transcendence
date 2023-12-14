@@ -4,7 +4,7 @@ export async function createChat({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const userIds: number[] = formData.getAll("users[]").map((id) => Number(id));
   const message = formData.get("message");
-  const url = "http://localhost:3001/chats";
+  const url = "https://transcendence.ngrok.app/api/chats";
   const body = {
     userIds,
     type: "direct",

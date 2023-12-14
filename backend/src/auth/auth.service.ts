@@ -26,7 +26,7 @@ export class AuthService {
     const user = req.user as UserEntity;
 
     if (!user) {
-      res.redirect('back');
+      res.redirect('https://transcendence.ngrok.app/');
       return;
     }
 

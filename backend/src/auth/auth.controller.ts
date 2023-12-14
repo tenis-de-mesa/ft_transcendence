@@ -17,16 +17,16 @@ export class AuthController {
     @User() user: UserEntity,
   ): Promise<void> {
     if (user.tfaEnabled && !session.tfaAuthenticated) {
-      res.redirect('http://localhost:3000/login/tfa-check');
+      res.redirect('https://transcendence.ngrok.app/login/tfa-check');
     }
-    res.redirect('back');
+    res.redirect('https://transcendence.ngrok.app/');
   }
 
   @Get('login/guest')
   @UseGuards(GuestGuard)
   async loginAsGuest(@Req() req: Request, @Res() res: Response): Promise<void> {
     req.session.cookie.maxAge = null; // end-of-connection
-    res.redirect('back');
+    res.redirect('https://transcendence.ngrok.app/');
   }
 
   @Get('logout')

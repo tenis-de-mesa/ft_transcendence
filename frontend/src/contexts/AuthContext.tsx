@@ -15,14 +15,18 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response: Response = await fetch(`http://localhost:3001/users/me`, {
-        credentials: "include",
-      });
+      const response: Response = await fetch(
+        `https://transcendence.ngrok.app/api/users/me`,
+        {
+          credentials: "include",
+        }
+      );
       if (!response.ok) {
         setIsLoading(false);
         return null;
       }
       const user = await response.json();
+      console.log(user);
       setCurrentUser(user);
       setIsLoading(false);
     };

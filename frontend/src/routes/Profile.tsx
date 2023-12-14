@@ -103,7 +103,7 @@ export default function Profile() {
     }
     setError(false);
 
-    await fetch("http://localhost:3001/users/", {
+    await fetch("https://transcendence.ngrok.app/api/users", {
       method: "POST",
       headers: {
         Accept: "application/json",

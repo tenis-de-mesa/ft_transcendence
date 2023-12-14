@@ -87,7 +87,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           {
             block: isOpen,
             hidden: !isOpen,
-          },
+          }
         )}
       ></div>
 
@@ -101,7 +101,7 @@ export const Sidebar: FC<ISidebarProps> = ({
           "shadow-xl",
           "z-[999] w-[16rem] max-w-[16rem] h-full top-0 left-0 md:relative fixed",
           "border-r border-gray-100 dark:border-opacity-10",
-          className,
+          className
         )}
       >
         <div
@@ -109,7 +109,7 @@ export const Sidebar: FC<ISidebarProps> = ({
             "flex ml-3 py-2 mt-5 mb-4 transform ease-out duration-100",
             {
               "px-5": isOpen,
-            },
+            }
           )}
         >
           <img
@@ -126,7 +126,7 @@ export const Sidebar: FC<ISidebarProps> = ({
               {
                 "opacity-100 delay-150": isOpen,
                 "opacity-0 delay-0": !isOpen,
-              },
+              }
             )}
             customWeight="medium"
           >
@@ -140,7 +140,7 @@ export const Sidebar: FC<ISidebarProps> = ({
               className={classNames(
                 "absolute top-0 flex items-center justify-center",
                 "w-8 h-8",
-                "bg-gray-800 rounded-full cursor-pointer -right-3",
+                "bg-gray-800 rounded-full cursor-pointer -right-3"
               )}
               onClick={() => !isTab && setIsOpen(!isOpen)}
             >
@@ -159,7 +159,7 @@ export const Sidebar: FC<ISidebarProps> = ({
               "whitespace-nowrap px-2.5 py-5 overflow-x-hidden no-scrollbar",
               {
                 "h-[60%]": isMob,
-              },
+              }
             )}
           >
             {options.map((item) => (
@@ -196,11 +196,12 @@ export const Sidebar: FC<ISidebarProps> = ({
                 >
                   {user.nickname}
                 </Typography>
-                <LuLogOut
-                  size={20}
-                  className="text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer hover:text-primary-400"
-                  onClick={() => navigate("/logout", { replace: true })}
-                />
+                <a href="/api/auth/logout">
+                  <LuLogOut
+                    size={20}
+                    className="text-gray-400 transition ease-in delay-300 opacity-100 cursor-pointer hover:text-primary-400"
+                  />
+                </a>
               </div>
               <Typography
                 variant="xs"

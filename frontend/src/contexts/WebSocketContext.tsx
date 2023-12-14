@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { Socket, io } from "socket.io-client";
 
-const baseURL = "http://localhost:3001";
+const baseURL = "https://transcendence.ngrok.app";
 
 export const WebSocketContext = createContext({} as Socket);
 

@@ -58,7 +58,7 @@ export class EnvironmentConfigService
   getRedirectURL(): string {
     return this.configService.get<string>(
       'INTRA_REDIRECT_URL',
-      'http://localhost:3001',
+      'https://transcendence.ngrok.app/api',
     );
   }
 

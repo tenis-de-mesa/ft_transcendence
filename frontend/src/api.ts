@@ -1,4 +1,4 @@
-const baseURL = "http://localhost:3001";
+const baseURL = "https://transcendence.ngrok.app/api";
 
 export interface APIError {
   message: string;
